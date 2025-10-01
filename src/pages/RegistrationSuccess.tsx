@@ -48,11 +48,10 @@ const RegistrationSuccess = () => {
       toast.error("Please enter a valid 10-digit mobile number");
       return;
     }
-    toast.success("Hall ticket downloaded successfully!");
-    // Simulate PDF download
-    setTimeout(() => {
-      toast.info("Check your downloads folder");
-    }, 1000);
+    
+    // Navigate to login page with mobile number
+    navigate(`/login?mobile=${mobile}`);
+    toast.success("Redirecting to download hall ticket...");
   };
 
   const handleWhatsAppShare = () => {
