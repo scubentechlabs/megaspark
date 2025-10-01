@@ -11,10 +11,11 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: "Home", href: "#home" },
-    { label: "Participants", href: "#participants" },
-    { label: "Category", href: "#category" },
-    { label: "Contact", href: "#contact" },
+    { label: "Home", href: "#" },
+    { label: "Benefits", href: "#benefits" },
+    { label: "Eligibility", href: "#eligibility" },
+    { label: "Registration", href: "#registration-section" },
+    { label: "FAQ", href: "#faq" },
   ];
 
   return (
