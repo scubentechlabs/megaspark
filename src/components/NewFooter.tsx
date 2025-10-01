@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export const NewFooter = () => {
   return (
@@ -6,7 +7,7 @@ export const NewFooter = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="text-2xl font-bold mb-4 text-primary">P.P. SAVANI CFE</h3>
+            <img src={logo} alt="P.P. SAVANI Centre for Excellence" className="h-12 md:h-14 w-auto mb-4" />
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Centre for Excellence - IIT-JEE | NEET | CA-CS Foundation. Empowering students through accessible education.
             </p>
