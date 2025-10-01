@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NewHeader } from "@/components/NewHeader";
 import { NewHero } from "@/components/NewHero";
 import { BenefitsSection } from "@/components/BenefitsSection";
-import { Categories } from "@/components/Categories";
+import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { About } from "@/components/About";
 import { Newsletter } from "@/components/Newsletter";
 import { NewFooter } from "@/components/NewFooter";
@@ -16,7 +16,7 @@ const Index = () => {
       <NewHeader onRegisterClick={() => setShowRegistrationForm(true)} />
       <NewHero onRegisterClick={() => setShowRegistrationForm(true)} />
       <BenefitsSection />
-      <Categories />
+      <ExamDatesVenue />
       <About />
       <Newsletter />
       <NewFooter />
