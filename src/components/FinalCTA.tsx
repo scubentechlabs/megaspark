@@ -32,7 +32,7 @@ export const FinalCTA = ({ onRegisterClick }: FinalCTAProps) => {
             onClick={onRegisterClick}
             className="text-lg px-8 py-6 h-auto group shadow-lg hover:shadow-xl transition-all"
           >
-            Register Now for ₹50
+            Register Now
             <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
           </Button>
           
