@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Users, Download, Sparkles } from "lucide-react";
-import studentHero from "@/assets/student-hero-transparent.png";
+import studentHero from "@/assets/student-hero-final.png";
 import { useEffect, useState } from "react";
 
 interface NewHeroProps {
