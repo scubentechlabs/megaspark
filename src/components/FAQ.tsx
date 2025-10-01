@@ -7,36 +7,36 @@ import {
 
 const faqs = [
   {
-    question: "Who is eligible to apply for this scholarship?",
-    answer: "Students with a minimum GPA of 3.5, demonstrating financial need, and showing leadership potential are eligible. You must be a citizen or permanent resident and enrolled (or planning to enroll) in an accredited university."
+    question: "Who can apply for the Mega Spark Exam?",
+    answer: "Students from Class 5 to Class 12 studying in any recognized school can apply. The exam is open to all students who wish to compete for scholarships and showcase their academic excellence across multiple subjects."
   },
   {
-    question: "What does the scholarship cover?",
-    answer: "The scholarship provides full tuition coverage for your entire degree program, mentorship opportunities, career development support, and access to exclusive networking events and international exposure programs."
+    question: "What is the syllabus for the exam?",
+    answer: "The syllabus is based on the respective class curriculum covering Mathematics, Science, English, and General Knowledge. Detailed syllabus for each class can be downloaded from our study material section. The exam focuses on conceptual understanding and application skills."
   },
   {
-    question: "When is the application deadline?",
-    answer: "Applications must be submitted by May 31, 2025. Late applications will not be considered. We recommend submitting your application at least one week early to avoid any technical issues."
+    question: "Is the ₹50 registration fee refundable?",
+    answer: "No, the ₹50 registration fee is non-refundable as it covers administrative costs, exam materials, and logistics. However, this nominal fee ensures your seat is confirmed for the exam and you receive all study materials and updates."
   },
   {
-    question: "How are recipients selected?",
-    answer: "Selection is based on academic excellence, leadership potential, financial need, and the quality of your personal statement. Our review committee evaluates applications holistically, considering all aspects of your profile."
+    question: "How will scholarships be distributed?",
+    answer: "Scholarships will be awarded based on exam performance and merit. Top performers in each category will receive scholarships ranging from ₹10,000 to ₹1,00,000. Results will be announced within 30 days of the exam, and scholarships will be directly credited to the winners' accounts or applied to their school fees."
   },
   {
-    question: "Can I apply if I already have another scholarship?",
-    answer: "Yes, you can apply even if you have other scholarships, as long as they are not full scholarships from other organizations. However, you must disclose all other financial aid in your application."
+    question: "What is the exam format and duration?",
+    answer: "The exam consists of multiple-choice questions (MCQs) and will be conducted in offline mode at designated centers. Duration varies by class: Classes 5-7 (90 minutes), Classes 8-10 (120 minutes), and Classes 11-12 (150 minutes)."
   },
   {
-    question: "Is the scholarship renewable?",
-    answer: "Yes, the scholarship is renewable annually throughout your degree program, provided you maintain a minimum GPA of 3.3 and meet the program's academic and ethical standards."
+    question: "Can I change my exam center after registration?",
+    answer: "Yes, you can request an exam center change up to 7 days before the exam date by contacting our support team. Changes are subject to seat availability at the requested center."
   },
   {
-    question: "What documents do I need to submit?",
-    answer: "You'll need to submit your academic transcripts, two letters of recommendation, proof of financial need, and your personal statement. Additional documents may be requested during the interview phase."
+    question: "Will I receive a hall ticket?",
+    answer: "Yes, your hall ticket will be available for download after successful payment confirmation. You can also generate it from the registration success page by entering your registered mobile number. Please bring a printed copy of your hall ticket on exam day."
   },
   {
-    question: "When will I know if I've been selected?",
-    answer: "The shortlist will be announced on June 15, 2025. Selected candidates will be invited for interviews in early July, and final results will be published on August 1, 2025."
+    question: "What should I bring on the exam day?",
+    answer: "You must bring your hall ticket, a valid student ID card or school ID, two blue/black pens, a pencil, eraser, and a geometry box (if required for your class). Electronic devices including calculators and mobile phones are strictly prohibited."
   }
 ];
 
@@ -50,7 +50,7 @@ export const FAQ = () => {
               Frequently Asked Questions
             </h2>
             <p className="text-xl text-muted-foreground">
-              Find answers to common questions about the scholarship program
+              Find answers to common questions about the Mega Spark Exam
             </p>
           </div>
 
@@ -77,12 +77,12 @@ export const FAQ = () => {
             </p>
             <p className="text-muted-foreground">
               Contact us at{" "}
-              <a href="mailto:scholarships@example.com" className="text-primary hover:underline font-medium">
-                scholarships@example.com
+              <a href="mailto:info@ppsavani.edu.in" className="text-primary hover:underline font-medium">
+                info@ppsavani.edu.in
               </a>
               {" "}or call{" "}
-              <a href="tel:+15551234567" className="text-primary hover:underline font-medium">
-                +1 (555) 123-4567
+              <a href="tel:+919876543210" className="text-primary hover:underline font-medium">
+                +91 98765 43210
               </a>
             </p>
           </div>

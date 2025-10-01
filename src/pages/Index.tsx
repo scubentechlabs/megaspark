@@ -6,6 +6,7 @@ import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
 import { RegistrationSection } from "@/components/RegistrationSection";
+import { FAQ } from "@/components/FAQ";
 import { NewFooter } from "@/components/NewFooter";
 
 const Index = () => {
@@ -22,6 +23,7 @@ const Index = () => {
       <EligibilityCriteria />
       <DownloadGuide />
       <RegistrationSection />
+      <FAQ />
       <NewFooter />
     </main>
   );
