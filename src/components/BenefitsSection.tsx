@@ -124,12 +124,6 @@ export const BenefitsSection = () => {
             );
           })}
         </div>
-
-        <div className="text-center mt-12">
-          <p className="text-sm text-muted-foreground italic">
-            💡 Hover over cards to discover more details
-          </p>
-        </div>
       </div>
 
       <style>{`
