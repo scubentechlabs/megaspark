@@ -53,15 +53,12 @@ export default {
         },
       },
       backgroundImage: {
-        'gradient-hero': 'var(--gradient-hero)',
-        'gradient-card': 'var(--gradient-card)',
+        'gradient-blob': 'var(--gradient-blob)',
+        'dot-pattern': 'var(--dot-pattern)',
       },
       boxShadow: {
-        'lg': 'var(--shadow-lg)',
-        'xl': 'var(--shadow-xl)',
-      },
-      transitionTimingFunction: {
-        'smooth': 'var(--transition-smooth)',
+        'card': 'var(--shadow-card)',
+        'hover': 'var(--shadow-hover)',
       },
       borderRadius: {
         lg: "var(--radius)",

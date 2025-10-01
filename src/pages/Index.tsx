@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
-import { Benefits } from "@/components/Benefits";
-import { Eligibility } from "@/components/Eligibility";
-import { Timeline } from "@/components/Timeline";
-import { FAQ } from "@/components/FAQ";
-import { Footer } from "@/components/Footer";
+import { NewHeader } from "@/components/NewHeader";
+import { NewHero } from "@/components/NewHero";
+import { Categories } from "@/components/Categories";
+import { About } from "@/components/About";
+import { Newsletter } from "@/components/Newsletter";
+import { NewFooter } from "@/components/NewFooter";
 import { RegistrationForm } from "@/components/RegistrationForm";
 
 const Index = () => {
@@ -13,21 +12,12 @@ const Index = () => {
 
   return (
     <main className="min-h-screen">
-      <Header onRegisterClick={() => setShowRegistrationForm(true)} />
-      <Hero onRegisterClick={() => setShowRegistrationForm(true)} />
-      <section id="benefits">
-        <Benefits />
-      </section>
-      <section id="eligibility">
-        <Eligibility />
-      </section>
-      <section id="timeline">
-        <Timeline />
-      </section>
-      <section id="faq">
-        <FAQ />
-      </section>
-      <Footer />
+      <NewHeader onRegisterClick={() => setShowRegistrationForm(true)} />
+      <NewHero onRegisterClick={() => setShowRegistrationForm(true)} />
+      <Categories />
+      <About />
+      <Newsletter />
+      <NewFooter />
       
       {showRegistrationForm && (
         <RegistrationForm onClose={() => setShowRegistrationForm(false)} />

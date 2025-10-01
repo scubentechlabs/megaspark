@@ -8,25 +8,25 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 20% 15%;
+    --background: 248 60% 95%;
+    --foreground: 240 10% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 240 10% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
+    --popover-foreground: 240 10% 20%;
 
-    --primary: 217 91% 45%;
+    --primary: 35 91% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 20% 15%;
+    --secondary: 246 45% 80%;
+    --secondary-foreground: 240 10% 20%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 248 50% 92%;
+    --muted-foreground: 240 10% 45%;
 
-    --accent: 262 83% 58%;
+    --accent: 246 60% 65%;
     --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 36%;
@@ -35,41 +35,39 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 45%;
+    --border: 248 40% 88%;
+    --input: 248 40% 88%;
+    --ring: 35 91% 58%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 45%) 0%, hsl(262 83% 58%) 100%);
-    --gradient-card: linear-gradient(to bottom, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
+    --gradient-blob: linear-gradient(135deg, hsl(246 60% 65%) 0%, hsl(246 80% 75%) 100%);
+    --dot-pattern: radial-gradient(circle, hsl(246 50% 85%) 1px, transparent 1px);
     
-    --shadow-lg: 0 10px 40px -10px hsl(217 91% 45% / 0.2);
-    --shadow-xl: 0 20px 60px -15px hsl(217 91% 45% / 0.3);
-    
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-card: 0 4px 20px -2px hsl(246 60% 65% / 0.15);
+    --shadow-hover: 0 8px 30px -4px hsl(246 60% 65% / 0.25);
   }
 
   .dark {
-    --background: 220 25% 8%;
-    --foreground: 220 14% 95%;
+    --background: 240 25% 12%;
+    --foreground: 248 20% 95%;
 
-    --card: 220 20% 12%;
-    --card-foreground: 220 14% 95%;
+    --card: 240 20% 16%;
+    --card-foreground: 248 20% 95%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 220 14% 95%;
+    --popover: 240 20% 16%;
+    --popover-foreground: 248 20% 95%;
 
-    --primary: 217 91% 55%;
+    --primary: 35 91% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 15% 18%;
-    --secondary-foreground: 220 14% 95%;
+    --secondary: 246 45% 30%;
+    --secondary-foreground: 248 20% 95%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 65%;
+    --muted: 240 20% 20%;
+    --muted-foreground: 248 10% 65%;
 
-    --accent: 262 83% 65%;
+    --accent: 246 60% 55%;
     --accent-foreground: 0 0% 100%;
 
     --success: 142 76% 45%;
@@ -78,9 +76,9 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 217 91% 55%;
+    --border: 240 20% 25%;
+    --input: 240 20% 25%;
+    --ring: 35 91% 58%;
   }
 }
 
@@ -91,5 +89,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background-image: var(--dot-pattern);
+    background-size: 20px 20px;
   }
 }
