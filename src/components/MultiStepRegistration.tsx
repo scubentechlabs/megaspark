@@ -9,6 +9,7 @@ import { ExamPreferencesStep } from "./registration/ExamPreferencesStep";
 import { PaymentStep } from "./registration/PaymentStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MultiStepRegistrationProps {
   onClose: () => void;
@@ -66,16 +67,43 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     }
   };
 
-  const handlePaymentComplete = () => {
-    console.log("Registration completed:", formData);
-    toast.success("Payment Successful!", {
-      description: "Redirecting to confirmation page..."
-    });
-    
-    // Redirect to success page after 2 seconds
-    setTimeout(() => {
-      navigate("/registration-success");
-    }, 2000);
+  const handlePaymentComplete = async () => {
+    try {
+      // Generate registration number
+      const registrationNumber = `REG${Date.now()}`;
+      
+      // Save to database
+      const { data, error } = await supabase
+        .from('registrations')
+        .insert({
+          student_name: `${formData.studentFirstName} ${formData.studentLastName}`,
+          email: formData.studentEmail,
+          mobile_number: formData.studentPhone,
+          standard: formData.standard,
+          medium: formData.medium,
+          exam_center: formData.examCenter || 'To be announced',
+          registration_number: registrationNumber
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log("Registration saved:", data);
+      toast.success("Registration Successful!", {
+        description: "Your exam registration has been completed."
+      });
+      
+      // Redirect to success page after 2 seconds
+      setTimeout(() => {
+        navigate("/registration-success");
+      }, 2000);
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast.error("Registration Failed", {
+        description: error.message || "Please try again."
+      });
+    }
   };
 
   return (
