@@ -1,13 +1,51 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Users, Building } from "lucide-react";
+import { BookOpen, Users, Download, Sparkles } from "lucide-react";
 import studentHero from "@/assets/student-hero.png";
+import { useEffect, useState } from "react";
 
 interface NewHeroProps {
   onRegisterClick: () => void;
 }
 
 export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const targetDate = new Date('2025-12-07T00:00:00').getTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleDownloadGuide = () => {
+    const guideSection = document.getElementById('about');
+    if (guideSection) {
+      guideSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section id="home" className="py-20 relative overflow-hidden">
       <div className="container mx-auto px-4">
@@ -15,55 +53,90 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           {/* Left Content */}
           <div className="space-y-8 animate-fade-in">
             <div>
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                Free{" "}
-                <span className="text-primary">Scholarships</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
+                <Sparkles className="h-4 w-4 text-accent animate-pulse" />
+                <span className="text-sm font-semibold text-accent">Mega Spark Exam 2025</span>
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                Win Scholarships Worth{" "}
+                <span className="text-accent">₹75 Crore</span>
                 <br />
-                For Every Bright
-                <br />
-                Student
+                <span className="text-primary">Mega Spark Exam 2025</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
-                Get free scholarships for every level of education that every student who achieves 
-                a bright future can get
+                The exam that opens doors to learning, growth, and limitless possibilities.
               </p>
+            </div>
+
+            {/* Countdown Timer */}
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-card">
+              <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
+                Exam Starts In:
+              </p>
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { value: timeLeft.days, label: 'Days' },
+                  { value: timeLeft.hours, label: 'Hours' },
+                  { value: timeLeft.minutes, label: 'Minutes' },
+                  { value: timeLeft.seconds, label: 'Seconds' }
+                ].map((item, idx) => (
+                  <div key={idx} className="text-center">
+                    <div className="bg-gradient-to-br from-primary to-accent text-white rounded-xl p-3 mb-2">
+                      <div className="text-3xl font-bold">{String(item.value).padStart(2, '0')}</div>
+                    </div>
+                    <div className="text-xs text-muted-foreground font-medium">{item.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-4 items-center">
               <Button
                 size="lg"
                 onClick={onRegisterClick}
-                className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 py-6 text-lg font-semibold"
+                className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 py-6 text-lg font-semibold shadow-hover"
               >
-                Submission
+                Register Now
               </Button>
-              <button className="text-foreground font-medium hover:text-primary transition-colors">
-                How to apply submission?
-              </button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={handleDownloadGuide}
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full px-8 py-6 text-lg font-semibold"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download Guide
+              </Button>
             </div>
           </div>
 
           {/* Right Content - Student Image with Blob */}
           <div className="relative">
-            {/* Navy Blob Background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm" />
+            {/* Navy Blob Background with Sparkle Effect */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm animate-pulse" />
+            
+            {/* Glowing Sparkle Effects */}
+            <div className="absolute top-10 right-10 w-4 h-4 bg-accent rounded-full animate-ping" />
+            <div className="absolute top-32 right-20 w-3 h-3 bg-primary rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
+            <div className="absolute bottom-32 right-16 w-4 h-4 bg-accent rounded-full animate-ping" style={{ animationDelay: '1s' }} />
             
             {/* Student Image */}
             <div className="relative z-10 flex justify-center">
               <img
                 src={studentHero}
-                alt="Student holding folder"
+                alt="Student celebrating success"
                 className="w-full max-w-md object-contain"
               />
             </div>
 
             {/* Floating Icons */}
             <div className="absolute top-20 left-10 w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-bounce">
-              <BookOpen className="h-8 w-8 text-primary" />
+              <Sparkles className="h-8 w-8 text-accent" />
             </div>
             
             <div className="absolute bottom-20 left-0 w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <Users className="h-8 w-8 text-accent" />
+              <BookOpen className="h-8 w-8 text-accent" />
             </div>
           </div>
         </div>
@@ -71,32 +144,32 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
         {/* Stats Card - Top Right */}
         <Card className="absolute top-8 right-8 p-6 shadow-hover hidden xl:block max-w-xs border-2 border-primary/10">
           <div className="mb-4">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wide">Platform</span>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wide flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Scholarship Stats
+            </span>
             <h3 className="text-xl font-bold mt-1 text-primary">
-              An <span className="text-accent">Educational</span> Service
-              <br />
-              With Rapid Development
+              Empowering <span className="text-accent">Students</span> Across India
             </h3>
           </div>
           
           <div className="space-y-4">
             <div>
-              <div className="text-3xl font-bold text-primary">1050+</div>
-              <div className="text-sm text-muted-foreground">Scholarship</div>
+              <div className="text-3xl font-bold text-accent">₹75 Cr</div>
+              <div className="text-sm text-muted-foreground">Total Scholarship Worth</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-accent">3500+</div>
-              <div className="text-sm text-muted-foreground">Students</div>
+              <div className="text-3xl font-bold text-primary">10,000+</div>
+              <div className="text-sm text-muted-foreground">Participating Students</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary">500+</div>
-              <div className="text-sm text-muted-foreground">Partner Group</div>
+              <div className="text-3xl font-bold text-accent">500+</div>
+              <div className="text-sm text-muted-foreground">Partner Institutions</div>
             </div>
           </div>
 
           <p className="text-xs text-muted-foreground mt-4 leading-relaxed">
-            With more highly educated people, the hope is that they can become valuable assets for 
-            the country's future development
+            Join thousands of students who are transforming their future through the Mega Spark Exam
           </p>
         </Card>
       </div>
