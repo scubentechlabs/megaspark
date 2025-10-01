@@ -7,7 +7,7 @@ import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
 import { Newsletter } from "@/components/Newsletter";
 import { NewFooter } from "@/components/NewFooter";
-import { RegistrationForm } from "@/components/RegistrationForm";
+import { MultiStepRegistration } from "@/components/MultiStepRegistration";
 
 const Index = () => {
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
@@ -24,7 +24,7 @@ const Index = () => {
       <NewFooter />
       
       {showRegistrationForm && (
-        <RegistrationForm onClose={() => setShowRegistrationForm(false)} />
+        <MultiStepRegistration onClose={() => setShowRegistrationForm(false)} />
       )}
     </main>
   );
