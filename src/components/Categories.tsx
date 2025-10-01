@@ -6,37 +6,37 @@ const categories = [
     icon: Shield,
     title: "Private",
     description: "Private Scholarships",
-    color: "bg-blue-100 text-blue-600"
+    color: "bg-primary/10 text-primary"
   },
   {
     icon: Globe,
     title: "International",
     description: "International Scholarships",
-    color: "bg-purple-100 text-purple-600"
+    color: "bg-accent/10 text-accent"
   },
   {
     icon: Building,
     title: "Organizational",
     description: "Organizational Scholarships",
-    color: "bg-indigo-100 text-indigo-600"
+    color: "bg-primary/10 text-primary"
   },
   {
     icon: Heart,
     title: "Aid",
     description: "Aid Scholarships",
-    color: "bg-blue-100 text-blue-600"
+    color: "bg-accent/10 text-accent"
   },
   {
     icon: FlaskConical,
     title: "Research",
     description: "Research Scholarships",
-    color: "bg-purple-100 text-purple-600"
+    color: "bg-primary/10 text-primary"
   },
   {
     icon: FileCheck,
     title: "Official Bond",
     description: "Official Bond Scholarships",
-    color: "bg-indigo-100 text-indigo-600"
+    color: "bg-accent/10 text-accent"
   }
 ];
 
@@ -45,9 +45,9 @@ export const Categories = () => {
     <section id="category" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <span className="text-primary text-sm font-semibold uppercase tracking-wide">Categories</span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-2">
-            Category Of Each <span className="text-primary">Scholarship</span>
+          <span className="text-accent text-sm font-semibold uppercase tracking-wide">Categories</span>
+          <h2 className="text-4xl md:text-5xl font-bold mt-2 text-primary">
+            Category Of Each <span className="text-accent">Scholarship</span>
           </h2>
         </div>
 

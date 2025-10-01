@@ -21,8 +21,8 @@ export const Newsletter = () => {
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <span className="text-primary text-sm font-semibold uppercase tracking-wide">Newsletter</span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-6">
+          <span className="text-accent text-sm font-semibold uppercase tracking-wide">Newsletter</span>
+          <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-6 text-primary">
             Submit For Updated
           </h2>
           <p className="text-muted-foreground text-lg mb-8">
@@ -44,7 +44,7 @@ export const Newsletter = () => {
             <Button
               type="submit"
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 h-12 font-semibold"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 h-12 font-semibold"
             >
               Subscribe
             </Button>

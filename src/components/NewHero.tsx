@@ -33,7 +33,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
               <Button
                 size="lg"
                 onClick={onRegisterClick}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-8 py-6 text-lg font-semibold"
+                className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 py-6 text-lg font-semibold"
               >
                 Submission
               </Button>
@@ -45,8 +45,8 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
 
           {/* Right Content - Student Image with Blob */}
           <div className="relative">
-            {/* Purple Blob Background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-80 blur-sm" />
+            {/* Navy Blob Background */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm" />
             
             {/* Student Image */}
             <div className="relative z-10 flex justify-center">
@@ -58,22 +58,22 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             </div>
 
             {/* Floating Icons */}
-            <div className="absolute top-20 left-10 w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-bounce">
-              <BookOpen className="h-8 w-8 text-accent" />
+            <div className="absolute top-20 left-10 w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-bounce">
+              <BookOpen className="h-8 w-8 text-primary" />
             </div>
             
-            <div className="absolute bottom-20 left-0 w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <Users className="h-8 w-8 text-primary" />
+            <div className="absolute bottom-20 left-0 w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+              <Users className="h-8 w-8 text-accent" />
             </div>
           </div>
         </div>
 
         {/* Stats Card - Top Right */}
-        <Card className="absolute top-8 right-8 p-6 shadow-hover hidden xl:block max-w-xs">
+        <Card className="absolute top-8 right-8 p-6 shadow-hover hidden xl:block max-w-xs border-2 border-primary/10">
           <div className="mb-4">
-            <span className="text-primary text-sm font-semibold uppercase tracking-wide">Platform</span>
-            <h3 className="text-xl font-bold mt-1">
-              An <span className="text-primary">Educational</span> Service
+            <span className="text-accent text-sm font-semibold uppercase tracking-wide">Platform</span>
+            <h3 className="text-xl font-bold mt-1 text-primary">
+              An <span className="text-accent">Educational</span> Service
               <br />
               With Rapid Development
             </h3>
@@ -81,7 +81,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           
           <div className="space-y-4">
             <div>
-              <div className="text-3xl font-bold text-foreground">1050+</div>
+              <div className="text-3xl font-bold text-primary">1050+</div>
               <div className="text-sm text-muted-foreground">Scholarship</div>
             </div>
             <div>

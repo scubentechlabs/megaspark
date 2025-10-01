@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 interface NewHeaderProps {
   onRegisterClick: () => void;
@@ -19,10 +20,10 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
   return (
     <header className="bg-background/80 backdrop-blur-sm border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <span className="font-bold text-2xl text-foreground">Schdent</span>
+            <img src={logo} alt="P.P. SAVANI Centre for Excellence" className="h-12 md:h-14 w-auto" />
           </div>
 
           {/* Desktop Navigation */}
@@ -40,12 +41,12 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" className="text-foreground font-medium">
+            <Button variant="ghost" className="text-foreground font-medium hover:text-primary">
               Login
             </Button>
             <Button
               onClick={onRegisterClick}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-6"
             >
               Sign Up
             </Button>
@@ -77,10 +78,10 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
                 </a>
               ))}
               <div className="flex flex-col gap-2 px-4 pt-2">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
                   Login
                 </Button>
-                <Button onClick={onRegisterClick} className="w-full bg-primary hover:bg-primary/90">
+                <Button onClick={onRegisterClick} className="w-full bg-accent hover:bg-accent/90">
                   Sign Up
                 </Button>
               </div>

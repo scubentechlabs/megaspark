@@ -25,11 +25,11 @@ export const About = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-primary text-sm font-semibold uppercase tracking-wide">About Us</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-6">
-              Free <span className="text-primary">Scholarship</span>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wide">About Us</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-6 text-primary">
+              Free <span className="text-accent">Scholarship</span>
               <br />
-              Provider By Schdent
+              Provider By P.P. SAVANI CFE
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Have the opportunity to go to school or college without thinking about the cost? 
@@ -46,8 +46,8 @@ export const About = () => {
                   className="bg-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 border-border"
                 >
                   <CardContent className="p-8 text-center">
-                    <div className="mx-auto mb-6 h-20 w-20 rounded-2xl bg-accent/10 flex items-center justify-center">
-                      <Icon className="h-10 w-10 text-accent" />
+                    <div className="mx-auto mb-6 h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Icon className="h-10 w-10 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold mb-3 text-foreground">{feature.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
