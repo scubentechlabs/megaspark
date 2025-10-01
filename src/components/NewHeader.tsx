@@ -18,6 +18,7 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
     { label: "Eligibility", href: "#eligibility" },
     { label: "Registration", href: "#registration-section" },
     { label: "FAQ", href: "#faq" },
+    { label: "Admin", href: "/admin", isRoute: true },
   ];
 
   return (
@@ -32,13 +33,23 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-foreground font-medium hover:text-primary transition-colors"
-              >
-                {link.label}
-              </a>
+              link.isRoute ? (
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.href)}
+                  className="text-foreground font-medium hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-foreground font-medium hover:text-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              )
             ))}
           </nav>
 
@@ -75,14 +86,27 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-foreground font-medium px-4 py-2 hover:bg-muted rounded-lg"
-                >
-                  {link.label}
-                </a>
+                link.isRoute ? (
+                  <button
+                    key={link.label}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate(link.href);
+                    }}
+                    className="text-foreground font-medium px-4 py-2 hover:bg-muted rounded-lg text-left"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-foreground font-medium px-4 py-2 hover:bg-muted rounded-lg"
+                  >
+                    {link.label}
+                  </a>
+                )
               ))}
               <div className="flex flex-col gap-2 px-4 pt-2">
                 <Button 
