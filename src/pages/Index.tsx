@@ -3,7 +3,7 @@ import { NewHeader } from "@/components/NewHeader";
 import { NewHero } from "@/components/NewHero";
 import { BenefitsSection } from "@/components/BenefitsSection";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
-import { About } from "@/components/About";
+import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { Newsletter } from "@/components/Newsletter";
 import { NewFooter } from "@/components/NewFooter";
 import { RegistrationForm } from "@/components/RegistrationForm";
@@ -17,7 +17,7 @@ const Index = () => {
       <NewHero onRegisterClick={() => setShowRegistrationForm(true)} />
       <BenefitsSection />
       <ExamDatesVenue />
-      <About />
+      <EligibilityCriteria />
       <Newsletter />
       <NewFooter />
       
