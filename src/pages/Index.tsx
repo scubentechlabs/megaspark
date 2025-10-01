@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Benefits } from "@/components/Benefits";
 import { Eligibility } from "@/components/Eligibility";
@@ -12,11 +13,20 @@ const Index = () => {
 
   return (
     <main className="min-h-screen">
+      <Header onRegisterClick={() => setShowRegistrationForm(true)} />
       <Hero onRegisterClick={() => setShowRegistrationForm(true)} />
-      <Benefits />
-      <Eligibility />
-      <Timeline />
-      <FAQ />
+      <section id="benefits">
+        <Benefits />
+      </section>
+      <section id="eligibility">
+        <Eligibility />
+      </section>
+      <section id="timeline">
+        <Timeline />
+      </section>
+      <section id="faq">
+        <FAQ />
+      </section>
       <Footer />
       
       {showRegistrationForm && (
