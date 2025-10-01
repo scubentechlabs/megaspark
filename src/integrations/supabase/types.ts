@@ -16,40 +16,70 @@ export type Database = {
     Tables: {
       registrations: {
         Row: {
+          address: string | null
           created_at: string
+          date_of_birth: string | null
           email: string
           exam_center: string
+          exam_date: string | null
+          gender: string | null
           hall_ticket_url: string | null
           id: string
           medium: string
           mobile_number: string
+          parent_email: string | null
+          parent_first_name: string | null
+          parent_last_name: string | null
+          parent_phone: string | null
           registration_number: string
+          school_address: string | null
+          school_name: string | null
           standard: string
           student_name: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email: string
           exam_center: string
+          exam_date?: string | null
+          gender?: string | null
           hall_ticket_url?: string | null
           id?: string
           medium: string
           mobile_number: string
+          parent_email?: string | null
+          parent_first_name?: string | null
+          parent_last_name?: string | null
+          parent_phone?: string | null
           registration_number: string
+          school_address?: string | null
+          school_name?: string | null
           standard: string
           student_name: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string
           exam_center?: string
+          exam_date?: string | null
+          gender?: string | null
           hall_ticket_url?: string | null
           id?: string
           medium?: string
           mobile_number?: string
+          parent_email?: string | null
+          parent_first_name?: string | null
+          parent_last_name?: string | null
+          parent_phone?: string | null
           registration_number?: string
+          school_address?: string | null
+          school_name?: string | null
           standard?: string
           student_name?: string
           updated_at?: string

@@ -35,12 +35,12 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const validateStep = () => {
     if (currentStep === 1) {
-      if (!formData.studentFirstName || !formData.studentLastName || !formData.studentEmail || !formData.studentPhone) {
+      if (!formData.studentFirstName || !formData.studentLastName || !formData.studentEmail || !formData.studentPhone || !formData.dateOfBirth || !formData.gender || !formData.address) {
         toast.error("Please fill in all required fields");
         return false;
       }
     } else if (currentStep === 2) {
-      if (!formData.parentFirstName || !formData.parentEmail || !formData.schoolName) {
+      if (!formData.parentFirstName || !formData.parentLastName || !formData.parentEmail || !formData.parentPhone || !formData.schoolName || !formData.schoolCity || !formData.schoolBoard) {
         toast.error("Please fill in all required fields");
         return false;
       }
@@ -70,17 +70,27 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
   const handlePaymentComplete = async () => {
     try {
       // Generate registration number
-      const registrationNumber = `REG${Date.now()}`;
+      const registrationNumber = `SPARK${Date.now()}`;
       
-      // Save to database
+      // Save to database with all fields
       const { data, error } = await supabase
         .from('registrations')
         .insert({
           student_name: `${formData.studentFirstName} ${formData.studentLastName}`,
           email: formData.studentEmail,
           mobile_number: formData.studentPhone,
+          date_of_birth: formData.dateOfBirth,
+          gender: formData.gender,
+          address: formData.address,
+          parent_first_name: formData.parentFirstName,
+          parent_last_name: formData.parentLastName,
+          parent_email: formData.parentEmail,
+          parent_phone: formData.parentPhone,
+          school_name: formData.schoolName,
+          school_address: `${formData.schoolCity}, ${formData.schoolBoard}`,
           standard: formData.standard,
           medium: formData.medium,
+          exam_date: formData.examDate,
           exam_center: formData.examCenter || 'To be announced',
           registration_number: registrationNumber
         })

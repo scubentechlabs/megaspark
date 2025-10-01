@@ -20,6 +20,16 @@ interface Registration {
   registration_number: string;
   hall_ticket_url: string | null;
   created_at: string;
+  date_of_birth: string | null;
+  gender: string | null;
+  address: string | null;
+  parent_first_name: string | null;
+  parent_last_name: string | null;
+  parent_email: string | null;
+  parent_phone: string | null;
+  school_name: string | null;
+  school_address: string | null;
+  exam_date: string | null;
 }
 
 export default function Admin() {
@@ -77,14 +87,138 @@ export default function Admin() {
     }
   };
 
+  const handleDownloadHallTicket = (reg: Registration) => {
+    const hallTicketHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Hall Ticket - ${reg.registration_number}</title>
+        <style>
+          @page { size: A4; margin: 0; }
+          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+          .container { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
+          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+          .header h1 { margin: 0; font-size: 24px; color: #000; }
+          .header h2 { margin: 5px 0; font-size: 18px; color: #333; }
+          .header p { margin: 5px 0; font-size: 14px; }
+          .medium-badge { display: inline-block; padding: 5px 15px; background: #f0f0f0; border-radius: 5px; margin: 10px 0; font-weight: bold; }
+          .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          .info-table td { padding: 10px; border: 1px solid #000; }
+          .info-table td:first-child { font-weight: bold; width: 40%; background: #f5f5f5; }
+          .notes { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #000; }
+          .notes h3 { margin-top: 0; }
+          .notes ul { margin: 10px 0; padding-left: 20px; }
+          .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 2px solid #000; }
+          .photo-box { width: 120px; height: 150px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 150px; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🌟 MEGA SPARK EXAM 2025 🌟</h1>
+            <h2>મેગા સ્પાર્ક પરીક્ષા - 2025</h2>
+            <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
+            <div class="medium-badge">${reg.medium === 'gujarati' ? 'ગુજરાતી માધ્યમ (Gujarati Medium)' : 'English Medium (આંગ્લ માધ્યમ)'}</div>
+          </div>
+          
+          <table class="info-table">
+            <tr>
+              <td>Registration Number<br>નોંધણી નંબર</td>
+              <td><strong style="font-size: 18px;">${reg.registration_number}</strong></td>
+            </tr>
+            <tr>
+              <td>Student Name<br>વિદ્યાર્થીનું નામ</td>
+              <td>${reg.student_name}</td>
+            </tr>
+            <tr>
+              <td>Date of Birth<br>જન્મ તારીખ</td>
+              <td>${reg.date_of_birth ? new Date(reg.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>Gender<br>લિંગ</td>
+              <td>${reg.gender || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>Standard<br>ધોરણ</td>
+              <td>${reg.standard}</td>
+            </tr>
+            <tr>
+              <td>School Name<br>શાળાનું નામ</td>
+              <td>${reg.school_name || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>Mobile Number<br>મોબાઇલ નંબર</td>
+              <td>${reg.mobile_number}</td>
+            </tr>
+            <tr>
+              <td>Email Address<br>ઇમેઇલ સરનામું</td>
+              <td>${reg.email}</td>
+            </tr>
+            <tr>
+              <td>Exam Date<br>પરીક્ષા તારીખ</td>
+              <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'To be announced'}</td>
+            </tr>
+            <tr>
+              <td>Exam Center<br>પરીક્ષા કેન્દ્ર</td>
+              <td>${reg.exam_center}</td>
+            </tr>
+          </table>
+
+          <div class="notes">
+            <h3>Important Instructions / મહત્વની સૂચનાઓ:</h3>
+            <ul>
+              <li>Bring this hall ticket to the exam center / આ પ્રવેશ પત્ર પરીક્ષા કેન્દ્ર પર લાવવું</li>
+              <li>Reporting Time: 8:00 AM | Exam Time: 10:00 AM - 12:00 PM</li>
+              <li>Bring valid ID proof / માન્ય ઓળખ પુરાવો સાથે લાવવો</li>
+              <li>Mobile phones not allowed in exam hall / પરીક્ષા હોલમાં મોબાઇલ ફોન માન્ય નથી</li>
+            </ul>
+          </div>
+
+          <div class="footer">
+            <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
+            <p>Website: www.megaspark.com | Email: info@megaspark.com</p>
+            <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(hallTicketHTML);
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      
+      toast({
+        title: "Hall Ticket Ready",
+        description: "Opening print dialog for hall ticket",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please allow popups to download hall ticket",
+        variant: "destructive",
+      });
+    }
+  };
+
   const exportToCSV = () => {
     const headers = [
       "Registration Number",
       "Student Name",
+      "Date of Birth",
+      "Gender",
       "Email",
       "Mobile Number",
       "Standard",
       "Medium",
+      "School Name",
+      "Exam Date",
       "Exam Center",
       "Registration Date",
     ];
@@ -92,10 +226,14 @@ export default function Admin() {
     const csvData = filteredRegistrations.map((reg) => [
       reg.registration_number,
       reg.student_name,
+      reg.date_of_birth || 'N/A',
+      reg.gender || 'N/A',
       reg.email,
       reg.mobile_number,
       reg.standard,
       reg.medium,
+      reg.school_name || 'N/A',
+      reg.exam_date || 'N/A',
       reg.exam_center,
       new Date(reg.created_at).toLocaleDateString(),
     ]);
@@ -253,12 +391,11 @@ export default function Admin() {
                     <TableRow>
                       <TableHead>Reg. No.</TableHead>
                       <TableHead>Student Name</TableHead>
-                      <TableHead>Email</TableHead>
                       <TableHead>Mobile</TableHead>
                       <TableHead>Standard</TableHead>
                       <TableHead>Medium</TableHead>
-                      <TableHead>Exam Center</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead>Exam Date</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -266,13 +403,22 @@ export default function Admin() {
                       <TableRow key={reg.id}>
                         <TableCell className="font-medium">{reg.registration_number}</TableCell>
                         <TableCell>{reg.student_name}</TableCell>
-                        <TableCell>{reg.email}</TableCell>
                         <TableCell>{reg.mobile_number}</TableCell>
                         <TableCell>{reg.standard}</TableCell>
-                        <TableCell>{reg.medium}</TableCell>
-                        <TableCell>{reg.exam_center}</TableCell>
+                        <TableCell className="capitalize">{reg.medium}</TableCell>
                         <TableCell>
-                          {new Date(reg.created_at).toLocaleDateString()}
+                          {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDownloadHallTicket(reg)}
+                            className="gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Hall Ticket
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
