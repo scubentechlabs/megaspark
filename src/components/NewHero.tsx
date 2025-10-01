@@ -140,38 +140,6 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             </div>
           </div>
         </div>
-
-        {/* Stats Card - Top Right */}
-        <Card className="absolute top-8 right-8 p-6 shadow-hover hidden xl:block max-w-xs border-2 border-primary/10">
-          <div className="mb-4">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wide flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Scholarship Stats
-            </span>
-            <h3 className="text-xl font-bold mt-1 text-primary">
-              Empowering <span className="text-accent">Students</span> Across India
-            </h3>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <div className="text-3xl font-bold text-accent">₹75 Cr</div>
-              <div className="text-sm text-muted-foreground">Total Scholarship Worth</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary">10,000+</div>
-              <div className="text-sm text-muted-foreground">Participating Students</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-accent">500+</div>
-              <div className="text-sm text-muted-foreground">Partner Institutions</div>
-            </div>
-          </div>
-
-          <p className="text-xs text-muted-foreground mt-4 leading-relaxed">
-            Join thousands of students who are transforming their future through the Mega Spark Exam
-          </p>
-        </Card>
       </div>
     </section>
   );
