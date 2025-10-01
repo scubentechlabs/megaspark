@@ -6,8 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Search, Download, Users, Calendar } from "lucide-react";
+import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText } from "lucide-react";
 import logo from "@/assets/logo.png";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 interface Registration {
   id: string;
@@ -276,159 +288,210 @@ export default function Admin() {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <img src={logo} alt="Logo" className="h-12" />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <Sidebar className="border-r">
+          <SidebarContent>
+            <div className="p-6 border-b">
+              <img src={logo} alt="Logo" className="h-10 mb-2" />
+              <h2 className="font-semibold text-lg">MEGA SPARK</h2>
+              <p className="text-xs text-muted-foreground">Admin Dashboard</p>
+            </div>
+            
+            <SidebarGroup>
+              <SidebarGroupLabel>Menu</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="w-full justify-start">
+                      <BarChart3 className="h-4 w-4 mr-3" />
+                      <span>Dashboard</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="w-full justify-start bg-accent">
+                      <Users className="h-4 w-4 mr-3" />
+                      <span>Registrations</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="w-full justify-start">
+                      <FileText className="h-4 w-4 mr-3" />
+                      <span>Reports</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="w-full justify-start">
+                      <Settings className="h-4 w-4 mr-3" />
+                      <span>Settings</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton className="w-full justify-start" onClick={() => navigate("/")}>
+                      <Home className="h-4 w-4 mr-3" />
+                      <span>Back to Home</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
+
+        <div className="flex-1 flex flex-col min-h-screen">
+          {/* Top Header Bar */}
+          <header className="h-16 border-b bg-card flex items-center px-6 gap-4">
+            <SidebarTrigger />
             <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Admin Panel</h1>
-              <p className="text-muted-foreground">Manage all exam registrations</p>
+              <h1 className="text-2xl font-semibold">Registrations</h1>
             </div>
-            <Button variant="outline" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+            <Button variant="ghost" size="sm">
+              <Settings className="h-4 w-4" />
             </Button>
-          </div>
-        </div>
+          </header>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="border-2 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                Total Registrations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">{stats.total}</p>
-            </CardContent>
-          </Card>
+          {/* Main Content */}
+          <main className="flex-1 p-6 overflow-auto bg-muted/20">
+            <div className="max-w-7xl mx-auto space-y-6">
 
-          <Card className="border-2 border-accent/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-accent" />
-                By Standard
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                {Object.entries(stats.byStandard).map(([std, count]) => (
-                  <p key={std} className="text-sm">
-                    <span className="font-semibold">{std}:</span> {count}
-                  </p>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className="bg-card hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Total Registrations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-3xl font-bold">{stats.total}</p>
+                  </CardContent>
+                </Card>
 
-          <Card className="border-2 border-primary/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-primary" />
-                By Medium
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                {Object.entries(stats.byMedium).map(([medium, count]) => (
-                  <p key={medium} className="text-sm">
-                    <span className="font-semibold">{medium}:</span> {count}
-                  </p>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                <Card className="bg-card hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      By Standard
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1">
+                      {Object.entries(stats.byStandard).map(([std, count]) => (
+                        <p key={std} className="text-sm">
+                          <span className="font-semibold">{std}:</span> {count}
+                        </p>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
 
-        {/* Search and Actions */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name, mobile, email, or registration number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+                <Card className="bg-card hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      By Medium
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1">
+                      {Object.entries(stats.byMedium).map(([medium, count]) => (
+                        <p key={medium} className="text-sm">
+                          <span className="font-semibold capitalize">{medium}:</span> {count}
+                        </p>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-              <div className="flex gap-2">
-                <Button onClick={exportToCSV} variant="outline" className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Export CSV
-                </Button>
-                <Button onClick={fetchRegistrations} variant="outline">
-                  Refresh
-                </Button>
-              </div>
+
+              {/* Search and Actions */}
+              <Card className="bg-card">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by name, mobile, email, or registration number..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 bg-background"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={exportToCSV} className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Export CSV
+                      </Button>
+                      <Button onClick={fetchRegistrations} variant="outline">
+                        Refresh
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Registrations Table */}
+              <Card className="bg-card">
+                <CardHeader className="border-b">
+                  <CardTitle className="text-xl font-semibold">
+                    All Registrations ({filteredRegistrations.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="text-center py-12 text-muted-foreground">Loading registrations...</div>
+                  ) : filteredRegistrations.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      No registrations found
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted/50">
+                            <TableHead className="font-semibold">Reg. No.</TableHead>
+                            <TableHead className="font-semibold">Student Name</TableHead>
+                            <TableHead className="font-semibold">Mobile</TableHead>
+                            <TableHead className="font-semibold">Standard</TableHead>
+                            <TableHead className="font-semibold">Medium</TableHead>
+                            <TableHead className="font-semibold">Exam Date</TableHead>
+                            <TableHead className="font-semibold">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredRegistrations.map((reg) => (
+                            <TableRow key={reg.id} className="hover:bg-muted/50">
+                              <TableCell className="font-medium">{reg.registration_number}</TableCell>
+                              <TableCell>{reg.student_name}</TableCell>
+                              <TableCell>{reg.mobile_number}</TableCell>
+                              <TableCell>{reg.standard}</TableCell>
+                              <TableCell className="capitalize">{reg.medium}</TableCell>
+                              <TableCell>
+                                {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleDownloadHallTicket(reg)}
+                                  className="gap-2"
+                                >
+                                  <Download className="h-4 w-4" />
+                                  Hall Ticket
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Registrations Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              All Registrations ({filteredRegistrations.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="text-center py-8">Loading registrations...</div>
-            ) : filteredRegistrations.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No registrations found
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Reg. No.</TableHead>
-                      <TableHead>Student Name</TableHead>
-                      <TableHead>Mobile</TableHead>
-                      <TableHead>Standard</TableHead>
-                      <TableHead>Medium</TableHead>
-                      <TableHead>Exam Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRegistrations.map((reg) => (
-                      <TableRow key={reg.id}>
-                        <TableCell className="font-medium">{reg.registration_number}</TableCell>
-                        <TableCell>{reg.student_name}</TableCell>
-                        <TableCell>{reg.mobile_number}</TableCell>
-                        <TableCell>{reg.standard}</TableCell>
-                        <TableCell className="capitalize">{reg.medium}</TableCell>
-                        <TableCell>
-                          {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDownloadHallTicket(reg)}
-                            className="gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            Hall Ticket
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
