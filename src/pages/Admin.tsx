@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText } from "lucide-react";
+import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText, LogOut } from "lucide-react";
 import logo from "@/assets/logo.png";
 import {
   Sidebar,
@@ -53,8 +53,35 @@ export default function Admin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchRegistrations();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/admin/login");
+      return;
+    }
+    fetchRegistrations();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged Out",
+        description: "You have been logged out successfully",
+      });
+      navigate("/admin/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     if (searchTerm) {
@@ -345,8 +372,9 @@ export default function Admin() {
             <div className="flex-1">
               <h1 className="text-2xl font-semibold">Registrations</h1>
             </div>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Logout
             </Button>
           </header>
 
