@@ -5,27 +5,26 @@ import { BenefitsSection } from "@/components/BenefitsSection";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
+import { RegistrationSection } from "@/components/RegistrationSection";
 import { Newsletter } from "@/components/Newsletter";
 import { NewFooter } from "@/components/NewFooter";
-import { MultiStepRegistration } from "@/components/MultiStepRegistration";
 
 const Index = () => {
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
-
   return (
     <main className="min-h-screen">
-      <NewHeader onRegisterClick={() => setShowRegistrationForm(true)} />
-      <NewHero onRegisterClick={() => setShowRegistrationForm(true)} />
+      <NewHeader onRegisterClick={() => {
+        document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
+      }} />
+      <NewHero onRegisterClick={() => {
+        document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
+      }} />
       <BenefitsSection />
       <ExamDatesVenue />
       <EligibilityCriteria />
       <DownloadGuide />
+      <RegistrationSection />
       <Newsletter />
       <NewFooter />
-      
-      {showRegistrationForm && (
-        <MultiStepRegistration onClose={() => setShowRegistrationForm(false)} />
-      )}
     </main>
   );
 };
