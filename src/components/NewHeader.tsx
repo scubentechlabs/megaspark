@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
@@ -9,6 +10,7 @@ interface NewHeaderProps {
 
 export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const navLinks = [
     { label: "Home", href: "#" },
@@ -42,7 +44,11 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" className="text-foreground font-medium hover:text-primary">
+            <Button 
+              variant="ghost" 
+              className="text-foreground font-medium hover:text-primary"
+              onClick={() => navigate("/login")}
+            >
               Login
             </Button>
             <Button
@@ -79,10 +85,23 @@ export const NewHeader = ({ onRegisterClick }: NewHeaderProps) => {
                 </a>
               ))}
               <div className="flex flex-col gap-2 px-4 pt-2">
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary hover:text-white">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-primary text-primary hover:bg-primary hover:text-white"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
                   Login
                 </Button>
-                <Button onClick={onRegisterClick} className="w-full bg-accent hover:bg-accent/90">
+                <Button 
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onRegisterClick();
+                  }} 
+                  className="w-full bg-accent hover:bg-accent/90"
+                >
                   Sign Up
                 </Button>
               </div>
