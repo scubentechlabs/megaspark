@@ -52,13 +52,9 @@ export const BenefitsSection = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16 animate-fade-in">
-          <span className="text-accent text-sm font-semibold uppercase tracking-wide">Why Participate?</span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-2 text-primary mb-4">
-            Unlock Amazing <span className="text-accent">Benefits</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-primary">
+            Why Choose Mega Spark Exam
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Join the Mega Spark Exam and gain access to life-changing opportunities
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
