@@ -48,6 +48,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
               <SelectValue placeholder="Select standard" />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
+              <SelectItem value="5th">5th Standard</SelectItem>
               <SelectItem value="6th">6th Standard</SelectItem>
               <SelectItem value="7th">7th Standard</SelectItem>
               <SelectItem value="8th">8th Standard</SelectItem>
