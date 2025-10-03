@@ -78,9 +78,10 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
               <SelectValue placeholder="Select preferred exam date" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2025-12-07">7th December 2025</SelectItem>
-              <SelectItem value="2025-12-14">14th December 2025</SelectItem>
-              <SelectItem value="2025-12-21">21st December 2025</SelectItem>
+              <SelectItem value="2025-12-07">7th December 2025 - Sunday</SelectItem>
+              <SelectItem value="2025-12-14">14th December 2025 - Sunday</SelectItem>
+              <SelectItem value="2025-12-21">21st December 2025 - Sunday</SelectItem>
+              <SelectItem value="2025-12-28">28th December 2025 - Sunday</SelectItem>
             </SelectContent>
           </Select>
         </div>
