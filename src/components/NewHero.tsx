@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Users, Download, Sparkles } from "lucide-react";
 import studentHero from "@/assets/student-hero.png";
+import studentOriginal from "@/assets/student-original.png";
+import heroScholarship from "@/assets/hero-scholarship.jpg";
+import schoolBuilding from "@/assets/school-building.jpg";
 import { useEffect, useState } from "react";
 
 interface NewHeroProps {
@@ -9,12 +12,31 @@ interface NewHeroProps {
 }
 
 export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0
   });
+
+  const sliderImages = [
+    studentHero,
+    studentOriginal,
+    heroScholarship,
+    schoolBuilding,
+    studentHero,
+    studentOriginal
+  ];
+
+  // Image slider effect
+  useEffect(() => {
+    const sliderInterval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % sliderImages.length);
+    }, 3000);
+
+    return () => clearInterval(sliderInterval);
+  }, []);
 
   useEffect(() => {
     const targetDate = new Date('2025-12-07T00:00:00').getTime();
@@ -53,14 +75,14 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           {/* Left Content */}
           <div className="space-y-8 animate-fade-in">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
-                <Sparkles className="h-4 w-4 text-accent animate-pulse" />
-                <span className="text-sm font-semibold text-accent">Mega Spark Exam 2025</span>
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent to-primary text-white mb-4 shadow-lg">
+                <Sparkles className="h-5 w-5 animate-pulse" />
+                <span className="text-base font-bold">Mega Spark Exam 2025</span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Win Scholarships Worth{" "}
-                <span className="text-accent">₹75 Crore</span>
+                <span className="text-foreground">₹75 Crore</span>
                 <br />
                 <span className="text-primary">Mega Spark Exam 2025</span>
               </h1>
@@ -111,7 +133,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             </div>
           </div>
 
-          {/* Right Content - Student Image with Blob */}
+          {/* Right Content - Image Slider */}
           <div className="relative">
             {/* Navy Blob Background with Sparkle Effect */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm animate-pulse" />
@@ -121,13 +143,34 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             <div className="absolute top-32 right-20 w-3 h-3 bg-primary rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
             <div className="absolute bottom-32 right-16 w-4 h-4 bg-accent rounded-full animate-ping" style={{ animationDelay: '1s' }} />
             
-            {/* Student Image */}
-            <div className="relative z-10 flex justify-center">
-              <img
-                src={studentHero}
-                alt="Student celebrating success"
-                className="w-full max-w-md object-contain"
-              />
+            {/* Image Slider */}
+            <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
+              <div className="relative w-full max-w-md h-[500px]">
+                {sliderImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Scholarship opportunity ${index + 1}`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                      index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+                ))}
+              </div>
+              
+              {/* Slider Dots */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                {sliderImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentImageIndex ? 'bg-accent w-6' : 'bg-white/50'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Floating Icons */}
