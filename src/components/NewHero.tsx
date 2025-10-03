@@ -148,7 +148,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             
             {/* Image Slider */}
             <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
-              <div className="relative w-full max-w-md h-[500px]">
+              <div className="relative w-full max-w-2xl h-[600px]">
                 {sliderImages.map((image, index) => (
                   <img
                     key={index}
