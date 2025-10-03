@@ -73,7 +73,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in order-2 lg:order-1">
             <div>
               <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-accent via-primary to-accent text-white mb-6 shadow-2xl animate-pulse border-2 border-white/30">
                 <Sparkles className="h-5 w-5 animate-spin" />
@@ -137,7 +137,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           </div>
 
           {/* Right Content - Image Slider */}
-          <div className="relative">
+          <div className="relative order-1 lg:order-2">
             {/* Navy Blob Background with Sparkle Effect */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm animate-pulse" />
             
@@ -148,7 +148,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             
             {/* Image Slider */}
             <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
-              <div className="relative w-full max-w-2xl h-[600px]">
+              <div className="relative w-full h-[400px] lg:h-[600px] lg:max-w-2xl aspect-square lg:aspect-auto">
                 {sliderImages.map((image, index) => (
                   <img
                     key={index}
