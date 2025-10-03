@@ -75,16 +75,19 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           {/* Left Content */}
           <div className="space-y-8 animate-fade-in">
             <div>
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent to-primary text-white mb-4 shadow-lg">
-                <Sparkles className="h-5 w-5 animate-pulse" />
-                <span className="text-base font-bold">Mega Spark Exam 2025</span>
+              <div className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-accent via-primary to-accent text-white mb-6 shadow-2xl animate-pulse border-2 border-white/30">
+                <Sparkles className="h-6 w-6 animate-spin" />
+                <span className="text-xl font-bold tracking-wide">Mega Spark Exam 2025</span>
+                <Sparkles className="h-6 w-6 animate-spin" />
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Win Scholarships Worth{" "}
                 <span className="text-foreground">₹75 Crore</span>
                 <br />
-                <span className="text-primary">Mega Spark Exam 2025</span>
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-5xl md:text-7xl">
+                  Mega Spark Exam 2025
+                </span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
                 The exam that opens doors to learning, growth, and limitless possibilities.
