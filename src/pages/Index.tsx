@@ -6,6 +6,7 @@ import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
 import { RegistrationSection } from "@/components/RegistrationSection";
+import { HelpBox } from "@/components/HelpBox";
 import { FinalCTA } from "@/components/FinalCTA";
 import { NewFooter } from "@/components/NewFooter";
 
@@ -23,6 +24,7 @@ const Index = () => {
       <EligibilityCriteria />
       <DownloadGuide />
       <RegistrationSection />
+      <HelpBox />
       <FinalCTA onRegisterClick={() => {
         document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
       }} />
