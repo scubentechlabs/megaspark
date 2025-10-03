@@ -138,14 +138,6 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
 
           {/* Right Content - Image Slider */}
           <div className="relative order-1 lg:order-2">
-            {/* Navy Blob Background with Sparkle Effect */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-blob rounded-[40%_60%_70%_30%/40%_50%_60%_50%] opacity-70 blur-sm animate-pulse" />
-            
-            {/* Glowing Sparkle Effects */}
-            <div className="absolute top-10 right-10 w-4 h-4 bg-accent rounded-full animate-ping" />
-            <div className="absolute top-32 right-20 w-3 h-3 bg-primary rounded-full animate-ping" style={{ animationDelay: '0.5s' }} />
-            <div className="absolute bottom-32 right-16 w-4 h-4 bg-accent rounded-full animate-ping" style={{ animationDelay: '1s' }} />
-            
             {/* Image Slider */}
             <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
               <div className="relative w-full h-[400px] lg:h-[600px] lg:max-w-2xl aspect-square lg:aspect-auto">
@@ -174,15 +166,6 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
                   />
                 ))}
               </div>
-            </div>
-
-            {/* Floating Icons */}
-            <div className="absolute top-20 left-10 w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-bounce">
-              <Sparkles className="h-8 w-8 text-accent" />
-            </div>
-            
-            <div className="absolute bottom-20 left-0 w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <BookOpen className="h-8 w-8 text-accent" />
             </div>
           </div>
         </div>
