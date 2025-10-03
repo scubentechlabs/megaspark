@@ -77,12 +77,12 @@ export const FAQ = () => {
             </p>
             <p className="text-muted-foreground">
               Contact us at{" "}
-              <a href="mailto:info@ppsavani.edu.in" className="text-primary hover:underline font-medium">
-                info@ppsavani.edu.in
+              <a href="mailto:digital.cfe.ppsavani@gmail.com" className="text-primary hover:underline font-medium">
+                digital.cfe.ppsavani@gmail.com
               </a>
               {" "}or call{" "}
-              <a href="tel:+919876543210" className="text-primary hover:underline font-medium">
-                +91 98765 43210
+              <a href="tel:+919978651005" className="text-primary hover:underline font-medium">
+                9978651005
               </a>
             </p>
           </div>

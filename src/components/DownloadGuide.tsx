@@ -120,8 +120,8 @@ export const DownloadGuide = () => {
                 <h4 className="font-bold text-foreground mb-1">Need Help?</h4>
                 <p className="text-sm text-muted-foreground">
                   If you face any issues viewing these materials, please contact us at{" "}
-                  <a href="mailto:support@ppsavani.edu.in" className="text-accent font-semibold hover:underline">
-                    support@ppsavani.edu.in
+                  <a href="mailto:digital.cfe.ppsavani@gmail.com" className="text-accent font-semibold hover:underline">
+                    digital.cfe.ppsavani@gmail.com
                   </a>
                 </p>
               </div>
