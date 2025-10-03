@@ -1,18 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Clock, CheckCircle2 } from "lucide-react";
+import { Calendar, MapPin, Clock } from "lucide-react";
 import schoolBuilding from "@/assets/school-building.jpg";
-import { useState } from "react";
 
 const examDates = [
-  { date: "7th December", day: "Sunday", time: "10:00 AM - 12:00 PM", status: "First Exam" },
-  { date: "14th December", day: "Sunday", time: "10:00 AM - 12:00 PM", status: "Second Exam" },
-  { date: "21st December", day: "Sunday", time: "10:00 AM - 12:00 PM", status: "Third Exam" },
-  { date: "28th December", day: "Sunday", time: "10:00 AM - 12:00 PM", status: "Final Exam" }
+  { date: "7th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
+  { date: "14th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
+  { date: "21st December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
+  { date: "28th December", day: "Sunday", time: "8:00 AM - 12:00 PM" }
 ];
 
 export const ExamDatesVenue = () => {
-  const [selectedDate, setSelectedDate] = useState(0);
-
   return (
     <section id="dates" className="py-20 bg-muted/30 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -32,62 +29,37 @@ export const ExamDatesVenue = () => {
           </p>
         </div>
 
-        {/* Interactive Timeline */}
+        {/* Single Interactive Box with All Dates */}
         <div className="mb-16">
           <div className="max-w-5xl mx-auto">
-            {/* Timeline Navigation */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {examDates.map((exam, idx) => (
-                <Card
-                  key={idx}
-                  onClick={() => setSelectedDate(idx)}
-                  className={`cursor-pointer transition-all duration-300 hover:shadow-hover ${
-                    selectedDate === idx
-                      ? 'border-2 border-accent shadow-card scale-105'
-                      : 'border-border hover:border-accent/50'
-                  }`}
-                >
-                  <CardContent className="p-6 text-center">
-                    <div className={`mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center ${
-                      selectedDate === idx
-                        ? 'bg-accent text-white'
-                        : 'bg-accent/10 text-accent'
-                    }`}>
-                      {selectedDate === idx ? (
-                        <CheckCircle2 className="h-7 w-7" />
-                      ) : (
-                        <Calendar className="h-7 w-7" />
-                      )}
-                    </div>
-                    <div className={`text-2xl font-bold mb-1 ${
-                      selectedDate === idx ? 'text-accent' : 'text-foreground'
-                    }`}>
-                      {exam.date.split(' ')[0]}
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-1">{exam.day}</div>
-                    <div className="text-xs font-semibold text-primary">{exam.status}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Selected Date Details */}
-            <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-primary/20">
+            <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center">
-                        <Calendar className="h-6 w-6 text-white" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                  {examDates.map((exam, idx) => (
+                    <div
+                      key={idx}
+                      className="text-center p-4 border-2 border-accent rounded-lg bg-background"
+                    >
+                      <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
+                        <Calendar className="h-7 w-7" />
                       </div>
-                      <div>
-                        <h3 className="text-3xl font-bold text-primary">{examDates[selectedDate].date}</h3>
-                        <p className="text-muted-foreground">{examDates[selectedDate].day}</p>
+                      <div className="text-2xl font-bold mb-1 text-foreground">
+                        {exam.date.split(' ')[0]}
                       </div>
+                      <div className="text-sm text-muted-foreground mb-1">{exam.day}</div>
+                      <div className="text-sm font-semibold text-accent">{exam.date.split(' ')[1]}</div>
                     </div>
-                    <div className="flex items-center gap-2 text-lg">
-                      <Clock className="h-5 w-5 text-accent" />
-                      <span className="font-semibold text-foreground">{examDates[selectedDate].time}</span>
+                  ))}
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-border">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center">
+                      <Clock className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Exam Time</p>
+                      <p className="text-xl font-bold text-primary">8:00 AM - 12:00 PM</p>
                     </div>
                   </div>
                   
