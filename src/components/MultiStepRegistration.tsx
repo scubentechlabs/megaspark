@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { X, ChevronRight, ChevronLeft, User, Users, Calendar, CreditCard } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, User, Users, CreditCard } from "lucide-react";
 import { StudentDetailsStep } from "./registration/StudentDetailsStep";
 import { ParentSchoolStep } from "./registration/ParentSchoolStep";
-import { ExamPreferencesStep } from "./registration/ExamPreferencesStep";
 import { PaymentStep } from "./registration/PaymentStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -19,14 +18,13 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
-  const totalSteps = 4;
+  const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
     { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
-    { number: 3, title: "Exam Preferences", icon: Calendar, description: "Choose your options" },
-    { number: 4, title: "Payment", icon: CreditCard, description: "Complete registration" }
+    { number: 3, title: "Payment", icon: CreditCard, description: "Complete registration" }
   ];
 
   const updateFormData = (updates: any) => {
@@ -42,11 +40,6 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     } else if (currentStep === 2) {
       if (!formData.schoolName || !formData.schoolMedium || !formData.standard || !formData.previousYearPercentage || !formData.preferredExamDate) {
         toast.error("Please fill in all required fields");
-        return false;
-      }
-    } else if (currentStep === 3) {
-      if (!formData.medium || !formData.examCenter) {
-        toast.error("Please complete all selections");
         return false;
       }
     }
@@ -87,8 +80,8 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
           preferred_exam_date: formData.preferredExamDate,
-          medium: formData.medium,
-          exam_center: formData.examCenter || 'To be announced',
+          medium: formData.schoolMedium, // Using school medium as exam medium
+          exam_center: 'To be announced',
           registration_number: registrationNumber
         })
         .select()
@@ -183,14 +176,11 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
               <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
             )}
             {currentStep === 3 && (
-              <ExamPreferencesStep formData={formData} updateFormData={updateFormData} />
-            )}
-            {currentStep === 4 && (
               <PaymentStep onPaymentComplete={handlePaymentComplete} />
             )}
           </div>
 
-          {currentStep < 4 && (
+          {currentStep < 3 && (
             <div className="flex justify-between mt-8 pt-6 border-t">
               <Button
                 variant="outline"
