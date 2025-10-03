@@ -92,7 +92,7 @@ export const ExamDatesVenue = () => {
               <MapPin className="h-8 w-8 text-accent" />
               Exam Centre Location
             </h3>
-            <p className="text-muted-foreground">P.P. Savani School Campus, Surat, Gujarat</p>
+            <p className="text-muted-foreground">P.P. Savani CFE, Abrama, Surat, Gujarat</p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -100,11 +100,11 @@ export const ExamDatesVenue = () => {
             <Card className="overflow-hidden hover:shadow-hover transition-all duration-300">
               <img
                 src={schoolBuilding}
-                alt="P.P. Savani School Campus"
+                alt="P.P. Savani CFE Campus"
                 className="w-full h-[300px] object-cover"
               />
               <CardContent className="p-6">
-                <h4 className="text-xl font-bold text-foreground mb-2">P.P. Savani School</h4>
+                <h4 className="text-xl font-bold text-foreground mb-2">P.P. Savani CFE</h4>
                 <p className="text-sm text-muted-foreground">
                   State-of-the-art facilities with air-conditioned examination halls and 
                   comfortable seating arrangements for all candidates.
@@ -112,8 +112,11 @@ export const ExamDatesVenue = () => {
               </CardContent>
             </Card>
 
-            {/* Google Map Embed */}
-            <Card className="overflow-hidden hover:shadow-hover transition-all duration-300">
+            {/* Google Map with Clickable Link */}
+            <Card 
+              className="overflow-hidden hover:shadow-hover transition-all duration-300 cursor-pointer"
+              onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=P.P.+Savani+CFE+Abrama+Surat+Gujarat', '_blank')}
+            >
               <div className="relative h-[300px]">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.6614947091847!2d72.89814731493284!3d21.193534985903668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f2f6b5e6b85%3A0x7e0e1b5f5e6b5e6b!2sP.P.%20Savani%20School!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
@@ -123,44 +126,26 @@ export const ExamDatesVenue = () => {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="P.P. Savani School Location"
-                  className="rounded-t-lg"
+                  title="P.P. Savani CFE Location"
+                  className="rounded-t-lg pointer-events-none"
                 />
+                <div className="absolute inset-0 bg-transparent hover:bg-primary/5 transition-colors" />
               </div>
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-1" />
                   <div>
-                    <h4 className="font-bold text-foreground mb-1">Address</h4>
+                    <h4 className="font-bold text-foreground mb-1">Click for Directions</h4>
                     <p className="text-sm text-muted-foreground">
-                      P.P. Savani School Campus<br />
-                      ABRAMA - ORNA Road, Surat<br />
-                      Gujarat, India - 394210
+                      P.P. Savani CFE<br />
+                      Abrama, Surat<br />
+                      Gujarat, India
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-
-          {/* Additional Info */}
-          <Card className="mt-8 bg-primary/5 border-primary/20">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <div className="flex-shrink-0 h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <MapPin className="h-6 w-6 text-accent" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-foreground mb-2">Getting There</h4>
-                  <p className="text-sm text-muted-foreground">
-                    The venue is well-connected by public transport. Ample parking space is available 
-                    for those coming by personal vehicles. Please arrive at least 30 minutes before 
-                    the exam start time for smooth check-in.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </section>
