@@ -31,7 +31,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <SelectTrigger>
               <SelectValue placeholder="Select medium" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background z-50">
               <SelectItem value="gujarati">Gujarati</SelectItem>
               <SelectItem value="english">English</SelectItem>
             </SelectContent>
@@ -47,7 +47,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <SelectTrigger>
               <SelectValue placeholder="Select standard" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background z-50">
               <SelectItem value="6th">6th Standard</SelectItem>
               <SelectItem value="7th">7th Standard</SelectItem>
               <SelectItem value="8th">8th Standard</SelectItem>
@@ -77,7 +77,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <SelectTrigger>
               <SelectValue placeholder="Select preferred exam date" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background z-50">
               <SelectItem value="2025-12-07">7th December 2025 - Sunday</SelectItem>
               <SelectItem value="2025-12-14">14th December 2025 - Sunday</SelectItem>
               <SelectItem value="2025-12-21">21st December 2025 - Sunday</SelectItem>
