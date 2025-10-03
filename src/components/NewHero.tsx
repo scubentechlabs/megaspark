@@ -140,7 +140,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
           <div className="relative order-1 lg:order-2">
             {/* Image Slider */}
             <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
-              <div className="relative w-full h-[400px] lg:h-[600px] lg:max-w-2xl aspect-square lg:aspect-auto">
+              <div className="relative w-full h-[500px] sm:h-[550px] lg:h-[600px] lg:max-w-2xl">
                 {sliderImages.map((image, index) => (
                   <img
                     key={index}
