@@ -17,9 +17,11 @@ export type Database = {
       registrations: {
         Row: {
           address: string | null
+          city_village: string | null
           created_at: string
           date_of_birth: string | null
-          email: string
+          district: string | null
+          email: string | null
           exam_center: string
           exam_date: string | null
           gender: string | null
@@ -30,19 +32,26 @@ export type Database = {
           parent_email: string | null
           parent_first_name: string | null
           parent_last_name: string | null
+          parent_name: string | null
           parent_phone: string | null
+          preferred_exam_date: string | null
+          previous_year_percentage: string | null
           registration_number: string
           school_address: string | null
+          school_medium: string | null
           school_name: string | null
           standard: string
           student_name: string
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
           address?: string | null
+          city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
-          email: string
+          district?: string | null
+          email?: string | null
           exam_center: string
           exam_date?: string | null
           gender?: string | null
@@ -53,19 +62,26 @@ export type Database = {
           parent_email?: string | null
           parent_first_name?: string | null
           parent_last_name?: string | null
+          parent_name?: string | null
           parent_phone?: string | null
+          preferred_exam_date?: string | null
+          previous_year_percentage?: string | null
           registration_number: string
           school_address?: string | null
+          school_medium?: string | null
           school_name?: string | null
           standard: string
           student_name: string
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
           address?: string | null
+          city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
-          email?: string
+          district?: string | null
+          email?: string | null
           exam_center?: string
           exam_date?: string | null
           gender?: string | null
@@ -76,13 +92,18 @@ export type Database = {
           parent_email?: string | null
           parent_first_name?: string | null
           parent_last_name?: string | null
+          parent_name?: string | null
           parent_phone?: string | null
+          preferred_exam_date?: string | null
+          previous_year_percentage?: string | null
           registration_number?: string
           school_address?: string | null
+          school_medium?: string | null
           school_name?: string | null
           standard?: string
           student_name?: string
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }

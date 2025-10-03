@@ -19,7 +19,7 @@ export const RegistrationSection = () => {
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
-    { number: 2, title: "Parent & School", icon: Users, description: "Guardian and school info" },
+    { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
     { number: 3, title: "Exam Preferences", icon: Calendar, description: "Choose your options" },
     { number: 4, title: "Payment", icon: CreditCard, description: "Complete registration" }
   ];
@@ -30,17 +30,17 @@ export const RegistrationSection = () => {
 
   const validateStep = () => {
     if (currentStep === 1) {
-      if (!formData.studentFirstName || !formData.studentLastName || !formData.studentEmail || !formData.studentPhone) {
+      if (!formData.studentName || !formData.parentName || !formData.phoneNumber || !formData.whatsappNumber || !formData.district || !formData.cityVillage) {
         toast.error("Please fill in all required fields");
         return false;
       }
     } else if (currentStep === 2) {
-      if (!formData.parentFirstName || !formData.parentEmail || !formData.schoolName) {
+      if (!formData.schoolName || !formData.schoolMedium || !formData.standard || !formData.previousYearPercentage || !formData.preferredExamDate) {
         toast.error("Please fill in all required fields");
         return false;
       }
     } else if (currentStep === 3) {
-      if (!formData.standard || !formData.medium || !formData.examDate) {
+      if (!formData.medium || !formData.examCenter) {
         toast.error("Please complete all selections");
         return false;
       }

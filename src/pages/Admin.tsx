@@ -25,22 +25,21 @@ interface Registration {
   id: string;
   mobile_number: string;
   student_name: string;
-  email: string;
+  email: string | null;
   standard: string;
   medium: string;
   exam_center: string;
   registration_number: string;
   hall_ticket_url: string | null;
   created_at: string;
-  date_of_birth: string | null;
-  gender: string | null;
-  address: string | null;
-  parent_first_name: string | null;
-  parent_last_name: string | null;
-  parent_email: string | null;
-  parent_phone: string | null;
+  parent_name: string | null;
+  whatsapp_number: string | null;
+  district: string | null;
+  city_village: string | null;
   school_name: string | null;
-  school_address: string | null;
+  school_medium: string | null;
+  previous_year_percentage: string | null;
+  preferred_exam_date: string | null;
   exam_date: string | null;
 }
 
@@ -172,12 +171,20 @@ export default function Admin() {
               <td>${reg.student_name}</td>
             </tr>
             <tr>
-              <td>Date of Birth<br>જન્મ તારીખ</td>
-              <td>${reg.date_of_birth ? new Date(reg.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</td>
+              <td>Parent Name<br>વાલીનું નામ</td>
+              <td>${reg.parent_name || 'N/A'}</td>
             </tr>
             <tr>
-              <td>Gender<br>લિંગ</td>
-              <td>${reg.gender || 'N/A'}</td>
+              <td>WhatsApp Number<br>વોટ્સએપ નંબર</td>
+              <td>${reg.whatsapp_number || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>District<br>જિલ્લો</td>
+              <td>${reg.district || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>City/Village<br>શહેર/ગામ</td>
+              <td>${reg.city_village || 'N/A'}</td>
             </tr>
             <tr>
               <td>Standard<br>ધોરણ</td>
@@ -186,6 +193,18 @@ export default function Admin() {
             <tr>
               <td>School Name<br>શાળાનું નામ</td>
               <td>${reg.school_name || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>School Medium<br>શાળા માધ્યમ</td>
+              <td>${reg.school_medium ? (reg.school_medium === 'gujarati' ? 'Gujarati' : 'English') : 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>Previous Year %<br>પાછલા વર્ષની ટકાવારી</td>
+              <td>${reg.previous_year_percentage || 'N/A'}</td>
+            </tr>
+            <tr>
+              <td>Preferred Exam Date<br>પસંદગીની પરીક્ષા તારીખ</td>
+              <td>${reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString('en-GB') : 'N/A'}</td>
             </tr>
             <tr>
               <td>Mobile Number<br>મોબાઇલ નંબર</td>
@@ -250,14 +269,17 @@ export default function Admin() {
     const headers = [
       "Registration Number",
       "Student Name",
-      "Date of Birth",
-      "Gender",
-      "Email",
+      "Parent Name",
       "Mobile Number",
-      "Standard",
-      "Medium",
+      "WhatsApp Number",
+      "District",
+      "City/Village",
       "School Name",
-      "Exam Date",
+      "School Medium",
+      "Standard",
+      "Previous Year %",
+      "Preferred Exam Date",
+      "Medium",
       "Exam Center",
       "Registration Date",
     ];
@@ -265,14 +287,17 @@ export default function Admin() {
     const csvData = filteredRegistrations.map((reg) => [
       reg.registration_number,
       reg.student_name,
-      reg.date_of_birth || 'N/A',
-      reg.gender || 'N/A',
-      reg.email,
+      reg.parent_name || 'N/A',
       reg.mobile_number,
-      reg.standard,
-      reg.medium,
+      reg.whatsapp_number || 'N/A',
+      reg.district || 'N/A',
+      reg.city_village || 'N/A',
       reg.school_name || 'N/A',
-      reg.exam_date || 'N/A',
+      reg.school_medium || 'N/A',
+      reg.standard,
+      reg.previous_year_percentage || 'N/A',
+      reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
+      reg.medium,
       reg.exam_center,
       new Date(reg.created_at).toLocaleDateString(),
     ]);

@@ -24,7 +24,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
-    { number: 2, title: "Parent & School", icon: Users, description: "Guardian and school info" },
+    { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
     { number: 3, title: "Exam Preferences", icon: Calendar, description: "Choose your options" },
     { number: 4, title: "Payment", icon: CreditCard, description: "Complete registration" }
   ];
@@ -35,17 +35,17 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const validateStep = () => {
     if (currentStep === 1) {
-      if (!formData.studentFirstName || !formData.studentLastName || !formData.studentEmail || !formData.studentPhone || !formData.dateOfBirth || !formData.gender || !formData.address) {
+      if (!formData.studentName || !formData.parentName || !formData.phoneNumber || !formData.whatsappNumber || !formData.district || !formData.cityVillage) {
         toast.error("Please fill in all required fields");
         return false;
       }
     } else if (currentStep === 2) {
-      if (!formData.parentFirstName || !formData.parentLastName || !formData.parentEmail || !formData.parentPhone || !formData.schoolName || !formData.schoolCity || !formData.schoolBoard) {
+      if (!formData.schoolName || !formData.schoolMedium || !formData.standard || !formData.previousYearPercentage || !formData.preferredExamDate) {
         toast.error("Please fill in all required fields");
         return false;
       }
     } else if (currentStep === 3) {
-      if (!formData.standard || !formData.medium || !formData.examDate) {
+      if (!formData.medium || !formData.examCenter) {
         toast.error("Please complete all selections");
         return false;
       }
@@ -76,21 +76,18 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
       const { data, error } = await supabase
         .from('registrations')
         .insert({
-          student_name: `${formData.studentFirstName} ${formData.studentLastName}`,
-          email: formData.studentEmail,
-          mobile_number: formData.studentPhone,
-          date_of_birth: formData.dateOfBirth,
-          gender: formData.gender,
-          address: formData.address,
-          parent_first_name: formData.parentFirstName,
-          parent_last_name: formData.parentLastName,
-          parent_email: formData.parentEmail,
-          parent_phone: formData.parentPhone,
+          student_name: formData.studentName,
+          parent_name: formData.parentName,
+          mobile_number: formData.phoneNumber,
+          whatsapp_number: formData.whatsappNumber,
+          district: formData.district,
+          city_village: formData.cityVillage,
           school_name: formData.schoolName,
-          school_address: `${formData.schoolCity}, ${formData.schoolBoard}`,
+          school_medium: formData.schoolMedium,
           standard: formData.standard,
+          previous_year_percentage: formData.previousYearPercentage,
+          preferred_exam_date: formData.preferredExamDate,
           medium: formData.medium,
-          exam_date: formData.examDate,
           exam_center: formData.examCenter || 'To be announced',
           registration_number: registrationNumber
         })

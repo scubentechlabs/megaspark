@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ParentSchoolStepProps {
   formData: any;
@@ -9,101 +10,78 @@ interface ParentSchoolStepProps {
 export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepProps) => {
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-primary mb-2">Parent Details</h3>
-        <p className="text-sm text-muted-foreground">Guardian/Parent information</p>
+      <div className="space-y-2">
+        <Label htmlFor="schoolName">Current School Name *</Label>
+        <Input
+          id="schoolName"
+          value={formData.schoolName || ""}
+          onChange={(e) => updateFormData({ schoolName: e.target.value })}
+          placeholder="Enter current school name"
+          required
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="parentFirstName">Parent First Name *</Label>
-          <Input
-            id="parentFirstName"
-            value={formData.parentFirstName || ""}
-            onChange={(e) => updateFormData({ parentFirstName: e.target.value })}
-            placeholder="Enter parent's first name"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="parentLastName">Parent Last Name *</Label>
-          <Input
-            id="parentLastName"
-            value={formData.parentLastName || ""}
-            onChange={(e) => updateFormData({ parentLastName: e.target.value })}
-            placeholder="Enter parent's last name"
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="schoolMedium">School Medium / School Language *</Label>
+        <Select 
+          value={formData.schoolMedium} 
+          onValueChange={(value) => updateFormData({ schoolMedium: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select medium" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gujarati">Gujarati</SelectItem>
+            <SelectItem value="english">English</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="parentEmail">Parent Email *</Label>
-          <Input
-            id="parentEmail"
-            type="email"
-            value={formData.parentEmail || ""}
-            onChange={(e) => updateFormData({ parentEmail: e.target.value })}
-            placeholder="parent@example.com"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="parentPhone">Parent Mobile *</Label>
-          <Input
-            id="parentPhone"
-            type="tel"
-            value={formData.parentPhone || ""}
-            onChange={(e) => updateFormData({ parentPhone: e.target.value })}
-            placeholder="+91 98765 43210"
-            required
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="standard">Current Standard *</Label>
+        <Select 
+          value={formData.standard} 
+          onValueChange={(value) => updateFormData({ standard: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select standard" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="6th">6th Standard</SelectItem>
+            <SelectItem value="7th">7th Standard</SelectItem>
+            <SelectItem value="8th">8th Standard</SelectItem>
+            <SelectItem value="9th">9th Standard</SelectItem>
+            <SelectItem value="10th">10th Standard</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="border-t border-border pt-6 mt-6">
-        <h3 className="text-xl font-bold text-primary mb-2">School Information</h3>
-        <p className="text-sm text-muted-foreground mb-4">Current school details</p>
+      <div className="space-y-2">
+        <Label htmlFor="previousYearPercentage">Your Previous Year Percentage *</Label>
+        <Input
+          id="previousYearPercentage"
+          value={formData.previousYearPercentage || ""}
+          onChange={(e) => updateFormData({ previousYearPercentage: e.target.value })}
+          placeholder="Enter percentage (e.g., 85%)"
+          required
+        />
+      </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="schoolName">School Name *</Label>
-            <Input
-              id="schoolName"
-              value={formData.schoolName || ""}
-              onChange={(e) => updateFormData({ schoolName: e.target.value })}
-              placeholder="Enter school name"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="schoolCity">City *</Label>
-              <Input
-                id="schoolCity"
-                value={formData.schoolCity || ""}
-                onChange={(e) => updateFormData({ schoolCity: e.target.value })}
-                placeholder="Enter city"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="schoolBoard">Board *</Label>
-              <Input
-                id="schoolBoard"
-                value={formData.schoolBoard || ""}
-                onChange={(e) => updateFormData({ schoolBoard: e.target.value })}
-                placeholder="GSEB/CBSE/ICSE"
-                required
-              />
-            </div>
-          </div>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="preferredExamDate">Preferred Exam Date *</Label>
+        <Select 
+          value={formData.preferredExamDate} 
+          onValueChange={(value) => updateFormData({ preferredExamDate: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select preferred exam date" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="2025-12-07">7th December 2025</SelectItem>
+            <SelectItem value="2025-12-14">14th December 2025</SelectItem>
+            <SelectItem value="2025-12-21">21st December 2025</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
