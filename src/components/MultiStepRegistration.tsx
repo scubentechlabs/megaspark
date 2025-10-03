@@ -168,7 +168,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         </CardHeader>
 
         <CardContent className="px-6 pb-6 pt-8">
-          <div className="min-h-[400px]">
+          <div className="min-h-[350px]">
             {currentStep === 1 && (
               <StudentDetailsStep formData={formData} updateFormData={updateFormData} />
             )}

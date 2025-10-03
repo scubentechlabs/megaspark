@@ -137,7 +137,7 @@ export const RegistrationSection = () => {
           </CardHeader>
 
           <CardContent className="p-8">
-            <div className="min-h-[500px]">
+            <div className="min-h-[350px]">
               {currentStep === 1 && (
                 <StudentDetailsStep formData={formData} updateFormData={updateFormData} />
               )}
