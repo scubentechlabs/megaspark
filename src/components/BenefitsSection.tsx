@@ -15,21 +15,21 @@ const benefits = [
     title: "1000 Students - 100% Scholarship",
     description: "Complete fee waiver through Dattak Yojana",
     detail: "1000 exceptional students will receive 100% scholarship coverage under our exclusive Dattak Yojana program for their entire academic journey.",
-    color: "bg-gradient-to-br from-accent to-accent/80"
+    color: "bg-gradient-to-br from-primary to-primary/80"
   },
   {
     icon: Award,
     title: "Certification of Achievement",
     description: "Recognition that opens doors to opportunities",
     detail: "Receive an official Certificate of Achievement recognized by top educational institutions and valued by universities nationwide.",
-    color: "bg-gradient-to-br from-primary to-accent"
+    color: "bg-gradient-to-br from-primary to-primary/80"
   },
   {
     icon: HeadphonesIcon,
     title: "Free Career Counselling",
     description: "Expert guidance for your future path",
     detail: "Get personalized career counselling sessions from industry experts to help you make informed decisions about your academic and professional future.",
-    color: "bg-gradient-to-br from-accent to-primary"
+    color: "bg-gradient-to-br from-primary to-primary/80"
   }
 ];
 
@@ -77,7 +77,7 @@ export const BenefitsSection = () => {
                 >
                   {/* Front of card */}
                   <Card
-                    className={`absolute inset-0 backface-hidden hover:shadow-hover transition-all duration-300 border-2 border-transparent hover:border-accent/20 overflow-hidden ${
+                    className={`absolute inset-0 backface-hidden hover:shadow-hover transition-all duration-300 border-2 border-transparent hover:border-primary/20 overflow-hidden ${
                       isFlipped ? 'pointer-events-none' : ''
                     }`}
                   >
@@ -91,10 +91,6 @@ export const BenefitsSection = () => {
                       <p className="text-sm text-muted-foreground leading-relaxed">
                         {benefit.description}
                       </p>
-                      <div className="absolute bottom-4 text-xs text-accent font-semibold flex items-center gap-1">
-                        <span>Tap to learn more</span>
-                        <span className="animate-bounce">→</span>
-                      </div>
                     </CardContent>
                   </Card>
 
@@ -103,7 +99,7 @@ export const BenefitsSection = () => {
                     className={`absolute inset-0 backface-hidden rotate-y-180 border-2 ${
                       !isFlipped ? 'pointer-events-none' : ''
                     }`}
-                    style={{ borderColor: 'hsl(var(--accent))' }}
+                    style={{ borderColor: 'hsl(var(--primary))' }}
                   >
                     <CardContent className={`p-6 h-full flex flex-col justify-center text-center ${benefit.color} text-white`}>
                       <Icon className="h-12 w-12 mx-auto mb-4 opacity-90" />
