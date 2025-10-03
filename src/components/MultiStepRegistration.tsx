@@ -33,13 +33,58 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const validateStep = () => {
     if (currentStep === 1) {
-      if (!formData.studentName || !formData.parentName || !formData.phoneNumber || !formData.whatsappNumber || !formData.district || !formData.cityVillage) {
-        toast.error("Please fill in all required fields");
+      // Validate all required fields
+      if (!formData.studentName || formData.studentName.trim() === "") {
+        toast.error("Please enter student's name");
+        return false;
+      }
+      if (!formData.parentName || formData.parentName.trim() === "") {
+        toast.error("Please enter parent's name");
+        return false;
+      }
+      // Validate phone number - must be exactly 10 digits
+      if (!formData.phoneNumber || formData.phoneNumber.length !== 10) {
+        toast.error("Phone number must be exactly 10 digits");
+        return false;
+      }
+      // Validate WhatsApp number - must be exactly 10 digits
+      if (!formData.whatsappNumber || formData.whatsappNumber.length !== 10) {
+        toast.error("WhatsApp number must be exactly 10 digits");
+        return false;
+      }
+      if (!formData.district || formData.district.trim() === "") {
+        toast.error("Please enter district");
+        return false;
+      }
+      if (!formData.cityVillage || formData.cityVillage.trim() === "") {
+        toast.error("Please enter city/village name");
         return false;
       }
     } else if (currentStep === 2) {
-      if (!formData.schoolName || !formData.schoolMedium || !formData.standard || !formData.previousYearPercentage || !formData.preferredExamDate) {
-        toast.error("Please fill in all required fields");
+      if (!formData.schoolName || formData.schoolName.trim() === "") {
+        toast.error("Please enter school name");
+        return false;
+      }
+      if (!formData.schoolMedium) {
+        toast.error("Please select school medium");
+        return false;
+      }
+      if (!formData.standard) {
+        toast.error("Please select current standard");
+        return false;
+      }
+      // Validate percentage - must be between 0-100
+      if (!formData.previousYearPercentage || formData.previousYearPercentage.trim() === "") {
+        toast.error("Please enter previous year percentage");
+        return false;
+      }
+      const percentage = parseFloat(formData.previousYearPercentage.replace('%', ''));
+      if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+        toast.error("Percentage must be between 0 and 100");
+        return false;
+      }
+      if (!formData.preferredExamDate) {
+        toast.error("Please select preferred exam date");
         return false;
       }
     }

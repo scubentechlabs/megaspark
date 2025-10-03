@@ -8,6 +8,27 @@ interface ParentSchoolStepProps {
 }
 
 export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepProps) => {
+  const handlePercentageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^\d.]/g, ''); // Allow only digits and decimal point
+    
+    // Limit to 2 decimal places
+    const parts = value.split('.');
+    if (parts.length > 2) {
+      value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    if (parts[1] && parts[1].length > 2) {
+      value = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+    
+    // Limit to 100
+    const numValue = parseFloat(value);
+    if (numValue > 100) {
+      value = '100';
+    }
+    
+    updateFormData({ previousYearPercentage: value });
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,11 +83,16 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
           <Label htmlFor="previousYearPercentage">Your Previous Year Percentage *</Label>
           <Input
             id="previousYearPercentage"
+            type="text"
             value={formData.previousYearPercentage || ""}
-            onChange={(e) => updateFormData({ previousYearPercentage: e.target.value })}
-            placeholder="Enter percentage (e.g., 85%)"
+            onChange={handlePercentageChange}
+            placeholder="Enter percentage (e.g., 85 or 85.5)"
+            maxLength={6}
             required
           />
+          {formData.previousYearPercentage && (parseFloat(formData.previousYearPercentage) < 0 || parseFloat(formData.previousYearPercentage) > 100) && (
+            <p className="text-xs text-destructive">Percentage must be between 0 and 100</p>
+          )}
         </div>
 
         <div className="space-y-2 md:col-span-2">
