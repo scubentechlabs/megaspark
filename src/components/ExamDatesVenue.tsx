@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MapPin, Clock } from "lucide-react";
-import schoolBuilding from "@/assets/school-building-new.jpg";
+import schoolBuilding from "@/assets/school-building.webp";
 
 const examDates = [
   { date: "7th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
