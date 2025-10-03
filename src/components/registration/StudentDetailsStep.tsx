@@ -7,6 +7,18 @@ interface StudentDetailsStepProps {
 }
 
 export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsStepProps) => {
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    if (value.length <= 10) {
+      updateFormData({ [field]: value });
+    }
+  };
+
+  const formatPhoneDisplay = (value: string) => {
+    if (!value) return '+91 ';
+    return `+91 ${value}`;
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,24 +48,32 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
           <Label htmlFor="phoneNumber">Enter Phone Number *</Label>
           <Input
             id="phoneNumber"
-            type="tel"
-            value={formData.phoneNumber || ""}
-            onChange={(e) => updateFormData({ phoneNumber: e.target.value })}
-            placeholder="+91 98765 43210"
+            type="text"
+            value={formatPhoneDisplay(formData.phoneNumber || "")}
+            onChange={(e) => handlePhoneChange(e, 'phoneNumber')}
+            placeholder="+91 9876543210"
+            maxLength={14}
             required
           />
+          {formData.phoneNumber && formData.phoneNumber.length !== 10 && (
+            <p className="text-xs text-destructive">Mobile number must be 10 digits</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="whatsappNumber">Your WhatsApp Number *</Label>
           <Input
             id="whatsappNumber"
-            type="tel"
-            value={formData.whatsappNumber || ""}
-            onChange={(e) => updateFormData({ whatsappNumber: e.target.value })}
-            placeholder="+91 98765 43210"
+            type="text"
+            value={formatPhoneDisplay(formData.whatsappNumber || "")}
+            onChange={(e) => handlePhoneChange(e, 'whatsappNumber')}
+            placeholder="+91 9876543210"
+            maxLength={14}
             required
           />
+          {formData.whatsappNumber && formData.whatsappNumber.length !== 10 && (
+            <p className="text-xs text-destructive">WhatsApp number must be 10 digits</p>
+          )}
         </div>
 
         <div className="space-y-2">
