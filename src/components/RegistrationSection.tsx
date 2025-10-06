@@ -8,6 +8,7 @@ import { ParentSchoolStep } from "./registration/ParentSchoolStep";
 import { PaymentStep } from "./registration/PaymentStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const RegistrationSection = () => {
   const navigate = useNavigate();
@@ -104,16 +105,37 @@ export const RegistrationSection = () => {
     }
   };
 
-  const handlePaymentComplete = () => {
-    console.log("Registration completed:", formData);
-    toast.success("Payment Successful!", {
-      description: "Redirecting to confirmation page..."
-    });
-    
-    // Redirect to success page after 2 seconds
-    setTimeout(() => {
-      navigate("/registration-success");
-    }, 2000);
+  const handlePaymentComplete = async () => {
+    try {
+      const registrationNumber = `SPARK${Date.now()}`;
+
+      const { error } = await supabase
+        .from('registrations')
+        .insert({
+          student_name: formData.studentName,
+          parent_name: formData.parentName,
+          mobile_number: formData.phoneNumber,
+          whatsapp_number: formData.whatsappNumber,
+          district: formData.district,
+          city_village: formData.cityVillage,
+          school_name: formData.schoolName,
+          school_medium: formData.schoolMedium,
+          standard: formData.standard,
+          previous_year_percentage: formData.previousYearPercentage,
+          preferred_exam_date: formData.preferredExamDate,
+          medium: (formData.schoolMedium || '').toString().toLowerCase() === 'english' ? 'English' : 'Gujarati',
+          exam_center: 'To be announced',
+          registration_number: registrationNumber,
+        });
+
+      if (error) throw error;
+
+      toast.success('Registration Successful!', { description: 'Redirecting to confirmation...' });
+      setTimeout(() => navigate('/registration-success'), 1500);
+    } catch (err: any) {
+      console.error('Registration save error:', err);
+      toast.error('Could not save registration', { description: err.message || 'Please try again.' });
+    }
   };
 
   return (
