@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Smartphone, CreditCard, Wallet, CheckCircle2, QrCode } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface PaymentStepProps {
@@ -12,7 +11,6 @@ interface PaymentStepProps {
 export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
-  const navigate = useNavigate();
 
   const paymentMethods = [
     { id: "gpay", name: "Google Pay", icon: Smartphone, color: "from-blue-500 to-blue-600" },
@@ -26,7 +24,7 @@ export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
     // Simulate payment processing
     setTimeout(() => {
       toast.success("Payment successful!");
-      navigate("/registration-success");
+      onPaymentComplete();
     }, 2000);
   };
 
@@ -131,7 +129,7 @@ export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
               <Button
                 onClick={() => {
                   toast.success("Payment successful!");
-                  navigate("/registration-success");
+                  onPaymentComplete();
                 }}
                 className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white py-6 text-lg font-semibold"
               >
