@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { Link } from "react-router-dom";
 
 export const NewFooter = () => {
   return (
@@ -43,6 +44,7 @@ export const NewFooter = () => {
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Scholarship Guide</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Application Tips</a></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">FAQ</a></li>
+              <li><Link to="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms & Conditions</a></li>
             </ul>
           </div>
