@@ -8,7 +8,14 @@ interface StudentDetailsStepProps {
 
 export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsStepProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    
+    // If value starts with 91 (country code from the prefix), remove it
+    if (value.startsWith('91') && value.length > 10) {
+      value = value.substring(2);
+    }
+    
+    // Limit to 10 digits
     if (value.length <= 10) {
       updateFormData({ [field]: value });
     }
