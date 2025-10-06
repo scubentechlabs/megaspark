@@ -176,8 +176,9 @@ export default function Login() {
   </div>
 
   <div class="footer">
-    <p><strong>Call Us</strong> 99796 51002 / 3 / 4 / 5</p>
-    <p><strong>www.cfekota.com</strong></p>
+    <p><strong>Call Us</strong> 9978651002 / 3 / 4 / 5</p>
+    <p><strong>Email:</strong> digital.cfe.ppsavani@gmail.com</p>
+    <p><strong>Website:</strong> megaspark.scubentechlabs.com</p>
   </div>
 
   <div class="no-print" style="margin-top: 30px; text-align: center;">
@@ -298,7 +299,7 @@ export default function Login() {
         </Card>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>Need help? Contact us at info@ppsavani.edu.in</p>
+          <p>Need help? Contact us at digital.cfe.ppsavani@gmail.com or call 9978651002 / 3 / 4 / 5</p>
         </div>
       </div>
     </div>
