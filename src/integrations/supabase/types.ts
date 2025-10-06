@@ -17,6 +17,7 @@ export type Database = {
       registrations: {
         Row: {
           address: string | null
+          building_name: string | null
           city_village: string | null
           created_at: string
           date_of_birth: string | null
@@ -24,6 +25,8 @@ export type Database = {
           email: string | null
           exam_center: string
           exam_date: string | null
+          exam_pattern: string | null
+          floor: string | null
           gender: string | null
           hall_ticket_url: string | null
           id: string
@@ -37,6 +40,7 @@ export type Database = {
           preferred_exam_date: string | null
           previous_year_percentage: string | null
           registration_number: string
+          room_no: string | null
           school_address: string | null
           school_medium: string | null
           school_name: string | null
@@ -47,6 +51,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          building_name?: string | null
           city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -54,6 +59,8 @@ export type Database = {
           email?: string | null
           exam_center: string
           exam_date?: string | null
+          exam_pattern?: string | null
+          floor?: string | null
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
@@ -67,6 +74,7 @@ export type Database = {
           preferred_exam_date?: string | null
           previous_year_percentage?: string | null
           registration_number: string
+          room_no?: string | null
           school_address?: string | null
           school_medium?: string | null
           school_name?: string | null
@@ -77,6 +85,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          building_name?: string | null
           city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
@@ -84,6 +93,8 @@ export type Database = {
           email?: string | null
           exam_center?: string
           exam_date?: string | null
+          exam_pattern?: string | null
+          floor?: string | null
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
@@ -97,6 +108,7 @@ export type Database = {
           preferred_exam_date?: string | null
           previous_year_percentage?: string | null
           registration_number?: string
+          room_no?: string | null
           school_address?: string | null
           school_medium?: string | null
           school_name?: string | null

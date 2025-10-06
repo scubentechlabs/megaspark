@@ -19,6 +19,10 @@ interface Registration {
   registration_number: string;
   hall_ticket_url: string | null;
   created_at: string;
+  room_no: string | null;
+  floor: string | null;
+  building_name: string | null;
+  exam_pattern: string | null;
 }
 
 export default function Login() {
@@ -141,19 +145,19 @@ export default function Login() {
     </tr>
     <tr>
       <td>Room No :</td>
-      <td><strong>-</strong></td>
+      <td><strong>${registration.room_no || '-'}</strong></td>
     </tr>
     <tr>
       <td>Floor :</td>
-      <td><strong>-</strong></td>
+      <td><strong>${registration.floor || '-'}</strong></td>
     </tr>
     <tr>
       <td>Building Name :</td>
-      <td><strong>-</strong></td>
+      <td><strong>${registration.building_name || '-'}</strong></td>
     </tr>
     <tr>
       <td>Exam Pattern :</td>
-      <td><strong>-</strong></td>
+      <td><strong>${registration.exam_pattern || '-'}</strong></td>
     </tr>
   </table>
 

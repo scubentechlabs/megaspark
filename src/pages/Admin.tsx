@@ -41,6 +41,10 @@ interface Registration {
   previous_year_percentage: string | null;
   preferred_exam_date: string | null;
   exam_date: string | null;
+  room_no: string | null;
+  floor: string | null;
+  building_name: string | null;
+  exam_pattern: string | null;
 }
 
 export default function Admin() {
@@ -217,6 +221,22 @@ export default function Admin() {
             <tr>
               <td>Exam Date<br>પરીક્ષા તારીખ</td>
               <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'To be announced'}</td>
+            </tr>
+            <tr>
+              <td>Room No<br>રૂમ નંબર</td>
+              <td>${reg.room_no || 'To be announced'}</td>
+            </tr>
+            <tr>
+              <td>Floor<br>માળ</td>
+              <td>${reg.floor || 'To be announced'}</td>
+            </tr>
+            <tr>
+              <td>Building Name<br>બિલ્ડિંગનું નામ</td>
+              <td>${reg.building_name || 'To be announced'}</td>
+            </tr>
+            <tr>
+              <td>Exam Pattern<br>પરીક્ષા પેટર્ન</td>
+              <td>${reg.exam_pattern || 'To be announced'}</td>
             </tr>
             <tr>
               <td>Exam Center<br>પરીક્ષા કેન્દ્ર</td>
