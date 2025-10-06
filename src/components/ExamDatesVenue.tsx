@@ -3,9 +3,9 @@ import { Calendar, MapPin, Clock } from "lucide-react";
 import schoolBuilding from "@/assets/school-building.webp";
 
 const examDates = [
+  { date: "30th November", day: "Sunday", time: "8:00 AM - 12:00 PM" },
   { date: "7th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
   { date: "14th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
-  { date: "21st December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
   { date: "28th December", day: "Sunday", time: "8:00 AM - 12:00 PM" }
 ];
 
@@ -25,7 +25,7 @@ export const ExamDatesVenue = () => {
             Exam Dates & <span className="text-accent">Venue</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Mark your calendar for all four exam dates throughout December 2025
+            Mark your calendar for all exam dates in November and December 2025
           </p>
         </div>
 

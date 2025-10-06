@@ -9,9 +9,9 @@ interface ExamPreferencesStepProps {
 }
 
 const examDates = [
+  { value: "2025-11-30", label: "30th November 2025 - Sunday" },
   { value: "2025-12-07", label: "7th December 2025 - Sunday" },
   { value: "2025-12-14", label: "14th December 2025 - Sunday" },
-  { value: "2025-12-21", label: "21st December 2025 - Sunday" },
   { value: "2025-12-28", label: "28th December 2025 - Sunday" }
 ];
 
