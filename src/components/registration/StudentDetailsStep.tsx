@@ -8,17 +8,9 @@ interface StudentDetailsStepProps {
 
 export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsStepProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-    
-    // If value starts with 91 (country code from the prefix), remove it
-    if (value.startsWith('91') && value.length > 10) {
-      value = value.substring(2);
-    }
-    
-    // Limit to 10 digits
-    if (value.length <= 10) {
-      updateFormData({ [field]: value });
-    }
+    // Keep only digits and cap at 10
+    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    updateFormData({ [field]: value });
   };
 
   const formatPhoneDisplay = (value: string) => {
@@ -56,10 +48,10 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
           <Input
             id="phoneNumber"
             type="text"
-            value={formatPhoneDisplay(formData.phoneNumber || "")}
+            value={formData.phoneNumber || ""}
             onChange={(e) => handlePhoneChange(e, 'phoneNumber')}
-            placeholder="+91 9876543210"
-            maxLength={14}
+            placeholder="Enter 10-digit mobile number"
+            maxLength={10}
             required
           />
           {formData.phoneNumber && formData.phoneNumber.length !== 10 && (
@@ -72,10 +64,10 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
           <Input
             id="whatsappNumber"
             type="text"
-            value={formatPhoneDisplay(formData.whatsappNumber || "")}
+            value={formData.whatsappNumber || ""}
             onChange={(e) => handlePhoneChange(e, 'whatsappNumber')}
-            placeholder="+91 9876543210"
-            maxLength={14}
+            placeholder="Enter 10-digit mobile number"
+            maxLength={10}
             required
           />
           {formData.whatsappNumber && formData.whatsappNumber.length !== 10 && (
