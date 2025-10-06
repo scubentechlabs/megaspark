@@ -178,7 +178,7 @@ export default function Login() {
   <div class="footer">
     <p><strong>Call Us</strong> 9978651002 / 3 / 4 / 5</p>
     <p><strong>Email:</strong> digital.cfe.ppsavani@gmail.com</p>
-    <p><strong>Website:</strong> megaspark.scubentechlabs.com</p>
+    <p><strong>Website:</strong> megasparkexam.com</p>
   </div>
 
   <div class="no-print" style="margin-top: 30px; text-align: center;">

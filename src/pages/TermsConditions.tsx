@@ -36,7 +36,7 @@ export default function TermsConditions() {
             <div className="prose prose-sm max-w-none">
               <section className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
                 <p className="text-muted-foreground leading-relaxed">
-                  Welcome to <strong>MegaSpark</strong> (megaspark.scubentechlabs.com) ("we", "us", "our", "Site"). 
+                  Welcome to <strong>MegaSpark</strong> (megasparkexam.com) ("we", "us", "our", "Site"). 
                   Please read these Terms & Conditions ("Terms") carefully before using the Site or any of our services 
                   (including payment via PhonePe). By accessing or using the Site, you agree to these Terms, our Privacy Policy, 
                   and any amendments made from time to time. If you do not agree, you should not use the Site or services.
