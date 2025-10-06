@@ -22,7 +22,7 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="studentName">Student's Name *</Label>
+          <Label htmlFor="studentName">Student's Full Name *</Label>
           <Input
             id="studentName"
             value={formData.studentName || ""}
@@ -33,7 +33,7 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="parentName">Parent's Name *</Label>
+          <Label htmlFor="parentName">Parent's Full Name *</Label>
           <Input
             id="parentName"
             value={formData.parentName || ""}
