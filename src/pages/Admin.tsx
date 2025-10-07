@@ -117,6 +117,33 @@ export default function Admin() {
     }
   }, [searchTerm, registrations]);
 
+  // Auto-select first available option when report type changes
+  useEffect(() => {
+    const uniqueVals = getUniqueValues();
+    
+    if (reportType === "exam-date" && uniqueVals.examDates.length > 0 && !selectedExamDate) {
+      setSelectedExamDate(uniqueVals.examDates[0]);
+    }
+    if (reportType === "room" && uniqueVals.rooms.length > 0 && !selectedRoom) {
+      setSelectedRoom(uniqueVals.rooms[0]);
+    }
+    if (reportType === "floor" && uniqueVals.floors.length > 0 && !selectedFloor) {
+      setSelectedFloor(uniqueVals.floors[0]);
+    }
+    if (reportType === "school" && uniqueVals.schools.length > 0 && !selectedSchool) {
+      setSelectedSchool(uniqueVals.schools[0]);
+    }
+  }, [reportType, registrations]);
+
+  const getUniqueValues = () => {
+    const examDates = [...new Set(registrations.map(r => r.exam_date).filter(Boolean))].sort();
+    const rooms = [...new Set(registrations.map(r => r.room_no).filter(Boolean))].sort();
+    const floors = [...new Set(registrations.map(r => r.floor).filter(Boolean))].sort();
+    const schools = [...new Set(registrations.map(r => r.school_name).filter(Boolean))].sort();
+    
+    return { examDates, rooms, floors, schools };
+  };
+
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
@@ -479,14 +506,6 @@ export default function Admin() {
     return { total, byStandard, byMedium };
   };
 
-  const getUniqueValues = () => {
-    const examDates = [...new Set(registrations.map(r => r.exam_date).filter(Boolean))].sort();
-    const rooms = [...new Set(registrations.map(r => r.room_no).filter(Boolean))].sort();
-    const floors = [...new Set(registrations.map(r => r.floor).filter(Boolean))].sort();
-    const schools = [...new Set(registrations.map(r => r.school_name).filter(Boolean))].sort();
-    
-    return { examDates, rooms, floors, schools };
-  };
 
   const getFilteredReportData = () => {
     let data = [...registrations];
