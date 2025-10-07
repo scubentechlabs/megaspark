@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText, LogOut, Edit } from "lucide-react";
+import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText, LogOut, Edit, Printer } from "lucide-react";
 import logo from "@/assets/logo.png";
 import {
   Sidebar,
@@ -302,6 +302,7 @@ export default function Admin() {
       "Parent Name",
       "Mobile Number",
       "WhatsApp Number",
+      "Email",
       "District",
       "City/Village",
       "School Name",
@@ -309,8 +310,13 @@ export default function Admin() {
       "Standard",
       "Previous Year %",
       "Preferred Exam Date",
+      "Exam Date",
       "Medium",
       "Exam Center",
+      "Room No",
+      "Floor",
+      "Building Name",
+      "Exam Pattern",
       "Registration Date",
     ];
 
@@ -320,6 +326,7 @@ export default function Admin() {
       reg.parent_name || 'N/A',
       reg.mobile_number,
       reg.whatsapp_number || 'N/A',
+      reg.email || 'N/A',
       reg.district || 'N/A',
       reg.city_village || 'N/A',
       reg.school_name || 'N/A',
@@ -327,8 +334,13 @@ export default function Admin() {
       reg.standard,
       reg.previous_year_percentage || 'N/A',
       reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
+      reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
       reg.medium,
       reg.exam_center,
+      reg.room_no || 'N/A',
+      reg.floor || 'N/A',
+      reg.building_name || 'N/A',
+      reg.exam_pattern || 'N/A',
       new Date(reg.created_at).toLocaleDateString(),
     ]);
 
@@ -351,6 +363,100 @@ export default function Admin() {
       title: "Exported!",
       description: "Registration data has been exported to CSV",
     });
+  };
+
+  const printRegistrations = () => {
+    const printHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Registration Data - MEGA SPARK EXAM 2025</title>
+        <style>
+          @page { size: A4 landscape; margin: 15mm; }
+          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; font-size: 10px; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .header h1 { margin: 0; font-size: 20px; }
+          .header p { margin: 5px 0; font-size: 12px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+          th { background: #f0f0f0; font-weight: bold; font-size: 9px; }
+          td { font-size: 9px; }
+          .footer { margin-top: 20px; text-align: center; font-size: 9px; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>MEGA SPARK EXAM 2025 - Registration Data</h1>
+          <p>Total Registrations: ${filteredRegistrations.length} | Generated: ${new Date().toLocaleString()}</p>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Reg. No.</th>
+              <th>Student Name</th>
+              <th>Mobile</th>
+              <th>Email</th>
+              <th>Standard</th>
+              <th>Medium</th>
+              <th>District</th>
+              <th>School</th>
+              <th>Exam Date</th>
+              <th>Room</th>
+              <th>Floor</th>
+              <th>Building</th>
+              <th>Pattern</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredRegistrations.map(reg => `
+              <tr>
+                <td>${reg.registration_number}</td>
+                <td>${reg.student_name}</td>
+                <td>${reg.mobile_number}</td>
+                <td>${reg.email || 'N/A'}</td>
+                <td>${reg.standard}</td>
+                <td>${reg.medium}</td>
+                <td>${reg.district || 'N/A'}</td>
+                <td>${reg.school_name || 'N/A'}</td>
+                <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
+                <td>${reg.room_no || 'N/A'}</td>
+                <td>${reg.floor || 'N/A'}</td>
+                <td>${reg.building_name || 'N/A'}</td>
+                <td>${reg.exam_pattern || 'N/A'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        <div class="footer">
+          <p>MEGA SPARK EXAM COMMITTEE | Website: www.megaspark.com</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      
+      toast({
+        title: "Print Ready",
+        description: "Opening print dialog for registration data",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please allow popups to print registration data",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStats = () => {
@@ -548,7 +654,11 @@ export default function Admin() {
                     <div className="flex gap-2">
                       <Button onClick={exportToCSV} className="gap-2">
                         <Download className="h-4 w-4" />
-                        Export CSV
+                        Download CSV
+                      </Button>
+                      <Button onClick={printRegistrations} variant="outline" className="gap-2">
+                        <Printer className="h-4 w-4" />
+                        Print
                       </Button>
                       <Button onClick={fetchRegistrations} variant="outline">
                         Refresh
