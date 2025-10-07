@@ -5,17 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Printer, FileText, Home } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { Download, Printer, FileText } from "lucide-react";
+import { AdminSidebar } from "@/components/AdminSidebar";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -45,40 +37,6 @@ interface Registration {
   floor: string | null;
   building_name: string | null;
   exam_pattern: string | null;
-}
-
-function AppSidebar() {
-  const navigate = useNavigate();
-
-  const menuItems = [
-    { title: "Dashboard", icon: Home, onClick: () => navigate("/admin") },
-    { title: "Reports", icon: FileText, onClick: () => navigate("/admin/reports") },
-  ];
-
-  return (
-    <Sidebar className="border-r">
-      <SidebarContent>
-        <div className="p-4">
-          <img src={logo} alt="MEGA SPARK" className="h-12 mx-auto" />
-        </div>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton onClick={item.onClick}>
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
-  );
 }
 
 export default function Reports() {
@@ -389,7 +347,7 @@ export default function Reports() {
     return (
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          <AppSidebar />
+          <AdminSidebar />
           <main className="flex-1 flex items-center justify-center">
             <p className="text-lg">Loading...</p>
           </main>
@@ -401,7 +359,7 @@ export default function Reports() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
+        <AdminSidebar />
         <main className="flex-1">
           <header className="h-14 border-b flex items-center px-6">
             <SidebarTrigger className="mr-4" />

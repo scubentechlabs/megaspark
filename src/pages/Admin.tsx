@@ -8,17 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Home, Search, Download, Users, Calendar, Settings, BarChart3, FileText, LogOut, Edit, Printer } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { Search, Download, LogOut, Edit, Printer, Users, Calendar } from "lucide-react";
+import { AdminSidebar } from "@/components/AdminSidebar";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -523,53 +515,7 @@ export default function Admin() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <Sidebar className="border-r">
-          <SidebarContent>
-            <div className="p-6 border-b">
-              <img src={logo} alt="Logo" className="h-10 mb-2" />
-              <h2 className="font-semibold text-lg">MEGA SPARK</h2>
-              <p className="text-xs text-muted-foreground">Admin Dashboard</p>
-            </div>
-            
-            <SidebarGroup>
-              <SidebarGroupLabel>Menu</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start">
-                      <BarChart3 className="h-4 w-4 mr-3" />
-                      <span>Dashboard</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start bg-accent">
-                      <Users className="h-4 w-4 mr-3" />
-                      <span>Registrations</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start" onClick={() => navigate("/admin/reports")}>
-                      <FileText className="h-4 w-4 mr-3" />
-                      <span>Reports</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start">
-                      <Settings className="h-4 w-4 mr-3" />
-                      <span>Settings</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start" onClick={() => navigate("/")}>
-                      <Home className="h-4 w-4 mr-3" />
-                      <span>Back to Home</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+        <AdminSidebar />
 
         <div className="flex-1 flex flex-col min-h-screen">
           {/* Top Header Bar */}
