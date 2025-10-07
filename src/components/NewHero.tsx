@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Users, Download, Sparkles } from "lucide-react";
-import event1 from "@/assets/event-1.webp";
 import event2 from "@/assets/event-2.webp";
 import event3 from "@/assets/event-3.webp";
 import event4 from "@/assets/event-4.webp";
@@ -22,7 +21,6 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
   });
 
   const sliderImages = [
-    event1,
     event2,
     event3,
     event4,
