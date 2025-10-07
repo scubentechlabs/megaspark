@@ -5,7 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Printer, FileText, ArrowLeft } from "lucide-react";
+import { Download, Printer, FileText, Home } from "lucide-react";
+import logo from "@/assets/logo.png";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Registration {
@@ -32,6 +45,40 @@ interface Registration {
   floor: string | null;
   building_name: string | null;
   exam_pattern: string | null;
+}
+
+function AppSidebar() {
+  const navigate = useNavigate();
+
+  const menuItems = [
+    { title: "Dashboard", icon: Home, onClick: () => navigate("/admin") },
+    { title: "Reports", icon: FileText, onClick: () => navigate("/admin/reports") },
+  ];
+
+  return (
+    <Sidebar className="border-r">
+      <SidebarContent>
+        <div className="p-4">
+          <img src={logo} alt="MEGA SPARK" className="h-12 mx-auto" />
+        </div>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton onClick={item.onClick}>
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
 }
 
 export default function Reports() {
@@ -340,25 +387,27 @@ export default function Reports() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-lg">Loading...</p>
-      </div>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <main className="flex-1 flex items-center justify-center">
+            <p className="text-lg">Loading...</p>
+          </main>
+        </div>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Admin
-            </Button>
-            <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-          </div>
-        </div>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar />
+        <main className="flex-1">
+          <header className="h-14 border-b flex items-center px-6">
+            <SidebarTrigger className="mr-4" />
+            <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+          </header>
+          <div className="p-6 space-y-6">
 
         {/* Reports Section */}
         <Card>
@@ -532,7 +581,9 @@ export default function Reports() {
             </div>
           </CardContent>
         </Card>
+          </div>
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
