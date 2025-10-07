@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import Reports from "./pages/Reports";
+import Settings from "./pages/Settings";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/reports" element={<Reports />} />
+          <Route path="/admin/settings" element={<Settings />} />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
