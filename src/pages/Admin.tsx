@@ -547,7 +547,12 @@ export default function Admin() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="w-full justify-start">
+                    <SidebarMenuButton className="w-full justify-start" onClick={() => {
+                      const reportsSection = document.getElementById('reports-section');
+                      if (reportsSection) {
+                        reportsSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}>
                       <FileText className="h-4 w-4 mr-3" />
                       <span>Reports</span>
                     </SidebarMenuButton>
@@ -633,6 +638,40 @@ export default function Admin() {
                           <span className="font-semibold capitalize">{medium}:</span> {count}
                         </p>
                       ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Reports Section */}
+              <div id="reports-section">
+                <Card className="bg-card">
+                  <CardHeader className="border-b">
+                    <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Reports & Analytics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button onClick={exportToCSV} variant="outline" className="h-auto py-4 flex flex-col items-start gap-2">
+                        <div className="flex items-center gap-2">
+                          <Download className="h-5 w-5" />
+                          <span className="font-semibold">Download CSV Report</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Export all registration data to CSV file
+                        </p>
+                      </Button>
+                      <Button onClick={printRegistrations} variant="outline" className="h-auto py-4 flex flex-col items-start gap-2">
+                        <div className="flex items-center gap-2">
+                          <Printer className="h-5 w-5" />
+                          <span className="font-semibold">Print Registration Report</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Print detailed registration data
+                        </p>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
