@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpeg";
+import hallTicketFooterImage from "@/assets/hall-ticket-footer.png";
 
 interface Registration {
   id: string;
@@ -263,6 +264,10 @@ export default function Admin() {
               <li>પરીક્ષાનો રિપોર્ટિંગ સમય સવારે 8:00 કલાકે રહેશે</li>
               <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
             </ul>
+          </div>
+
+          <div style="text-align: center; margin: 25px 0;">
+            <img src="${hallTicketFooterImage}" style="max-width: 100%; height: auto;" alt="P.P. Savani Centre for Excellence" />
           </div>
 
           <div class="footer">
