@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Smartphone, Download, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.png";
+import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpeg";
 
 interface Registration {
   id: string;
@@ -90,19 +91,21 @@ export default function Login() {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SPARK EXAM Hall Ticket - ${registration.registration_number}</title>
+  <title>MEGA SPARK EXAM Hall Ticket - ${registration.registration_number}</title>
   <style>
     @page { margin: 0; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; padding: 30px; background: white; }
     .header { text-align: center; margin-bottom: 20px; }
+    .header-image { width: 100%; max-width: 600px; margin-bottom: 15px; }
     .header h1 { font-size: 24px; color: #1a1a1a; margin: 5px 0; }
     .header h2 { font-size: 32px; color: #2563eb; margin: 10px 0; font-weight: bold; }
     .header h3 { font-size: 20px; color: #1a1a1a; margin: 5px 0; }
-    .medium { text-align: right; margin: 15px 0; font-size: 14px; color: #666; }
     .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
     .info-table td { padding: 12px; border: 1px solid #ddd; font-size: 14px; }
     .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 40%; }
+    .exam-pattern-box { padding: 10px; background: #f0f0f0; margin-top: 5px; }
+    .exam-pattern-box strong { display: block; margin-bottom: 5px; }
     .notes { margin: 25px 0; }
     .notes h4 { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
     .notes ol { padding-left: 20px; }
@@ -119,21 +122,16 @@ export default function Login() {
 </head>
 <body>
   <div class="header">
+    <img src="${hallTicketHeaderImage}" class="header-image" alt="P.P. Savani Centre for Excellence" />
     <h1>P.P. SAVANI GROUP</h1>
-    <h2>SPARK EXAM 2024</h2>
+    <h2>MEGA SPARK EXAM 2025</h2>
     <h3>EXAMINATION HALL TICKET</h3>
   </div>
-
-  <div class="medium">માધ્યમ : ${registration.medium === 'English' ? 'English' : 'ગુજરાતી'}</div>
 
   <table class="info-table">
     <tr>
       <td>Student Name :</td>
       <td><strong>${registration.student_name}</strong></td>
-    </tr>
-    <tr>
-      <td>Exam Date :</td>
-      <td><strong>29 December 2024</strong></td>
     </tr>
     <tr>
       <td>Seat No :</td>
@@ -144,45 +142,41 @@ export default function Login() {
       <td><strong>${registration.standard}</strong></td>
     </tr>
     <tr>
-      <td>Room No :</td>
-      <td><strong>${registration.room_no || '-'}</strong></td>
+      <td>Medium :</td>
+      <td><strong>${registration.medium === 'English' ? 'English' : 'ગુજરાતી (Gujarati)'}</strong></td>
     </tr>
     <tr>
-      <td>Floor :</td>
-      <td><strong>${registration.floor || '-'}</strong></td>
-    </tr>
-    <tr>
-      <td>Building Name :</td>
-      <td><strong>${registration.building_name || '-'}</strong></td>
+      <td>Exam Date :</td>
+      <td><strong>7th December 2025</strong></td>
     </tr>
     <tr>
       <td>Exam Pattern :</td>
-      <td><strong>${registration.exam_pattern || '-'}</strong></td>
+      <td>
+        <strong>MCQ (Multiple Choice Questions)</strong>
+        <div class="exam-pattern-box">
+          <strong>Subjects / વિષયો:</strong>
+          Science (વિજ્ઞાન), Maths (ગણિત), English (અંગ્રેજી)
+        </div>
+      </td>
     </tr>
   </table>
 
+  <div class="exam-center">
+    <h4>Exam Centre</h4>
+    <p>P P Savani Chaitanya Vidya Sankul<br>Mota Varachha-Abrama Road, Abrama, Kamrej,<br>Surat-394150. (Gujarat) India.</p>
+  </div>
+
   <div class="notes">
-    <h4>Notes:</h4>
+    <h4>નોંધ (Notes):</h4>
     <ol>
-      <li>શાળા પર સવારે 8:00 કલાકે રિપોર્ટ કરવાનું રહેશે.</li>
-      <li>માહિતી સેમિનાર :- સવારે 8:45 થી શરૂ થશે.</li>
-      <li>માહિતી સેમિનાર પૂર્ણ થયા પછી પરીક્ષા શરૂ થશે.</li>
-      <li>પરિણામનો સમય :- બપોરે 1:30 વાગ્યે રહેશે.</li>
-      <li>દરેક વિદ્યાર્થી એ આ હોલ-ટિકિટની પ્રિન્ટ કાઢી સાથે રાખવી.</li>
-      <li>હોલટિકિટ સિવાય અન્ય કોઈ ડોક્યુમેન્ટ લાવવું નહીં.</li>
-      <li>એક હોલટિકિટ સાથે મહત્તમ 3 નાસ્તા માટેના ફૂડ કૂપન મળશે.</li>
+      <li>પરીક્ષાનો રિપોર્ટિંગ સમય સવારે 8:00 કલાકે રહેશે</li>
+      <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
     </ol>
   </div>
 
-  <div class="exam-center">
-    <h4>Exam Centre</h4>
-    <p>${registration.exam_center}</p>
-  </div>
-
   <div class="footer">
-    <p><strong>Call Us</strong> 9978651002 / 3 / 4 / 5</p>
-    <p><strong>Email:</strong> digital.cfe.ppsavani@gmail.com</p>
-    <p><strong>Website:</strong> megasparkexam.com</p>
+    <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
+    <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
   </div>
 
   <div class="no-print" style="margin-top: 30px; text-align: center;">

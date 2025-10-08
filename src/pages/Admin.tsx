@@ -14,6 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpeg";
 
 interface Registration {
   id: string;
@@ -144,28 +145,29 @@ export default function Admin() {
           body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
           .container { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
           .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+          .header-image { width: 100%; max-width: 600px; margin-bottom: 15px; }
           .header h1 { margin: 0; font-size: 24px; color: #000; }
           .header h2 { margin: 5px 0; font-size: 18px; color: #333; }
           .header p { margin: 5px 0; font-size: 14px; }
-          .medium-badge { display: inline-block; padding: 5px 15px; background: #f0f0f0; border-radius: 5px; margin: 10px 0; font-weight: bold; }
           .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
           .info-table td { padding: 10px; border: 1px solid #000; }
           .info-table td:first-child { font-weight: bold; width: 40%; background: #f5f5f5; }
+          .exam-pattern-box { padding: 10px; background: #f0f0f0; margin-top: 5px; }
+          .exam-pattern-box strong { display: block; margin-bottom: 5px; }
           .notes { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #000; }
           .notes h3 { margin-top: 0; }
           .notes ul { margin: 10px 0; padding-left: 20px; }
           .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 2px solid #000; }
-          .photo-box { width: 120px; height: 150px; border: 1px solid #000; display: inline-block; text-align: center; line-height: 150px; }
           @media print { body { padding: 0; } }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
+            <img src="${hallTicketHeaderImage}" class="header-image" alt="P.P. Savani Centre for Excellence" />
             <h1>🌟 MEGA SPARK EXAM 2025 🌟</h1>
             <h2>મેગા સ્પાર્ક પરીક્ષા - 2025</h2>
             <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
-            <div class="medium-badge">${reg.medium === 'gujarati' ? 'ગુજરાતી માધ્યમ (Gujarati Medium)' : 'English Medium (આંગ્લ માધ્યમ)'}</div>
           </div>
           
           <table class="info-table">
@@ -198,6 +200,10 @@ export default function Admin() {
               <td>${reg.standard}</td>
             </tr>
             <tr>
+              <td>Medium<br>માધ્યમ</td>
+              <td>${reg.medium === 'gujarati' ? 'ગુજરાતી (Gujarati)' : 'English (આંગ્લ)'}</td>
+            </tr>
+            <tr>
               <td>School Name<br>શાળાનું નામ</td>
               <td>${reg.school_name || 'N/A'}</td>
             </tr>
@@ -211,7 +217,12 @@ export default function Admin() {
             </tr>
             <tr>
               <td>Preferred Exam Date<br>પસંદગીની પરીક્ષા તારીખ</td>
-              <td>${reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString('en-GB') : 'N/A'}</td>
+              <td>${reg.preferred_exam_date ? (() => {
+                const date = new Date(reg.preferred_exam_date);
+                const day = date.getDate();
+                const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
+                return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long' }).replace(/\d+/, day + suffix);
+              })() : 'N/A'}</td>
             </tr>
             <tr>
               <td>Mobile Number<br>મોબાઇલ નંબર</td>
@@ -219,47 +230,43 @@ export default function Admin() {
             </tr>
             <tr>
               <td>Email Address<br>ઇમેઇલ સરનામું</td>
-              <td>${reg.email}</td>
+              <td>${reg.email || 'N/A'}</td>
             </tr>
             <tr>
               <td>Exam Date<br>પરીક્ષા તારીખ</td>
-              <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'To be announced'}</td>
-            </tr>
-            <tr>
-              <td>Room No<br>રૂમ નંબર</td>
-              <td>${reg.room_no || 'To be announced'}</td>
-            </tr>
-            <tr>
-              <td>Floor<br>માળ</td>
-              <td>${reg.floor || 'To be announced'}</td>
-            </tr>
-            <tr>
-              <td>Building Name<br>બિલ્ડિંગનું નામ</td>
-              <td>${reg.building_name || 'To be announced'}</td>
+              <td>${reg.exam_date ? (() => {
+                const date = new Date(reg.exam_date);
+                const day = date.getDate();
+                const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
+                return date.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long' }).replace(/\d+/, day + suffix);
+              })() : 'To be announced'}</td>
             </tr>
             <tr>
               <td>Exam Pattern<br>પરીક્ષા પેટર્ન</td>
-              <td>${reg.exam_pattern || 'To be announced'}</td>
+              <td>
+                <strong>MCQ (Multiple Choice Questions)</strong>
+                <div class="exam-pattern-box">
+                  <strong>Subjects / વિષયો:</strong>
+                  Science (વિજ્ઞાન), Maths (ગણિત), English (અંગ્રેજી)
+                </div>
+              </td>
             </tr>
             <tr>
               <td>Exam Center<br>પરીક્ષા કેન્દ્ર</td>
-              <td>${reg.exam_center}</td>
+              <td>P P Savani Chaitanya Vidya Sankul<br>Mota Varachha-Abrama Road, Abrama, Kamrej,<br>Surat-394150. (Gujarat) India.</td>
             </tr>
           </table>
 
           <div class="notes">
-            <h3>Important Instructions / મહત્વની સૂચનાઓ:</h3>
+            <h3>Notes / નોંધ:</h3>
             <ul>
-              <li>Bring this hall ticket to the exam center / આ પ્રવેશ પત્ર પરીક્ષા કેન્દ્ર પર લાવવું</li>
-              <li>Reporting Time: 8:00 AM | Exam Time: 10:00 AM - 12:00 PM</li>
-              <li>Bring valid ID proof / માન્ય ઓળખ પુરાવો સાથે લાવવો</li>
-              <li>Mobile phones not allowed in exam hall / પરીક્ષા હોલમાં મોબાઇલ ફોન માન્ય નથી</li>
+              <li>પરીક્ષાનો રિપોર્ટિંગ સમય સવારે 8:00 કલાકે રહેશે</li>
+              <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
             </ul>
           </div>
 
           <div class="footer">
             <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
-            <p>Website: www.megaspark.com | Email: info@megaspark.com</p>
             <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
           </div>
         </div>
