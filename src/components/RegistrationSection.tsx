@@ -48,12 +48,12 @@ export const RegistrationSection = () => {
         toast.error("WhatsApp number must be exactly 10 digits");
         return false;
       }
-      if (!formData.district || formData.district.trim() === "") {
-        toast.error("Please enter district");
+      if (!formData.state || formData.state.trim() === "") {
+        toast.error("Please select state");
         return false;
       }
-      if (!formData.cityVillage || formData.cityVillage.trim() === "") {
-        toast.error("Please enter city/village name");
+      if (!formData.district || formData.district.trim() === "") {
+        toast.error("Please select district");
         return false;
       }
     } else if (currentStep === 2) {
