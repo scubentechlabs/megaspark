@@ -10,7 +10,7 @@ const downloadItems = [
     subtitle: "Complete syllabus for all standards",
     description: "Comprehensive syllabus covering all topics for Standards 5-10 in both Gujarati and English mediums.",
     color: "from-primary to-primary/80",
-    driveLink: "https://drive.google.com/file/d/YOUR_SYLLABUS_FILE_ID/view",
+    driveLink: "https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn?usp=sharing",
     previewContent: [
       "Mathematics: Algebra, Geometry, Arithmetic",
       "Science: Physics, Chemistry, Biology",
@@ -26,7 +26,7 @@ const downloadItems = [
     subtitle: "Previous year question patterns",
     description: "Sample question papers to help you understand the exam pattern and difficulty level.",
     color: "from-accent to-accent/80",
-    driveLink: "https://drive.google.com/file/d/YOUR_SAMPLE_PAPER_FILE_ID/view",
+    driveLink: "https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn?usp=sharing",
     previewContent: [
       "Section A: Multiple Choice Questions (40 marks)",
       "Section B: Short Answer Questions (30 marks)",
