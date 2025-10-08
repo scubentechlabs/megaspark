@@ -1,35 +1,62 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Smartphone, CreditCard, Wallet, CheckCircle2, QrCode } from "lucide-react";
+import { Smartphone, CreditCard, Wallet, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentStepProps {
   onPaymentComplete: () => void;
+  formData?: any;
 }
 
-export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
-  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
-  const [showQR, setShowQR] = useState(false);
+export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) => {
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const paymentMethods = [
-    { id: "gpay", name: "Google Pay", icon: Smartphone, color: "from-blue-500 to-blue-600" },
-    { id: "phonepe", name: "PhonePe", icon: Wallet, color: "from-purple-500 to-purple-600" },
-    { id: "paytm", name: "Paytm", icon: CreditCard, color: "from-cyan-500 to-cyan-600" }
-  ];
+  const amount = 50;
 
-  const handlePayment = (method: string) => {
-    setSelectedMethod(method);
-    toast.success("Processing payment...");
-    // Simulate payment processing
-    setTimeout(() => {
-      toast.success("Payment successful!");
-      onPaymentComplete();
-    }, 2000);
+  const handlePhonePePayment = async () => {
+    setIsProcessing(true);
+    
+    try {
+      // Generate temporary registration ID
+      const tempRegistrationId = `REG${Date.now()}`;
+      
+      console.log('Initiating PhonePe payment...');
+      
+      const { data, error } = await supabase.functions.invoke('phonepe-payment', {
+        body: {
+          amount: amount,
+          registrationId: tempRegistrationId,
+          customerName: formData?.studentName || 'Student',
+          customerPhone: formData?.phoneNumber || '9999999999',
+          customerEmail: formData?.email || undefined
+        }
+      });
+
+      if (error) {
+        console.error('Payment initiation error:', error);
+        throw new Error(error.message || 'Failed to initiate payment');
+      }
+
+      console.log('Payment response:', data);
+
+      if (data?.success && data?.paymentUrl) {
+        toast.success('Redirecting to payment gateway...');
+        // Redirect to PhonePe payment page
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error('Payment URL not received');
+      }
+
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error('Payment failed', {
+        description: error.message || 'Please try again'
+      });
+      setIsProcessing(false);
+    }
   };
-
-  const upiId = "ppsavani@upi";
-  const amount = "50";
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -40,106 +67,32 @@ export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
         <div className="text-sm opacity-90">One-time payment for Mega Spark Exam 2025</div>
       </Card>
 
-      {/* Payment Methods */}
+      {/* PhonePe Payment Button */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-foreground">Select Payment Method</h3>
+        <h3 className="text-lg font-bold text-foreground">Complete Payment</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {paymentMethods.map((method) => {
-            const Icon = method.icon;
-            return (
-              <Button
-                key={method.id}
-                onClick={() => handlePayment(method.id)}
-                disabled={selectedMethod !== null}
-                className={`h-auto py-6 bg-gradient-to-r ${method.color} hover:opacity-90 text-white relative overflow-hidden group`}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <Icon className="h-8 w-8" />
-                  <span className="font-semibold">{method.name}</span>
-                </div>
-                {selectedMethod === method.id && (
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent" />
-                  </div>
-                )}
-              </Button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or pay with</span>
-        </div>
-      </div>
-
-      {/* UPI QR Code Option */}
-      <Card className="border-2 border-accent/20 hover:shadow-hover transition-all">
-        <div className="p-6">
-          {!showQR ? (
-            <Button
-              onClick={() => setShowQR(true)}
-              variant="outline"
-              className="w-full h-auto py-6 border-2 border-accent hover:bg-accent/10"
-              disabled={selectedMethod !== null}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <QrCode className="h-8 w-8 text-accent" />
-                <span className="font-semibold text-lg">Scan UPI QR Code</span>
-                <span className="text-xs text-muted-foreground">Use any UPI app to scan & pay</span>
-              </div>
-            </Button>
+        <Button
+          onClick={handlePhonePePayment}
+          disabled={isProcessing}
+          className="w-full h-auto py-8 bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white text-xl font-bold shadow-lg"
+        >
+          {isProcessing ? (
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span>Processing Payment...</span>
+            </div>
           ) : (
-            <div className="space-y-4">
-              <div className="text-center">
-                <h4 className="font-bold text-lg text-foreground mb-2">Scan QR Code to Pay</h4>
-                <p className="text-sm text-muted-foreground">Scan using any UPI app</p>
-              </div>
-              
-              {/* QR Code Placeholder */}
-              <div className="bg-white p-6 rounded-xl mx-auto w-fit">
-                <div className="h-64 w-64 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <QrCode className="h-32 w-32 mx-auto text-primary mb-4" />
-                    <div className="text-xs text-muted-foreground">QR Code</div>
-                    <div className="text-sm font-semibold text-primary">{upiId}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
-                <div className="text-sm space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">UPI ID:</span>
-                    <span className="font-semibold text-accent">{upiId}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Amount:</span>
-                    <span className="font-semibold text-accent">₹{amount}</span>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => {
-                  toast.success("Payment successful!");
-                  onPaymentComplete();
-                }}
-                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white py-6 text-lg font-semibold"
-              >
-                <CheckCircle2 className="mr-2 h-5 w-5" />
-                I Have Completed Payment
-              </Button>
+            <div className="flex items-center gap-3">
+              <Wallet className="h-8 w-8" />
+              <span>Pay with PhonePe</span>
             </div>
           )}
-        </div>
-      </Card>
+        </Button>
+
+        <p className="text-center text-sm text-muted-foreground">
+          You will be redirected to PhonePe secure payment gateway
+        </p>
+      </div>
 
       {/* Payment Info */}
       <Card className="bg-muted/50 border-border p-4">
@@ -149,7 +102,30 @@ export const PaymentStep = ({ onPaymentComplete }: PaymentStepProps) => {
           </div>
           <div className="flex-1 text-sm text-muted-foreground">
             <p className="font-semibold text-foreground mb-1">Secure Payment</p>
-            <p>Your payment is processed securely. Registration will be confirmed immediately after successful payment.</p>
+            <p>Your payment is processed securely through PhonePe. Registration will be confirmed immediately after successful payment.</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Accepted Payment Methods */}
+      <Card className="p-4 border-accent/20">
+        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via PhonePe:</h4>
+        <div className="flex flex-wrap gap-3 items-center justify-center">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Wallet className="h-4 w-4 text-purple-500" />
+            <span>UPI</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CreditCard className="h-4 w-4 text-blue-500" />
+            <span>Credit Card</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <CreditCard className="h-4 w-4 text-green-500" />
+            <span>Debit Card</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Smartphone className="h-4 w-4 text-orange-500" />
+            <span>Net Banking</span>
           </div>
         </div>
       </Card>

@@ -212,7 +212,7 @@ export const RegistrationSection = () => {
                 <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
               )}
               {currentStep === 3 && (
-                <PaymentStep onPaymentComplete={handlePaymentComplete} />
+                <PaymentStep onPaymentComplete={handlePaymentComplete} formData={formData} />
               )}
             </div>
 
