@@ -18,7 +18,6 @@ export type Database = {
         Row: {
           address: string | null
           building_name: string | null
-          city_village: string | null
           created_at: string
           date_of_birth: string | null
           district: string | null
@@ -45,6 +44,7 @@ export type Database = {
           school_medium: string | null
           school_name: string | null
           standard: string
+          state: string | null
           student_name: string
           updated_at: string
           whatsapp_number: string | null
@@ -52,7 +52,6 @@ export type Database = {
         Insert: {
           address?: string | null
           building_name?: string | null
-          city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
           district?: string | null
@@ -79,6 +78,7 @@ export type Database = {
           school_medium?: string | null
           school_name?: string | null
           standard: string
+          state?: string | null
           student_name: string
           updated_at?: string
           whatsapp_number?: string | null
@@ -86,7 +86,6 @@ export type Database = {
         Update: {
           address?: string | null
           building_name?: string | null
-          city_village?: string | null
           created_at?: string
           date_of_birth?: string | null
           district?: string | null
@@ -113,6 +112,7 @@ export type Database = {
           school_medium?: string | null
           school_name?: string | null
           standard?: string
+          state?: string | null
           student_name?: string
           updated_at?: string
           whatsapp_number?: string | null
