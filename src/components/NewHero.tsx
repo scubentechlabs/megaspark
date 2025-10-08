@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Users, Download, Sparkles } from "lucide-react";
-import event2 from "@/assets/event-2.webp";
-import event3 from "@/assets/event-3.webp";
-import event4 from "@/assets/event-4.webp";
-import event5 from "@/assets/event-5.webp";
+import event1 from "@/assets/event-new-1.png";
+import event2 from "@/assets/event-new-2.png";
+import event3 from "@/assets/event-new-3.png";
+import event4 from "@/assets/event-new-4.png";
 import { useEffect, useState } from "react";
 
 interface NewHeroProps {
@@ -21,10 +21,10 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
   });
 
   const sliderImages = [
+    event1,
     event2,
     event3,
-    event4,
-    event5
+    event4
   ];
 
   // Image slider effect

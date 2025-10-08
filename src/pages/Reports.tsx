@@ -27,7 +27,7 @@ interface Registration {
   parent_name: string | null;
   whatsapp_number: string | null;
   district: string | null;
-  city_village: string | null;
+  state: string | null;
   school_name: string | null;
   school_medium: string | null;
   previous_year_percentage: string | null;
@@ -191,8 +191,8 @@ export default function Reports() {
       reg.mobile_number,
       reg.whatsapp_number || 'N/A',
       reg.email || 'N/A',
+      reg.state || 'N/A',
       reg.district || 'N/A',
-      reg.city_village || 'N/A',
       reg.school_name || 'N/A',
       reg.school_medium || 'N/A',
       reg.standard,

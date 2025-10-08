@@ -29,7 +29,7 @@ interface Registration {
   parent_name: string | null;
   whatsapp_number: string | null;
   district: string | null;
-  city_village: string | null;
+  state: string | null;
   school_name: string | null;
   school_medium: string | null;
   previous_year_percentage: string | null;
@@ -186,12 +186,12 @@ export default function Admin() {
               <td>${reg.whatsapp_number || 'N/A'}</td>
             </tr>
             <tr>
-              <td>District<br>જિલ્લો</td>
-              <td>${reg.district || 'N/A'}</td>
+              <td>State<br>રાજ્ય</td>
+              <td>${reg.state || 'N/A'}</td>
             </tr>
             <tr>
-              <td>City/Village<br>શહેર/ગામ</td>
-              <td>${reg.city_village || 'N/A'}</td>
+              <td>District<br>જિલ્લો</td>
+              <td>${reg.district || 'N/A'}</td>
             </tr>
             <tr>
               <td>Standard<br>ધોરણ</td>
@@ -320,8 +320,8 @@ export default function Admin() {
       reg.mobile_number,
       reg.whatsapp_number || 'N/A',
       reg.email || 'N/A',
+      reg.state || 'N/A',
       reg.district || 'N/A',
-      reg.city_village || 'N/A',
       reg.school_name || 'N/A',
       reg.school_medium || 'N/A',
       reg.standard,
