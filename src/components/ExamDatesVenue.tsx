@@ -11,7 +11,7 @@ const examDates = [
 
 export const ExamDatesVenue = () => {
   return (
-    <section id="dates" className="py-20 bg-muted/30 relative overflow-hidden">
+    <section id="dates" className="py-12 bg-muted/30 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary" />
       

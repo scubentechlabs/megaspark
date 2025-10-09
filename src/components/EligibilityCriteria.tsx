@@ -12,7 +12,7 @@ const standards = [
 
 export const EligibilityCriteria = () => {
   return (
-    <section id="eligibility" className="py-20 bg-background relative overflow-hidden">
+    <section id="eligibility" className="py-12 bg-background relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />

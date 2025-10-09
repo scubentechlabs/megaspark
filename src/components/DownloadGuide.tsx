@@ -43,7 +43,7 @@ export const DownloadGuide = () => {
   };
 
   return (
-    <section id="about" className="py-20 bg-muted/30 relative overflow-hidden">
+    <section id="about" className="py-12 bg-muted/30 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-10 right-10 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-10 left-10 w-48 h-48 bg-accent/5 rounded-full blur-3xl" />

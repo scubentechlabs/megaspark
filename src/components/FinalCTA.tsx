@@ -7,7 +7,7 @@ interface FinalCTAProps {
 
 export const FinalCTA = ({ onRegisterClick }: FinalCTAProps) => {
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/20">
+    <section className="py-12 bg-gradient-to-br from-primary/10 via-background to-secondary/20">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6 animate-pulse">

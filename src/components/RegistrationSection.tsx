@@ -139,7 +139,7 @@ export const RegistrationSection = () => {
   };
 
   return (
-    <section id="registration-section" className="py-20 bg-background relative overflow-hidden">
+    <section id="registration-section" className="py-12 bg-background relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-20 left-10 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-48 h-48 bg-accent/5 rounded-full blur-3xl" />
