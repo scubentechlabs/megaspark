@@ -92,6 +92,18 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
               </p>
             </div>
 
+            {/* Mobile: Thumbnails Grid */}
+            <div className="grid grid-cols-2 gap-3 lg:hidden">
+              {sliderImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Scholarship opportunity ${index + 1}`}
+                  className="w-full h-[180px] object-cover rounded-2xl shadow-lg"
+                />
+              ))}
+            </div>
+
             {/* Countdown Timer */}
             <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-card">
               <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
@@ -134,20 +146,8 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             </div>
           </div>
 
-          {/* Right Content - Image Slider/Thumbnails */}
+          {/* Right Content - Desktop Image Slider */}
           <div className="relative order-1 lg:order-2">
-            {/* Mobile: Thumbnails Grid */}
-            <div className="grid grid-cols-2 gap-3 lg:hidden">
-              {sliderImages.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Scholarship opportunity ${index + 1}`}
-                  className="w-full h-[180px] object-cover rounded-2xl shadow-lg"
-                />
-              ))}
-            </div>
-
             {/* Desktop: Image Slider */}
             <div className="hidden lg:block relative z-10 overflow-hidden rounded-3xl">
               <div className="relative w-full h-[600px] max-w-2xl">
