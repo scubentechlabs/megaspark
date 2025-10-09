@@ -18,9 +18,6 @@ export const NewFooter = () => {
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Scholarship Guide</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Application Tips</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">FAQ</a></li>
               <li><Link to="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link to="/refund-policy" className="text-muted-foreground hover:text-primary transition-colors">Refund Policy</Link></li>
               <li><Link to="/terms-conditions" className="text-muted-foreground hover:text-primary transition-colors">Terms & Conditions</Link></li>
