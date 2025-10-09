@@ -6,7 +6,7 @@ export const NewFooter = () => {
   return (
     <footer id="contact" className="bg-card pt-16 pb-8 border-t border-border">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div>
             <img src={logo} alt="P.P. SAVANI Centre for Excellence" className="h-12 md:h-14 w-auto mb-4" />
             <p className="text-muted-foreground text-sm leading-relaxed">
@@ -14,15 +14,6 @@ export const NewFooter = () => {
             </p>
           </div>
 
-          <div>
-            <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#home" className="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
-              <li><a href="#participants" className="text-muted-foreground hover:text-primary transition-colors">Participants</a></li>
-              <li><a href="#category" className="text-muted-foreground hover:text-primary transition-colors">Category</a></li>
-              <li><a href="#about" className="text-muted-foreground hover:text-primary transition-colors">About Us</a></li>
-            </ul>
-          </div>
 
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Resources</h4>
