@@ -15,7 +15,7 @@ export const NewFooter = () => {
           </div>
 
 
-          <div>
+          <div className="text-center">
             <h4 className="font-semibold mb-4 text-foreground">Resources</h4>
             <ul className="space-y-2 text-sm">
               <li><Link to="/privacy-policy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
