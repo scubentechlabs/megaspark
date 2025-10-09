@@ -134,11 +134,23 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             </div>
           </div>
 
-          {/* Right Content - Image Slider */}
+          {/* Right Content - Image Slider/Thumbnails */}
           <div className="relative order-1 lg:order-2">
-            {/* Image Slider */}
-            <div className="relative z-10 flex justify-center overflow-hidden rounded-3xl">
-              <div className="relative w-full h-[500px] sm:h-[550px] lg:h-[600px] lg:max-w-2xl">
+            {/* Mobile: Thumbnails Grid */}
+            <div className="grid grid-cols-2 gap-3 lg:hidden">
+              {sliderImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Scholarship opportunity ${index + 1}`}
+                  className="w-full h-[180px] object-cover rounded-2xl shadow-lg"
+                />
+              ))}
+            </div>
+
+            {/* Desktop: Image Slider */}
+            <div className="hidden lg:block relative z-10 overflow-hidden rounded-3xl">
+              <div className="relative w-full h-[600px] max-w-2xl">
                 {sliderImages.map((image, index) => (
                   <img
                     key={index}
