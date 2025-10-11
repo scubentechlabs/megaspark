@@ -77,7 +77,7 @@ serve(async (req) => {
           ...paytmParams,
           CHECKSUMHASH: checksum
         },
-        paytmUrl: 'https://securegw-stage.paytm.in/order/process', // Use production URL: https://securegw.paytm.in/order/process
+        paytmUrl: 'https://securegw.paytm.in/order/process', // Production URL (currently using production)
         orderId: orderId
       }),
       { 
