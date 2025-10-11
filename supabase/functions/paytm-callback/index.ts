@@ -37,11 +37,18 @@ serve(async (req) => {
       throw new Error('Paytm credentials not configured');
     }
 
-    const body = await req.json();
+    // Parse form data from Paytm
+    const formData = await req.formData();
+    const body: Record<string, any> = {};
+    
+    for (const [key, value] of formData.entries()) {
+      body[key] = value;
+    }
+    
     console.log('Paytm callback received:', body);
 
     const { CHECKSUMHASH, ...paytmParams } = body;
-
+    
     // Verify checksum
     const isValidChecksum = await verifyChecksum(body, CHECKSUMHASH, merchantKey);
     
