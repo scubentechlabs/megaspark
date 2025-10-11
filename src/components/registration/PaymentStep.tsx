@@ -15,16 +15,16 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
 
   const amount = 50;
 
-  const handlePhonePePayment = async () => {
+  const handlePaytmPayment = async () => {
     setIsProcessing(true);
     
     try {
       // Generate temporary registration ID
       const tempRegistrationId = `REG${Date.now()}`;
       
-      console.log('Initiating PhonePe payment...');
+      console.log('Initiating Paytm payment...');
       
-      const { data, error } = await supabase.functions.invoke('phonepe-payment', {
+      const { data, error } = await supabase.functions.invoke('paytm-payment', {
         body: {
           amount: amount,
           registrationId: tempRegistrationId,
@@ -41,12 +41,26 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
 
       console.log('Payment response:', data);
 
-      if (data?.success && data?.paymentUrl) {
+      if (data?.success && data?.paytmParams && data?.paytmUrl) {
         toast.success('Redirecting to payment gateway...');
-        // Redirect to PhonePe payment page
-        window.location.href = data.paymentUrl;
+        
+        // Create a form and submit to Paytm
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = data.paytmUrl;
+        
+        Object.keys(data.paytmParams).forEach(key => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = data.paytmParams[key];
+          form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
       } else {
-        throw new Error('Payment URL not received');
+        throw new Error('Payment parameters not received');
       }
 
     } catch (error: any) {
@@ -72,9 +86,9 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
         <h3 className="text-lg font-bold text-foreground">Complete Payment</h3>
         
         <Button
-          onClick={handlePhonePePayment}
+          onClick={handlePaytmPayment}
           disabled={isProcessing}
-          className="w-full h-auto py-8 bg-gradient-to-r from-purple-500 to-purple-600 hover:opacity-90 text-white text-xl font-bold shadow-lg"
+          className="w-full h-auto py-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white text-xl font-bold shadow-lg"
         >
           {isProcessing ? (
             <div className="flex items-center gap-3">
@@ -84,13 +98,13 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           ) : (
             <div className="flex items-center gap-3">
               <Wallet className="h-8 w-8" />
-              <span>Pay with PhonePe</span>
+              <span>Pay with Paytm</span>
             </div>
           )}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
-          You will be redirected to PhonePe secure payment gateway
+          You will be redirected to Paytm secure payment gateway
         </p>
       </div>
 
@@ -102,17 +116,17 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           </div>
           <div className="flex-1 text-sm text-muted-foreground">
             <p className="font-semibold text-foreground mb-1">Secure Payment</p>
-            <p>Your payment is processed securely through PhonePe. Registration will be confirmed immediately after successful payment.</p>
+            <p>Your payment is processed securely through Paytm. Registration will be confirmed immediately after successful payment.</p>
           </div>
         </div>
       </Card>
 
       {/* Accepted Payment Methods */}
       <Card className="p-4 border-accent/20">
-        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via PhonePe:</h4>
+        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via Paytm:</h4>
         <div className="flex flex-wrap gap-3 items-center justify-center">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Wallet className="h-4 w-4 text-purple-500" />
+            <Wallet className="h-4 w-4 text-blue-500" />
             <span>UPI</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
