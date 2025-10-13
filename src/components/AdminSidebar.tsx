@@ -56,7 +56,7 @@ export function AdminSidebar() {
                     onClick={() => navigate(item.path)}
                     className={
                       isActive(item.path)
-                        ? "bg-orange-500 text-white hover:bg-orange-600 hover:text-white"
+                        ? "bg-accent text-accent-foreground hover:bg-accent/90"
                         : "hover:bg-muted"
                     }
                   >
