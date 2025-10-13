@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Home, Users } from "lucide-react";
+import { BarChart3, FileText, Settings, Home, Users, CreditCard } from "lucide-react";
 import logo from "@/assets/logo.png";
 import {
   Sidebar,
@@ -20,6 +20,7 @@ export function AdminSidebar() {
     { title: "Dashboard", icon: BarChart3, path: "/admin" },
     { title: "Registrations", icon: Users, path: "/admin" },
     { title: "Reports", icon: FileText, path: "/admin/reports" },
+    { title: "Payments", icon: CreditCard, path: "/admin/payments" },
     { title: "Settings", icon: Settings, path: "/admin/settings" },
     { title: "Back to Home", icon: Home, path: "/" },
   ];

@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          failure_reason: string | null
+          id: string
+          order_id: string | null
+          payment_method: string | null
+          payment_type: string
+          registration_id: string | null
+          registration_number: string | null
+          status: string
+          student_name: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          order_id?: string | null
+          payment_method?: string | null
+          payment_type: string
+          registration_id?: string | null
+          registration_number?: string | null
+          status: string
+          student_name: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          order_id?: string | null
+          payment_method?: string | null
+          payment_type?: string
+          registration_id?: string | null
+          registration_number?: string | null
+          status?: string
+          student_name?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registrations: {
         Row: {
           address: string | null

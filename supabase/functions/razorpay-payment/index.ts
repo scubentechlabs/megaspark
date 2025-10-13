@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -65,6 +66,26 @@ serve(async (req) => {
 
     const order = await response.json();
     console.log('Razorpay order created:', order.id);
+
+    // Save payment record to database
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { error: paymentError } = await supabase
+      .from('payments')
+      .insert({
+        student_name: customerName,
+        registration_number: registrationId,
+        amount: amount,
+        payment_type: 'razorpay',
+        status: 'pending',
+        order_id: order.id,
+      });
+
+    if (paymentError) {
+      console.error('Error saving payment record:', paymentError);
+    }
 
     return new Response(
       JSON.stringify({

@@ -39,15 +39,18 @@ serve(async (req) => {
 
   try {
     const keySecret = Deno.env.get('RAZORPAY_KEY_SECRET');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
     if (!keySecret) {
       throw new Error('Razorpay secret not configured');
     }
 
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const body = await req.json();
     console.log('Razorpay callback received:', body);
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, registrationData } = body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       throw new Error('Missing required payment parameters');
@@ -63,17 +66,71 @@ serve(async (req) => {
 
     if (!isValid) {
       console.error('Invalid signature');
+      
+      // Update payment to failed
+      await supabase
+        .from('payments')
+        .update({
+          status: 'failed',
+          failure_reason: 'Signature verification failed',
+        })
+        .eq('order_id', razorpay_order_id);
+
       throw new Error('Payment verification failed');
     }
 
     console.log('Payment verified successfully:', razorpay_payment_id);
 
-    // You can update registration status here if needed
-    // const supabaseClient = createClient(
-    //   Deno.env.get('SUPABASE_URL') ?? '',
-    //   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    // );
-    // await supabaseClient.from('registrations').update({ payment_status: 'completed' })...
+    // Fetch payment method details from Razorpay
+    let paymentMethod = 'razorpay';
+    try {
+      const keyId = Deno.env.get('RAZORPAY_KEY_ID');
+      const auth = btoa(`${keyId}:${keySecret}`);
+      const paymentResponse = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+        },
+      });
+      if (paymentResponse.ok) {
+        const paymentData = await paymentResponse.json();
+        paymentMethod = paymentData.method || 'razorpay';
+      }
+    } catch (error) {
+      console.error('Error fetching payment method:', error);
+    }
+
+    // Update payment to success
+    const { error: updateError } = await supabase
+      .from('payments')
+      .update({
+        status: 'success',
+        transaction_id: razorpay_payment_id,
+        payment_method: paymentMethod,
+      })
+      .eq('order_id', razorpay_order_id);
+
+    if (updateError) {
+      console.error('Error updating payment:', updateError);
+    }
+
+    // Insert registration if provided
+    if (registrationData) {
+      const { data: regData, error: regError } = await supabase
+        .from('registrations')
+        .insert(registrationData)
+        .select()
+        .single();
+
+      if (regError) {
+        console.error('Registration error:', regError);
+      } else {
+        // Link payment to registration
+        await supabase
+          .from('payments')
+          .update({ registration_id: regData.id })
+          .eq('order_id', razorpay_order_id);
+      }
+    }
 
     return new Response(
       JSON.stringify({ 
