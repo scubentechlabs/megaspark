@@ -4,6 +4,7 @@ import { Smartphone, CreditCard, Wallet, CheckCircle2, Loader2 } from "lucide-re
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface PaymentStepProps {
   onPaymentComplete: () => void;
@@ -11,6 +12,7 @@ interface PaymentStepProps {
 }
 
 export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) => {
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const amount = 50;
@@ -79,6 +81,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
               if (verifyError || !verifyData?.success) {
                 toast.error('Payment verification failed');
                 setIsProcessing(false);
+                navigate(`/payment-failed?orderId=${response.razorpay_order_id}&reason=Payment verification failed`);
                 return;
               }
 
@@ -89,6 +92,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
               ondismiss: function() {
                 setIsProcessing(false);
                 toast.error('Payment cancelled');
+                navigate(`/payment-failed?orderId=${data.orderId}&reason=Payment cancelled by user`);
               }
             }
           };
@@ -110,6 +114,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
         description: error.message || 'Please try again'
       });
       setIsProcessing(false);
+      // Note: Can't navigate here as we don't have orderId yet if payment initiation failed
     }
   };
 

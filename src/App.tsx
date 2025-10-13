@@ -14,6 +14,7 @@ import RegistrationSuccess from "./pages/RegistrationSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import TermsConditions from "./pages/TermsConditions";
+import PaymentFailed from "./pages/PaymentFailed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/admin/settings" element={<Settings />} />
           <Route path="/admin/payments" element={<PaymentSummary />} />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
+          <Route path="/payment-failed" element={<PaymentFailed />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
