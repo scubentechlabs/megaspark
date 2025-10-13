@@ -15,16 +15,16 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
 
   const amount = 50;
 
-  const handlePaytmPayment = async () => {
+  const handleRazorpayPayment = async () => {
     setIsProcessing(true);
     
     try {
       // Generate temporary registration ID
       const tempRegistrationId = `REG${Date.now()}`;
       
-      console.log('Initiating Paytm payment...');
+      console.log('Initiating Razorpay payment...');
       
-      const { data, error } = await supabase.functions.invoke('paytm-payment', {
+      const { data, error } = await supabase.functions.invoke('razorpay-payment', {
         body: {
           amount: amount,
           registrationId: tempRegistrationId,
@@ -41,24 +41,65 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
 
       console.log('Payment response:', data);
 
-      if (data?.success && data?.paytmParams && data?.paytmUrl) {
-        toast.success('Redirecting to payment gateway...');
-        
-        // Create a form and submit to Paytm
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = data.paytmUrl;
-        
-        Object.keys(data.paytmParams).forEach(key => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = data.paytmParams[key];
-          form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
+      if (data?.success && data?.orderId && data?.keyId) {
+        // Load Razorpay script
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+
+        script.onload = () => {
+          const options = {
+            key: data.keyId,
+            amount: data.amount,
+            currency: data.currency,
+            name: 'Mega Spark Exam 2025',
+            description: 'Registration Fee',
+            order_id: data.orderId,
+            prefill: {
+              name: formData?.studentName || 'Student',
+              email: formData?.email || '',
+              contact: formData?.phoneNumber || '9999999999'
+            },
+            theme: {
+              color: '#3399cc'
+            },
+            handler: async function (response: any) {
+              console.log('Payment successful:', response);
+              
+              // Verify payment on server
+              const { data: verifyData, error: verifyError } = await supabase.functions.invoke('razorpay-callback', {
+                body: {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature
+                }
+              });
+
+              if (verifyError || !verifyData?.success) {
+                toast.error('Payment verification failed');
+                setIsProcessing(false);
+                return;
+              }
+
+              toast.success('Payment successful!');
+              onPaymentComplete();
+            },
+            modal: {
+              ondismiss: function() {
+                setIsProcessing(false);
+                toast.error('Payment cancelled');
+              }
+            }
+          };
+
+          const razorpay = new (window as any).Razorpay(options);
+          razorpay.open();
+        };
+
+        script.onerror = () => {
+          throw new Error('Failed to load Razorpay');
+        };
       } else {
         throw new Error('Payment parameters not received');
       }
@@ -86,7 +127,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
         <h3 className="text-lg font-bold text-foreground">Complete Payment</h3>
         
         <Button
-          onClick={handlePaytmPayment}
+          onClick={handleRazorpayPayment}
           disabled={isProcessing}
           className="w-full h-auto py-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:opacity-90 text-white text-xl font-bold shadow-lg"
         >
@@ -97,14 +138,14 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Wallet className="h-8 w-8" />
-              <span>Pay with Paytm</span>
+              <CreditCard className="h-8 w-8" />
+              <span>Pay with Razorpay</span>
             </div>
           )}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
-          You will be redirected to Paytm secure payment gateway
+          Secure payment powered by Razorpay
         </p>
       </div>
 
@@ -116,14 +157,14 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           </div>
           <div className="flex-1 text-sm text-muted-foreground">
             <p className="font-semibold text-foreground mb-1">Secure Payment</p>
-            <p>Your payment is processed securely through Paytm. Registration will be confirmed immediately after successful payment.</p>
+            <p>Your payment is processed securely through Razorpay. Registration will be confirmed immediately after successful payment.</p>
           </div>
         </div>
       </Card>
 
       {/* Accepted Payment Methods */}
       <Card className="p-4 border-accent/20">
-        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via Paytm:</h4>
+        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via Razorpay:</h4>
         <div className="flex flex-wrap gap-3 items-center justify-center">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Wallet className="h-4 w-4 text-blue-500" />
@@ -140,6 +181,10 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Smartphone className="h-4 w-4 text-orange-500" />
             <span>Net Banking</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Wallet className="h-4 w-4 text-purple-500" />
+            <span>Wallets</span>
           </div>
         </div>
       </Card>

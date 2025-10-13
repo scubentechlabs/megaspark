@@ -1,9 +1,9 @@
 project_id = "tgfpewbymloyxhpdfnzk"
 
-[functions.paytm-payment]
+[functions.razorpay-payment]
 verify_jwt = false
 
-[functions.paytm-callback]
+[functions.razorpay-callback]
 verify_jwt = false
 
 [functions.phonepe-payment]
