@@ -404,11 +404,16 @@ export default function Dashboard() {
                           </div>
                           <div className="text-right space-y-1">
                             <Badge
-                              variant={
+                              className={
                                 payment.status === "success"
-                                  ? "default"
+                                  ? "bg-green-500 hover:bg-green-600 text-white"
                                   : payment.status === "failed"
-                                  ? "destructive"
+                                  ? "bg-red-500 hover:bg-red-600 text-white"
+                                  : ""
+                              }
+                              variant={
+                                payment.status === "success" || payment.status === "failed"
+                                  ? "default"
                                   : "secondary"
                               }
                             >
