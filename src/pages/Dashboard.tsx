@@ -1,0 +1,433 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { AdminSidebar } from "@/components/AdminSidebar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import {
+  Users,
+  CheckCircle,
+  XCircle,
+  DollarSign,
+  TrendingUp,
+  Calendar,
+  RefreshCw,
+  FileText,
+  CreditCard,
+} from "lucide-react";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+interface DashboardStats {
+  totalRegistrations: number;
+  totalPayments: number;
+  successfulPayments: number;
+  failedPayments: number;
+  totalRevenue: number;
+  registrationsByStandard: Record<string, number>;
+  registrationsByMedium: Record<string, number>;
+  recentRegistrations: any[];
+  recentPayments: any[];
+}
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/admin/login");
+      return;
+    }
+    fetchDashboardData();
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch registrations
+      const { data: registrations, error: regError } = await supabase
+        .from("registrations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (regError) throw regError;
+
+      // Fetch payments
+      const { data: payments, error: payError } = await supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (payError) throw payError;
+
+      // Calculate statistics
+      const registrationsByStandard = registrations?.reduce((acc: any, reg) => {
+        acc[reg.standard] = (acc[reg.standard] || 0) + 1;
+        return acc;
+      }, {}) || {};
+
+      const registrationsByMedium = registrations?.reduce((acc: any, reg) => {
+        acc[reg.medium] = (acc[reg.medium] || 0) + 1;
+        return acc;
+      }, {}) || {};
+
+      const successfulPayments = payments?.filter((p) => p.status === "success") || [];
+      const failedPayments = payments?.filter((p) => p.status === "failed") || [];
+      const totalRevenue = successfulPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+
+      setStats({
+        totalRegistrations: registrations?.length || 0,
+        totalPayments: payments?.length || 0,
+        successfulPayments: successfulPayments.length,
+        failedPayments: failedPayments.length,
+        totalRevenue,
+        registrationsByStandard,
+        registrationsByMedium,
+        recentRegistrations: registrations?.slice(0, 5) || [],
+        recentPayments: payments?.slice(0, 5) || [],
+      });
+
+      toast.success("Dashboard data loaded");
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !stats) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-2" />
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const standardChartData = Object.entries(stats.registrationsByStandard).map(([key, value]) => ({
+    name: `Standard ${key}`,
+    value: value,
+  }));
+
+  const mediumChartData = Object.entries(stats.registrationsByMedium).map(([key, value]) => ({
+    name: key === "gujarati" ? "Gujarati" : "English",
+    value: value,
+  }));
+
+  const paymentStatusData = [
+    { name: "Success", value: stats.successfulPayments },
+    { name: "Failed", value: stats.failedPayments },
+    { name: "Pending", value: stats.totalPayments - stats.successfulPayments - stats.failedPayments },
+  ].filter((item) => item.value > 0);
+
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AdminSidebar />
+        <SidebarInset className="flex-1">
+          <div className="container mx-auto p-6">
+            {/* Header */}
+            <div className="mb-6 flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+                <p className="text-muted-foreground">Overview of your exam management system</p>
+              </div>
+              <Button onClick={fetchDashboardData} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalRegistrations}</div>
+                  <p className="text-xs text-muted-foreground">Students enrolled</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Successful Payments</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-success" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.successfulPayments}</div>
+                  <p className="text-xs text-muted-foreground">Completed transactions</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Failed Payments</CardTitle>
+                  <XCircle className="h-4 w-4 text-destructive" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.failedPayments}</div>
+                  <p className="text-xs text-muted-foreground">Needs attention</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">From successful payments</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid gap-6 md:grid-cols-2 mb-6">
+              {/* Registrations by Standard */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Registrations by Standard</CardTitle>
+                  <CardDescription>Distribution of students across standards</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={standardChartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="value" fill="#8884d8" name="Students" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Payment Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Status</CardTitle>
+                  <CardDescription>Success vs Failed payments</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={paymentStatusData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={(entry) => `${entry.name}: ${entry.value}`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {paymentStatusData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={
+                              entry.name === "Success"
+                                ? "#00C49F"
+                                : entry.name === "Failed"
+                                ? "#FF8042"
+                                : "#FFBB28"
+                            }
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Registrations by Medium */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Registrations by Medium</CardTitle>
+                  <CardDescription>Language preference distribution</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={mediumChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={(entry) => `${entry.name}: ${entry.value}`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {mediumChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>Navigate to key sections</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    className="w-full justify-start"
+                    variant="outline"
+                    onClick={() => navigate("/admin")}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    View All Registrations
+                  </Button>
+                  <Button
+                    className="w-full justify-start"
+                    variant="outline"
+                    onClick={() => navigate("/admin/payments")}
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    View Payment Summary
+                  </Button>
+                  <Button
+                    className="w-full justify-start"
+                    variant="outline"
+                    onClick={() => navigate("/admin/reports")}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Generate Reports
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity Section */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Recent Registrations */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Registrations</CardTitle>
+                  <CardDescription>Latest 5 student registrations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.recentRegistrations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No registrations yet
+                      </p>
+                    ) : (
+                      stats.recentRegistrations.map((reg) => (
+                        <div
+                          key={reg.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div>
+                            <p className="font-medium">{reg.student_name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {reg.registration_number} • Standard {reg.standard}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(reg.created_at), "dd MMM yyyy")}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Payments */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Payments</CardTitle>
+                  <CardDescription>Latest 5 payment transactions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.recentPayments.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No payments yet
+                      </p>
+                    ) : (
+                      stats.recentPayments.map((payment) => (
+                        <div
+                          key={payment.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div>
+                            <p className="font-medium">{payment.student_name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              ₹{payment.amount} • {payment.payment_type}
+                            </p>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <Badge
+                              variant={
+                                payment.status === "success"
+                                  ? "default"
+                                  : payment.status === "failed"
+                                  ? "destructive"
+                                  : "secondary"
+                              }
+                            >
+                              {payment.status}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(payment.created_at), "dd MMM yyyy")}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
