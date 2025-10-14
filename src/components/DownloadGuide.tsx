@@ -24,7 +24,7 @@ const downloadItems = [
     icon: FileText,
     title: "Exam Pattern",
     subtitle: "Previous year question patterns",
-    description: "Exam pattern to help you understand the exam structure and difficulty level.",
+    description: "MCQ (Multiple Choice Questions)\nSubjects / વિષયો:\nScience (વિજ્ઞાન), Maths (ગણિત), English (અંગ્રેજી)",
     color: "from-accent to-accent/80",
     driveLink: "https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn?usp=sharing",
     previewContent: [
