@@ -13,7 +13,10 @@ import { MultiStepRegistration } from "@/components/MultiStepRegistration";
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const Index = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -26,7 +29,11 @@ const Index = () => {
   return (
     <main className="min-h-screen">
       <Dialog open={isPopupOpen} onOpenChange={setIsPopupOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+          <VisuallyHidden>
+            <DialogTitle>Registration Form</DialogTitle>
+            <DialogDescription>Complete your exam registration</DialogDescription>
+          </VisuallyHidden>
           <MultiStepRegistration onClose={() => setIsPopupOpen(false)} />
         </DialogContent>
       </Dialog>

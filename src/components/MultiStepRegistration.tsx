@@ -152,8 +152,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <Card className="w-full max-w-4xl my-8 shadow-2xl">
+    <Card className="w-full border-0 shadow-none rounded-lg">
         <CardHeader className="relative pb-8 border-b">
           <Button
             variant="ghost"
@@ -248,6 +247,5 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           )}
         </CardContent>
       </Card>
-    </div>
   );
 };
