@@ -123,7 +123,6 @@ export default function Login() {
 </head>
 <body>
   <div class="header">
-    <img src="${hallTicketHeaderImage}" class="header-image" alt="Hall Ticket Header" />
     <h1>P.P. SAVANI GROUP</h1>
     <h2>MEGA SPARK EXAM 2025</h2>
     <h3>EXAMINATION HALL TICKET</h3>

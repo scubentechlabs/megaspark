@@ -165,7 +165,6 @@ export default function Admin() {
       <body>
         <div class="container">
           <div class="header">
-            <img src="${hallTicketHeaderImage}" class="header-image" alt="Hall Ticket Header" />
             <h1>🌟 MEGA SPARK EXAM 2025 🌟</h1>
             <h2>મેગા સ્પાર્ક પરીક્ષા - 2025</h2>
             <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
