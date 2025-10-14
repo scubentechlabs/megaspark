@@ -20,11 +20,11 @@ const downloadItems = [
     ]
   },
   {
-    id: "sample-paper",
+    id: "exam-pattern",
     icon: FileText,
-    title: "Sample Paper",
+    title: "Exam Pattern",
     subtitle: "Previous year question patterns",
-    description: "Sample question papers to help you understand the exam pattern and difficulty level.",
+    description: "Exam pattern to help you understand the exam structure and difficulty level.",
     color: "from-accent to-accent/80",
     driveLink: "https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn?usp=sharing",
     previewContent: [
