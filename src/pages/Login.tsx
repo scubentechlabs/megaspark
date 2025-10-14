@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Smartphone, Download, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
+import hallTicketFooterImage from "@/assets/hall-ticket-footer.png";
 
 interface Registration {
   id: string;
@@ -174,6 +175,10 @@ export default function Login() {
     </ol>
   </div>
 
+
+  <div style="text-align: center; margin: 20px 0;">
+    <img src="${hallTicketFooterImage}" style="max-width: 100%; height: auto;" alt="PP Savani Banner" />
+  </div>
 
   <div class="footer">
     <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
