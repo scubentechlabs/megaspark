@@ -176,7 +176,7 @@ export default function Login() {
 
 
   <div style="text-align: center; margin: 20px 0;">
-    <img src="${hallTicketFooterImage}" style="max-width: 100%; height: auto;" alt="PP Savani Banner" />
+    <img src="${hallTicketFooterImage}" style="max-width: 70%; height: auto;" alt="PP Savani Banner" />
   </div>
 
   <div class="footer">
