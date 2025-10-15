@@ -86,7 +86,14 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
               }
 
               toast.success('Payment successful!');
-              onPaymentComplete();
+              
+              // Await the payment complete handler to ensure navigation happens
+              try {
+                await onPaymentComplete();
+              } catch (error) {
+                console.error('Error completing registration:', error);
+                setIsProcessing(false);
+              }
             },
             modal: {
               ondismiss: function() {
