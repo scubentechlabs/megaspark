@@ -107,6 +107,8 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const handlePaymentComplete = async () => {
     try {
+      console.log('Starting registration save with data:', formData);
+      
       // Generate registration number
       const registrationNumber = `SPARK${Date.now()}`;
       
@@ -132,22 +134,24 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
-      console.log("Registration saved:", data);
+      console.log("Registration saved successfully:", data);
       toast.success("Registration Successful!", {
-        description: "Your exam registration has been completed."
+        description: "Redirecting to confirmation page..."
       });
       
-      // Redirect to success page after 2 seconds
-      setTimeout(() => {
-        navigate("/registration-success");
-      }, 2000);
+      // Navigate immediately to success page
+      navigate("/registration-success");
     } catch (error: any) {
       console.error("Registration error:", error);
       toast.error("Registration Failed", {
-        description: error.message || "Please try again."
+        description: error.message || "Please contact support."
       });
+      throw error; // Re-throw to be caught by PaymentStep
     }
   };
 

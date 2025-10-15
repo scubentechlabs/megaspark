@@ -107,6 +107,8 @@ export const RegistrationSection = () => {
 
   const handlePaymentComplete = async () => {
     try {
+      console.log('Starting registration save with data:', formData);
+      
       const registrationNumber = `SPARK${Date.now()}`;
 
       const { error } = await supabase
@@ -128,13 +130,20 @@ export const RegistrationSection = () => {
           registration_number: registrationNumber,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
 
-      toast.success('Registration Successful!', { description: 'Redirecting to confirmation...' });
-      setTimeout(() => navigate('/registration-success'), 1500);
+      console.log('Registration saved successfully');
+      toast.success('Registration Successful!', { description: 'Redirecting to confirmation page...' });
+      
+      // Navigate immediately to success page
+      navigate('/registration-success');
     } catch (err: any) {
       console.error('Registration save error:', err);
-      toast.error('Could not save registration', { description: err.message || 'Please try again.' });
+      toast.error('Could not save registration', { description: err.message || 'Please contact support.' });
+      throw err; // Re-throw to be caught by PaymentStep
     }
   };
 

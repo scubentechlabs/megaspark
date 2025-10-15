@@ -69,29 +69,32 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
             handler: async function (response: any) {
               console.log('Payment successful:', response);
               
-              // Verify payment on server
-              const { data: verifyData, error: verifyError } = await supabase.functions.invoke('razorpay-callback', {
-                body: {
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature
-                }
-              });
-
-              if (verifyError || !verifyData?.success) {
-                toast.error('Payment verification failed');
-                setIsProcessing(false);
-                navigate(`/payment-failed?orderId=${response.razorpay_order_id}&reason=Payment verification failed`);
-                return;
-              }
-
-              toast.success('Payment successful!');
-              
-              // Await the payment complete handler to ensure navigation happens
               try {
+                // Verify payment on server
+                const { data: verifyData, error: verifyError } = await supabase.functions.invoke('razorpay-callback', {
+                  body: {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature
+                  }
+                });
+
+                if (verifyError || !verifyData?.success) {
+                  toast.error('Payment verification failed');
+                  setIsProcessing(false);
+                  navigate(`/payment-failed?orderId=${response.razorpay_order_id}&reason=Payment verification failed`);
+                  return;
+                }
+
+                console.log('Payment verified, completing registration...');
+                toast.success('Payment successful! Completing registration...');
+                
+                // Complete registration and navigate
                 await onPaymentComplete();
+                // Note: onPaymentComplete handles navigation, so no need to reset isProcessing
               } catch (error) {
                 console.error('Error completing registration:', error);
+                toast.error('Registration failed after payment');
                 setIsProcessing(false);
               }
             },
