@@ -127,7 +127,7 @@ export const RegistrationSection = () => {
           medium: (formData.schoolMedium || '').toString().toLowerCase() === 'english' ? 'English' : 'Gujarati',
           exam_center: 'To be announced',
           registration_number: '' // Trigger will override this with auto-generated number
-        });
+        } as any);
 
       if (error) {
         console.error('Database error:', error);

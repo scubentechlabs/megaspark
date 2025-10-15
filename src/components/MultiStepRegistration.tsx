@@ -128,7 +128,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           medium: formData.schoolMedium, // Using school medium as exam medium
           exam_center: 'To be announced',
           registration_number: '' // Trigger will override this with auto-generated number
-        })
+        } as any)
         .select()
         .single();
 
