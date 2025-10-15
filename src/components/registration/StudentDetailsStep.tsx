@@ -76,6 +76,27 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="confirmPhoneNumber">Re-enter Phone Number *</Label>
+          <Input
+            id="confirmPhoneNumber"
+            type="text"
+            value={formData.confirmPhoneNumber || ""}
+            onChange={(e) => handlePhoneChange(e, 'confirmPhoneNumber')}
+            placeholder="Re-enter 10-digit mobile number"
+            maxLength={10}
+            required
+          />
+          {formData.confirmPhoneNumber && formData.confirmPhoneNumber.length !== 10 && (
+            <p className="text-xs text-destructive">Mobile number must be 10 digits</p>
+          )}
+          {formData.confirmPhoneNumber && formData.phoneNumber && 
+           formData.confirmPhoneNumber.length === 10 && 
+           formData.phoneNumber !== formData.confirmPhoneNumber && (
+            <p className="text-xs text-destructive">Phone numbers do not match</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="whatsappNumber">Your WhatsApp Number *</Label>
           <Input
             id="whatsappNumber"

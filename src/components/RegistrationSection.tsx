@@ -43,6 +43,15 @@ export const RegistrationSection = () => {
         toast.error("Phone number must be exactly 10 digits");
         return false;
       }
+      // Validate confirm phone number - must match
+      if (!formData.confirmPhoneNumber || formData.confirmPhoneNumber.length !== 10) {
+        toast.error("Please re-enter phone number");
+        return false;
+      }
+      if (formData.phoneNumber !== formData.confirmPhoneNumber) {
+        toast.error("Phone numbers do not match");
+        return false;
+      }
       // Validate WhatsApp number - must be exactly 10 digits
       if (!formData.whatsappNumber || formData.whatsappNumber.length !== 10) {
         toast.error("WhatsApp number must be exactly 10 digits");
