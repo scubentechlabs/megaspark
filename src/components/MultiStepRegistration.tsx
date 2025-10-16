@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { X, ChevronRight, ChevronLeft, User, Users, CreditCard } from "lucide-react";
+import { ChevronRight, ChevronLeft, User, Users, CreditCard } from "lucide-react";
 import { StudentDetailsStep } from "./registration/StudentDetailsStep";
 import { ParentSchoolStep } from "./registration/ParentSchoolStep";
 import { PaymentStep } from "./registration/PaymentStep";
@@ -155,16 +155,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   return (
     <Card className="w-full border-0 shadow-none rounded-lg">
-        <CardHeader className="relative pb-8 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="absolute right-4 top-4 hover:bg-destructive/10"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-          
+        <CardHeader className="pb-8 border-b">
           <CardTitle className="text-3xl font-bold text-center mb-2 text-primary">
             Mega Spark Exam Registration
           </CardTitle>
