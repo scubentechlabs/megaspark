@@ -94,7 +94,7 @@ export type Database = {
           parent_phone: string | null
           preferred_exam_date: string | null
           previous_year_percentage: string | null
-          registration_number: string
+          registration_number: string | null
           room_no: string | null
           school_address: string | null
           school_medium: string | null
@@ -128,7 +128,7 @@ export type Database = {
           parent_phone?: string | null
           preferred_exam_date?: string | null
           previous_year_percentage?: string | null
-          registration_number?: string
+          registration_number?: string | null
           room_no?: string | null
           school_address?: string | null
           school_medium?: string | null
@@ -162,7 +162,7 @@ export type Database = {
           parent_phone?: string | null
           preferred_exam_date?: string | null
           previous_year_percentage?: string | null
-          registration_number?: string
+          registration_number?: string | null
           room_no?: string | null
           school_address?: string | null
           school_medium?: string | null
