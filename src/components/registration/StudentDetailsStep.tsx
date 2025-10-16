@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface StudentDetailsStepProps {
   formData: any;
@@ -101,24 +102,16 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPhoneNumber">Re-enter Phone Number *</Label>
-          <Input
-            id="confirmPhoneNumber"
-            type="text"
-            value={formData.confirmPhoneNumber || ""}
-            onChange={(e) => handlePhoneChange(e, 'confirmPhoneNumber')}
-            placeholder="Re-enter 10-digit mobile number"
-            maxLength={10}
-            required
-          />
-          {formData.confirmPhoneNumber && formData.confirmPhoneNumber.length !== 10 && (
-            <p className="text-xs text-destructive">Mobile number must be 10 digits</p>
-          )}
-          {formData.confirmPhoneNumber && formData.phoneNumber && 
-           formData.confirmPhoneNumber.length === 10 && 
-           formData.phoneNumber !== formData.confirmPhoneNumber && (
-            <p className="text-xs text-destructive">Phone numbers do not match</p>
-          )}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="confirmPhone"
+              checked={formData.confirmPhoneNumber || false}
+              onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
+            />
+            <Label htmlFor="confirmPhone" className="text-sm font-normal cursor-pointer">
+              I confirm my mobile number *
+            </Label>
+          </div>
         </div>
 
         <div className="space-y-2">

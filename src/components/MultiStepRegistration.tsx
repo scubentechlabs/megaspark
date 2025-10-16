@@ -47,6 +47,11 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Phone number must be exactly 10 digits");
         return false;
       }
+      // Validate phone confirmation checkbox
+      if (!formData.confirmPhoneNumber) {
+        toast.error("Please confirm your mobile number");
+        return false;
+      }
       // Validate WhatsApp number - must be exactly 10 digits
       if (!formData.whatsappNumber || formData.whatsappNumber.length !== 10) {
         toast.error("WhatsApp number must be exactly 10 digits");
