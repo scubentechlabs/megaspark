@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 interface PaymentStepProps {
-  onPaymentComplete: () => void;
+  onPaymentComplete: (orderId: string) => Promise<void>;
   formData?: any;
 }
 
@@ -90,7 +90,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
                 toast.success('Payment successful! Completing registration...');
                 
                 // Complete registration and navigate
-                await onPaymentComplete();
+                await onPaymentComplete(response.razorpay_order_id);
                 // Note: onPaymentComplete handles navigation, so no need to reset isProcessing
               } catch (error) {
                 console.error('Error completing registration:', error);

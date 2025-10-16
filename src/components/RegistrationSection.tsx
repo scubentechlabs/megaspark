@@ -114,11 +114,11 @@ export const RegistrationSection = () => {
     }
   };
 
-  const handlePaymentComplete = async () => {
+  const handlePaymentComplete = async (orderId: string) => {
     try {
       console.log('Starting registration save with data:', formData);
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('registrations')
         .insert({
           student_name: formData.studentName,
@@ -136,7 +136,9 @@ export const RegistrationSection = () => {
           medium: (formData.schoolMedium || '').toString().toLowerCase() === 'english' ? 'English' : 'Gujarati',
           exam_center: 'To be announced',
           registration_number: '' // Trigger will override this with auto-generated number
-        } as any);
+        } as any)
+        .select()
+        .single();
 
       if (error) {
         console.error('Database error:', error);
@@ -144,6 +146,13 @@ export const RegistrationSection = () => {
       }
 
       console.log('Registration saved successfully');
+
+      // Link payment to this registration to trigger registration number generation
+      await supabase
+        .from('payments')
+        .update({ registration_id: (data as any).id })
+        .eq('order_id', orderId);
+
       toast.success('Registration Successful!', { description: 'Redirecting to confirmation page...' });
       
       // Navigate immediately to success page

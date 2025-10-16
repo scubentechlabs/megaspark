@@ -110,7 +110,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     }
   };
 
-  const handlePaymentComplete = async () => {
+  const handlePaymentComplete = async (orderId: string) => {
     try {
       console.log('Starting registration save with data:', formData);
       
@@ -143,6 +143,13 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
       }
 
       console.log("Registration saved successfully:", data);
+
+      // Link payment to this registration to trigger registration number generation
+      await supabase
+        .from('payments')
+        .update({ registration_id: (data as any).id })
+        .eq('order_id', orderId);
+
       toast.success("Registration Successful!", {
         description: "Redirecting to confirmation page..."
       });
