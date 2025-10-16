@@ -102,19 +102,6 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="confirmPhone"
-              checked={formData.confirmPhoneNumber || false}
-              onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
-            />
-            <Label htmlFor="confirmPhone" className="text-sm font-normal cursor-pointer">
-              I confirm my mobile number *
-            </Label>
-          </div>
-        </div>
-
-        <div className="space-y-2">
           <Label htmlFor="whatsappNumber">Your WhatsApp Number *</Label>
           <Input
             id="whatsappNumber"
@@ -167,6 +154,19 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="confirmPhone"
+              checked={formData.confirmPhoneNumber || false}
+              onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
+            />
+            <Label htmlFor="confirmPhone" className="text-sm font-normal cursor-pointer">
+              I confirm my mobile number *
+            </Label>
+          </div>
         </div>
       </div>
     </div>
