@@ -66,6 +66,14 @@ serve(async (req) => {
 
     console.log('Initiating PhonePe payment for transaction:', merchantTransactionId, 'headerBuilder:v3');
 
+    // Decide PhonePe environment
+    const phonepeEnv = Deno.env.get('PHONEPE_ENV')?.toUpperCase().trim();
+    const isSandbox = (phonepeEnv ?? 'PROD') !== 'PROD';
+    const payUrl = isSandbox
+      ? 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay'
+      : 'https://api.phonepe.com/apis/hermes/pg/v1/pay';
+    console.log('PhonePe environment:', isSandbox ? 'SANDBOX' : 'PROD', 'URL:', payUrl);
+
     // Make API call to PhonePe
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
@@ -73,7 +81,7 @@ serve(async (req) => {
     headers.set('X-VERIFY', xVerifyAscii);
     headers.set('X-MERCHANT-ID', merchantId);
 
-    const response = await fetch('https://api.phonepe.com/apis/hermes/pg/v1/pay', {
+    const response = await fetch(payUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({

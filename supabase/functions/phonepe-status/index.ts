@@ -34,18 +34,25 @@ serve(async (req) => {
     const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     const xVerifyHeader = `${checksum}###${saltIndex}`.replace(/[\r\n]/g, '').trim();
 
+    // Decide PhonePe environment
+    const phonepeEnv = Deno.env.get('PHONEPE_ENV')?.toUpperCase().trim();
+    const isSandbox = (phonepeEnv ?? 'PROD') !== 'PROD';
+    const baseUrl = isSandbox
+      ? 'https://api-preprod.phonepe.com/apis/pg-sandbox'
+      : 'https://api.phonepe.com/apis/hermes';
+    const statusUrl = `${baseUrl}/pg/v1/status/${merchantId}/${merchantTransactionId}`;
+    console.log('PhonePe status env:', isSandbox ? 'SANDBOX' : 'PROD', 'URL:', statusUrl);
+
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
+    headers.set('Accept', 'application/json');
     headers.set('X-VERIFY', xVerifyHeader);
     headers.set('X-MERCHANT-ID', merchantId);
 
-    const statusResponse = await fetch(
-      `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${merchantTransactionId}`,
-      {
-        method: 'GET',
-        headers
-      }
-    );
+    const statusResponse = await fetch(statusUrl, {
+      method: 'GET',
+      headers
+    });
 
     const statusResult = await statusResponse.json();
     console.log('PhonePe status response:', statusResult);
