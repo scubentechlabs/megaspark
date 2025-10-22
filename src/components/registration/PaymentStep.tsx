@@ -23,6 +23,9 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
     try {
       console.log('Initiating PhonePe payment...');
       
+      // Save form data to session storage for later use after redirect
+      sessionStorage.setItem('registrationFormData', JSON.stringify(formData));
+      
       const { data, error } = await supabase.functions.invoke('phonepe-payment', {
         body: {
           amount: amount,
@@ -41,8 +44,11 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
       console.log('PhonePe payment response:', data);
 
       if (data?.success && data?.paymentUrl) {
+        toast.success('Redirecting to PhonePe payment gateway...');
         // Redirect to PhonePe payment page
-        window.location.href = data.paymentUrl;
+        setTimeout(() => {
+          window.location.href = data.paymentUrl;
+        }, 1000);
       } else {
         throw new Error('Payment URL not received');
       }

@@ -2,19 +2,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PartyPopper, Download, Share2, Home, Phone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { PartyPopper, Download, Share2, Home, Phone, Loader2 } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+import { supabase } from "@/integrations/supabase/client";
 
 const RegistrationSuccess = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mobile, setMobile] = useState("");
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
 
   useEffect(() => {
-    // Trigger confetti animation on mount
+    // Check if this is a PhonePe redirect
+    const txnId = searchParams.get('txnId');
+    
+    if (txnId) {
+      // Verify payment status with PhonePe
+      verifyPhonePePayment(txnId);
+    } else {
+      // Trigger confetti for direct access
+      triggerConfetti();
+    }
+  }, [searchParams]);
+
+  const triggerConfetti = () => {
     const duration = 3000;
     const end = Date.now() + duration;
 
@@ -40,7 +55,86 @@ const RegistrationSuccess = () => {
     };
 
     frame();
-  }, []);
+  };
+
+  const verifyPhonePePayment = async (txnId: string) => {
+    setIsVerifyingPayment(true);
+    
+    try {
+      console.log('Verifying PhonePe payment for txnId:', txnId);
+      
+      // Get form data from session storage
+      const formDataStr = sessionStorage.getItem('registrationFormData');
+      if (!formDataStr) {
+        toast.error('Registration data not found');
+        navigate('/');
+        return;
+      }
+      
+      const formData = JSON.parse(formDataStr);
+      
+      // Check if payment exists in database
+      const { data: paymentData, error: paymentError } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('order_id', txnId)
+        .single();
+
+      if (paymentError || !paymentData || paymentData.status !== 'success') {
+        toast.error('Payment verification failed');
+        navigate(`/payment-failed?orderId=${txnId}&reason=Payment not verified`);
+        return;
+      }
+
+      // Create registration record
+      const { data: registrationData, error: registrationError } = await supabase
+        .from('registrations')
+        .insert({
+          student_name: formData.studentName,
+          parent_name: formData.parentName,
+          mobile_number: formData.phoneNumber,
+          whatsapp_number: formData.whatsappNumber,
+          state: formData.state,
+          district: formData.district,
+          school_name: formData.schoolName,
+          school_medium: formData.schoolMedium,
+          standard: formData.standard,
+          previous_year_percentage: formData.previousYearPercentage,
+          preferred_exam_date: formData.preferredExamDate,
+          exam_date: formData.preferredExamDate,
+          medium: formData.schoolMedium,
+          exam_center: 'To be announced',
+          registration_number: ''
+        } as any)
+        .select()
+        .single();
+
+      if (registrationError) {
+        console.error('Registration error:', registrationError);
+        toast.error('Failed to create registration');
+        return;
+      }
+
+      // Link payment to registration
+      await supabase
+        .from('payments')
+        .update({ registration_id: (registrationData as any).id })
+        .eq('order_id', txnId);
+
+      // Clear session storage
+      sessionStorage.removeItem('registrationFormData');
+      
+      toast.success('Registration completed successfully!');
+      triggerConfetti();
+      
+    } catch (error: any) {
+      console.error('Payment verification error:', error);
+      toast.error('Failed to verify payment');
+      navigate('/');
+    } finally {
+      setIsVerifyingPayment(false);
+    }
+  };
 
   const handleDownloadHallTicket = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +154,21 @@ const RegistrationSuccess = () => {
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
+
+  // Show loading state while verifying payment
+  if (isVerifyingPayment) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-2xl">
+          <CardContent className="p-12 text-center">
+            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-primary" />
+            <h2 className="text-2xl font-bold mb-2">Verifying Payment...</h2>
+            <p className="text-muted-foreground">Please wait while we confirm your payment</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">

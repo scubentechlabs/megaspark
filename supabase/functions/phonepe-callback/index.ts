@@ -63,9 +63,23 @@ serve(async (req) => {
       // Extract registration ID from merchant transaction ID
       const registrationId = merchantTransactionId.split('_')[0];
 
-      // You could update the registration status here
-      // For now, we'll just log it
-      console.log('Payment completed for registration:', registrationId);
+      // Save payment record
+      const { error: paymentError } = await supabaseClient
+        .from('payments')
+        .insert({
+          order_id: merchantTransactionId,
+          payment_id: statusResult.data.transactionId,
+          amount: statusResult.data.amount / 100, // Convert from paise to rupees
+          status: 'success',
+          payment_method: 'phonepe',
+          registration_id: null // Will be linked later when registration is created
+        });
+
+      if (paymentError) {
+        console.error('Error saving payment:', paymentError);
+      } else {
+        console.log('Payment saved successfully for:', merchantTransactionId);
+      }
     }
 
     return new Response(
