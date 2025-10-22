@@ -45,8 +45,6 @@ export default function Reports() {
   const [reportType, setReportType] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedExamDate, setSelectedExamDate] = useState<string>("");
-  const [selectedRoom, setSelectedRoom] = useState<string>("");
-  const [selectedFloor, setSelectedFloor] = useState<string>("");
   const [selectedSchool, setSelectedSchool] = useState<string>("");
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -98,12 +96,6 @@ export default function Reports() {
     if (reportType === "exam-date" && uniqueVals.examDates.length > 0 && !selectedExamDate) {
       setSelectedExamDate(uniqueVals.examDates[0]);
     }
-    if (reportType === "room" && uniqueVals.rooms.length > 0 && !selectedRoom) {
-      setSelectedRoom(uniqueVals.rooms[0]);
-    }
-    if (reportType === "floor" && uniqueVals.floors.length > 0 && !selectedFloor) {
-      setSelectedFloor(uniqueVals.floors[0]);
-    }
     if (reportType === "school" && uniqueVals.schools.length > 0 && !selectedSchool) {
       setSelectedSchool(uniqueVals.schools[0]);
     }
@@ -111,11 +103,9 @@ export default function Reports() {
 
   const getUniqueValues = () => {
     const examDates = [...new Set(registrations.map(r => r.exam_date).filter(Boolean))].sort();
-    const rooms = [...new Set(registrations.map(r => r.room_no).filter(Boolean))].sort();
-    const floors = [...new Set(registrations.map(r => r.floor).filter(Boolean))].sort();
     const schools = [...new Set(registrations.map(r => r.school_name).filter(Boolean))].sort();
     
-    return { examDates, rooms, floors, schools };
+    return { examDates, schools };
   };
 
   const getFilteredReportData = () => {
@@ -133,16 +123,6 @@ export default function Reports() {
       case "exam-date":
         if (selectedExamDate) {
           data = data.filter(reg => reg.exam_date === selectedExamDate);
-        }
-        break;
-      case "room":
-        if (selectedRoom) {
-          data = data.filter(reg => reg.room_no === selectedRoom);
-        }
-        break;
-      case "floor":
-        if (selectedFloor) {
-          data = data.filter(reg => reg.floor === selectedFloor);
         }
         break;
       case "school":
@@ -177,10 +157,6 @@ export default function Reports() {
       "Exam Date",
       "Medium",
       "Exam Center",
-      "Room No",
-      "Floor",
-      "Building Name",
-      "Exam Pattern",
       "Registration Date",
     ];
 
@@ -201,10 +177,6 @@ export default function Reports() {
       reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
       reg.medium,
       reg.exam_center,
-      reg.room_no || 'N/A',
-      reg.floor || 'N/A',
-      reg.building_name || 'N/A',
-      reg.exam_pattern || 'N/A',
       new Date(reg.created_at).toLocaleDateString(),
     ]);
 
@@ -221,8 +193,6 @@ export default function Reports() {
     let fileName = `report-${reportType}`;
     if (reportType === "date" && selectedDate) fileName += `-${selectedDate}`;
     if (reportType === "exam-date" && selectedExamDate) fileName += `-${selectedExamDate}`;
-    if (reportType === "room" && selectedRoom) fileName += `-room-${selectedRoom}`;
-    if (reportType === "floor" && selectedFloor) fileName += `-floor-${selectedFloor}`;
     if (reportType === "school" && selectedSchool) fileName += `-${selectedSchool.substring(0, 20)}`;
     
     a.download = `${fileName}-${new Date().toISOString().split("T")[0]}.csv`;
@@ -243,8 +213,6 @@ export default function Reports() {
     let reportTitle = "All Registrations";
     if (reportType === "date" && selectedDate) reportTitle = `Registrations on ${new Date(selectedDate).toLocaleDateString('en-GB')}`;
     if (reportType === "exam-date" && selectedExamDate) reportTitle = `Exam Date: ${new Date(selectedExamDate).toLocaleDateString('en-GB')}`;
-    if (reportType === "room" && selectedRoom) reportTitle = `Room: ${selectedRoom}`;
-    if (reportType === "floor" && selectedFloor) reportTitle = `Floor: ${selectedFloor}`;
     if (reportType === "school" && selectedSchool) reportTitle = `School: ${selectedSchool}`;
 
     const printHTML = `
@@ -285,10 +253,6 @@ export default function Reports() {
               <th>District</th>
               <th>School</th>
               <th>Exam Date</th>
-              <th>Room</th>
-              <th>Floor</th>
-              <th>Building</th>
-              <th>Pattern</th>
             </tr>
           </thead>
           <tbody>
@@ -303,10 +267,6 @@ export default function Reports() {
                 <td>${reg.district || 'N/A'}</td>
                 <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
-                <td>${reg.room_no || 'N/A'}</td>
-                <td>${reg.floor || 'N/A'}</td>
-                <td>${reg.building_name || 'N/A'}</td>
-                <td>${reg.exam_pattern || 'N/A'}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -379,7 +339,7 @@ export default function Reports() {
             {/* Report Type Selection */}
             <div>
               <p className="text-sm font-medium mb-3">Select Report Type</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Button
                   variant={reportType === "all" ? "default" : "outline"}
                   onClick={() => setReportType("all")}
@@ -400,20 +360,6 @@ export default function Reports() {
                   className="w-full"
                 >
                   Exam Date
-                </Button>
-                <Button
-                  variant={reportType === "room" ? "default" : "outline"}
-                  onClick={() => setReportType("room")}
-                  className="w-full"
-                >
-                  Room Wise
-                </Button>
-                <Button
-                  variant={reportType === "floor" ? "default" : "outline"}
-                  onClick={() => setReportType("floor")}
-                  className="w-full"
-                >
-                  Floor Wise
                 </Button>
                 <Button
                   variant={reportType === "school" ? "default" : "outline"}
@@ -449,42 +395,6 @@ export default function Reports() {
                     {uniqueValues.examDates.map(date => (
                       <SelectItem key={date} value={date}>
                         {new Date(date).toLocaleDateString('en-GB')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {reportType === "room" && (
-              <div>
-                <p className="text-sm font-medium mb-2">Select Room Number</p>
-                <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                  <SelectTrigger className="max-w-xs">
-                    <SelectValue placeholder="Select room" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {uniqueValues.rooms.map(room => (
-                      <SelectItem key={room} value={room}>
-                        {room}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {reportType === "floor" && (
-              <div>
-                <p className="text-sm font-medium mb-2">Select Floor</p>
-                <Select value={selectedFloor} onValueChange={setSelectedFloor}>
-                  <SelectTrigger className="max-w-xs">
-                    <SelectValue placeholder="Select floor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {uniqueValues.floors.map(floor => (
-                      <SelectItem key={floor} value={floor}>
-                        {floor}
                       </SelectItem>
                     ))}
                   </SelectContent>
