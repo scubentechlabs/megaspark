@@ -47,8 +47,8 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Please enter a valid 10-digit phone number");
         return false;
       }
-      // Only validate confirmation if phone number is valid
-      if (formData.phoneNumber && formData.phoneNumber.length === 10 && !formData.confirmPhoneNumber) {
+      // Validate phone confirmation checkbox
+      if (!formData.confirmPhoneNumber) {
         toast.error("Please confirm your mobile number by checking the confirmation box");
         return false;
       }
