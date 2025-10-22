@@ -43,13 +43,9 @@ export const RegistrationSection = () => {
         toast.error("Phone number must be exactly 10 digits");
         return false;
       }
-      // Validate confirm phone number - must match
-      if (!formData.confirmPhoneNumber || formData.confirmPhoneNumber.length !== 10) {
-        toast.error("Please re-enter phone number");
-        return false;
-      }
-      if (formData.phoneNumber !== formData.confirmPhoneNumber) {
-        toast.error("Phone numbers do not match");
+      // Validate phone confirmation checkbox
+      if (!formData.confirmPhoneNumber) {
+        toast.error("Please confirm your mobile number by checking the confirmation box");
         return false;
       }
       // Validate WhatsApp number - must be exactly 10 digits
