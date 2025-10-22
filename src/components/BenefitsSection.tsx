@@ -19,9 +19,9 @@ const benefits = [
   },
   {
     icon: Award,
-    title: "Certification of Achievement",
-    description: "Recognition that opens doors to opportunities",
-    detail: "Receive an official Certificate of Achievement recognized by top educational institutions and valued by universities nationwide.",
+    title: "Educational NASA & Japan Trip for Free",
+    description: "Global exposure for top performers",
+    detail: "Top students earn global exposure through Mega Spark Exam 2025 scholarships.",
     color: "bg-gradient-to-br from-primary to-primary/80"
   },
   {
