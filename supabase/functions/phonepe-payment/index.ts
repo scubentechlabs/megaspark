@@ -20,9 +20,9 @@ serve(async (req) => {
   }
 
   try {
-    const merchantId = Deno.env.get('PHONEPE_MERCHANT_ID');
-    const saltKey = Deno.env.get('PHONEPE_SALT_KEY');
-    const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX');
+    const merchantId = Deno.env.get('PHONEPE_MERCHANT_ID')?.trim();
+    const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.replace(/\r?\n/g, '').trim();
+    const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.replace(/\r?\n/g, '').trim();
 
     if (!merchantId || !saltKey || !saltIndex) {
       throw new Error('PhonePe credentials not configured');
@@ -61,17 +61,18 @@ serve(async (req) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    const xVerify = `${checksum}###${saltIndex}`;
+    const xVerifyHeader = `${checksum}###${saltIndex}`;
+    const xVerifySafe = xVerifyHeader.replace(/[\r\n]/g, '').trim();
 
     console.log('Initiating PhonePe payment for transaction:', merchantTransactionId);
 
     // Make API call to PhonePe
     const response = await fetch('https://api.phonepe.com/apis/hermes/pg/v1/pay', {
       method: 'POST',
-      headers: {
+      headers: new Headers({
         'Content-Type': 'application/json',
-        'X-VERIFY': String(xVerify),
-      },
+        'X-VERIFY': xVerifySafe,
+      }),
       body: JSON.stringify({
         request: base64Payload
       })
