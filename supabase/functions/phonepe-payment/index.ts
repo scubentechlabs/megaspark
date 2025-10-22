@@ -62,17 +62,18 @@ serve(async (req) => {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     const xVerifyHeader = `${checksum}###${saltIndex}`;
-    const xVerifySafe = xVerifyHeader.replace(/[\r\n]/g, '').trim();
+    const xVerifyAscii = xVerifyHeader.replace(/[^\x00-\x7F]/g, '');
 
-    console.log('Initiating PhonePe payment for transaction:', merchantTransactionId);
+    console.log('Initiating PhonePe payment for transaction:', merchantTransactionId, 'headerBuilder:v3');
 
     // Make API call to PhonePe
+    const headers = new Headers();
+    headers.set('Content-Type', 'application/json');
+    headers.set('X-VERIFY', xVerifyAscii);
+
     const response = await fetch('https://api.phonepe.com/apis/hermes/pg/v1/pay', {
       method: 'POST',
-      headers: new Headers({
-        'Content-Type': 'application/json',
-        'X-VERIFY': xVerifySafe,
-      }),
+      headers,
       body: JSON.stringify({
         request: base64Payload
       })
