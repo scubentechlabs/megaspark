@@ -44,12 +44,12 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
       }
       // Validate phone number - must be exactly 10 digits
       if (!formData.phoneNumber || formData.phoneNumber.length !== 10) {
-        toast.error("Phone number must be exactly 10 digits");
+        toast.error("Please enter a valid 10-digit phone number");
         return false;
       }
       // Validate phone confirmation checkbox
       if (!formData.confirmPhoneNumber) {
-        toast.error("Please confirm your mobile number");
+        toast.error("Please check the box to confirm your mobile number is correct");
         return false;
       }
       // Validate WhatsApp number - must be exactly 10 digits

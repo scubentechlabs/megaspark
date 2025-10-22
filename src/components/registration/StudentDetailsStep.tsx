@@ -156,16 +156,22 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
+        <div className="md:col-span-2 space-y-2">
+          <div className="flex items-start space-x-2 p-4 bg-muted/50 rounded-lg border border-border">
             <Checkbox
               id="confirmPhone"
               checked={formData.confirmPhoneNumber || false}
               onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
+              className="mt-1"
             />
-            <Label htmlFor="confirmPhone" className="text-sm font-normal cursor-pointer">
-              I confirm my mobile number *
-            </Label>
+            <div className="flex-1">
+              <Label htmlFor="confirmPhone" className="text-sm font-medium cursor-pointer block mb-1">
+                Confirm Mobile Number *
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                I confirm that the phone number ({formData.phoneNumber || "not entered"}) is correct and I have access to this number.
+              </p>
+            </div>
           </div>
         </div>
       </div>
