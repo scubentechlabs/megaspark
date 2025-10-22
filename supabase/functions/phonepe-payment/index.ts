@@ -51,8 +51,10 @@ serve(async (req) => {
 
     console.log('Payment payload:', paymentPayload);
 
-    // Encode payload to base64
-    const base64Payload = btoa(JSON.stringify(paymentPayload));
+    // Encode payload to base64 (UTF-8 safe)
+    const payloadString = JSON.stringify(paymentPayload);
+    const payloadBytes = new TextEncoder().encode(payloadString);
+    const base64Payload = btoa(String.fromCharCode(...payloadBytes));
 
     // Generate X-VERIFY checksum
     const checksumString = `${base64Payload}/pg/v1/pay${saltKey}`;
@@ -81,7 +83,7 @@ serve(async (req) => {
     headers.set('X-VERIFY', xVerifyAscii);
     headers.set('X-MERCHANT-ID', merchantId);
 
-    const response = await fetch(payUrl, {
+    let response = await fetch(payUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -89,7 +91,7 @@ serve(async (req) => {
       })
     });
 
-    const raw = await response.text();
+    let raw = await response.text();
     let result: any = null;
     try {
       result = raw ? JSON.parse(raw) : null;
@@ -97,6 +99,24 @@ serve(async (req) => {
       // not JSON
     }
     console.log('PhonePe raw response:', response.status, raw);
+
+    // If unauthorized on PROD, try SANDBOX automatically
+    if (response.status === 401 && !isSandbox) {
+      const sandboxUrl = 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay';
+      console.log('Retrying PhonePe payment in SANDBOX due to 401 from PROD');
+      response = await fetch(sandboxUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ request: base64Payload })
+      });
+      raw = await response.text();
+      try {
+        result = raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        // not JSON
+      }
+      console.log('PhonePe SANDBOX raw response:', response.status, raw);
+    }
 
     if (!response.ok) {
       throw new Error(result?.message || `PhonePe returned ${response.status}`);
