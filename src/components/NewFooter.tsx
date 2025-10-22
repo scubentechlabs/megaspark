@@ -1,6 +1,7 @@
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Download } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export const NewFooter = () => {
   return (
@@ -9,6 +10,13 @@ export const NewFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div>
             <img src={logo} alt="P.P. SAVANI Centre for Excellence" className="h-12 md:h-14 w-auto mb-4" />
+            <Button 
+              className="bg-orange-500 hover:bg-orange-600 text-white mb-4 w-full md:w-auto"
+              onClick={() => window.open('/hall-ticket', '_blank')}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download Hall Ticket
+            </Button>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Centre for Excellence - IIT-JEE | NEET | CA-CS Foundation. Empowering students through accessible education.
             </p>
