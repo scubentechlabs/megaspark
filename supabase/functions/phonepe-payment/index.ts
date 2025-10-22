@@ -40,7 +40,7 @@ serve(async (req) => {
       merchantTransactionId: merchantTransactionId,
       merchantUserId: `USER_${registrationId}`,
       amount: amount * 100, // Convert to paise
-      redirectUrl: `${req.headers.get('origin')}/registration-success?txnId=${merchantTransactionId}`,
+      redirectUrl: `${(req.headers.get('origin') || (req.headers.get('referer') ? new URL(req.headers.get('referer')!).origin : 'https://megasparkexam.com'))}/registration-success?txnId=${merchantTransactionId}`,
       redirectMode: "REDIRECT",
       callbackUrl: `${Deno.env.get('SUPABASE_URL')}/functions/v1/phonepe-callback`,
       mobileNumber: customerPhone,

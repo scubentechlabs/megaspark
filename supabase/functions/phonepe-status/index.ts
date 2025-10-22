@@ -20,16 +20,12 @@ serve(async (req) => {
       throw new Error('PhonePe credentials not configured');
     }
 
-    const body = await req.json();
-    console.log('PhonePe callback received:', body);
-
-    const { merchantTransactionId } = body;
-
+    const { merchantTransactionId } = await req.json();
     if (!merchantTransactionId) {
-      throw new Error('Missing transaction ID');
+      throw new Error('merchantTransactionId is required');
     }
 
-    // Verify payment status with PhonePe
+    // Build X-VERIFY header for status check
     const checksumString = `/pg/v1/status/${merchantId}/${merchantTransactionId}${saltKey}`;
     const encoder = new TextEncoder();
     const data = encoder.encode(checksumString);
@@ -52,57 +48,46 @@ serve(async (req) => {
     );
 
     const statusResult = await statusResponse.json();
-    console.log('Payment status:', statusResult);
+    console.log('PhonePe status response:', statusResult);
 
-    // Update registration in database if payment successful
+    // If success, ensure a payment row exists
     if (statusResult.success && statusResult.data?.state === 'COMPLETED') {
       const supabaseClient = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
       );
 
-      // Extract registration ID from merchant transaction ID
-      const registrationId = merchantTransactionId.split('_')[0];
+      const amount = (statusResult.data.amount ?? 0) / 100;
 
-      // Save payment record
-      const { error: paymentError } = await supabaseClient
+      // Upsert payment by order_id
+      const { error: upsertError } = await supabaseClient
         .from('payments')
-        .insert({
-          order_id: merchantTransactionId,
-          payment_id: statusResult.data.transactionId,
-          amount: statusResult.data.amount / 100, // Convert from paise to rupees
-          status: 'success',
-          payment_method: 'phonepe',
-          registration_id: null // Will be linked later when registration is created
-        });
+        .upsert(
+          {
+            order_id: merchantTransactionId,
+            payment_id: statusResult.data.transactionId,
+            amount: amount,
+            status: 'success',
+            payment_method: 'phonepe'
+          },
+          { onConflict: 'order_id' }
+        );
 
-      if (paymentError) {
-        console.error('Error saving payment:', paymentError);
-      } else {
-        console.log('Payment saved successfully for:', merchantTransactionId);
+      if (upsertError) {
+        console.error('Upsert payment error:', upsertError);
       }
     }
 
     return new Response(
       JSON.stringify({ success: true, status: statusResult }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
-
   } catch (error) {
-    console.error('PhonePe callback error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Callback processing failed';
+    console.error('PhonePe status error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Status check failed';
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: errorMessage
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
+      JSON.stringify({ success: false, error: errorMessage }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
