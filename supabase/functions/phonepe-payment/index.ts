@@ -70,7 +70,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-VERIFY': xVerify,
+        'X-VERIFY': String(xVerify),
       },
       body: JSON.stringify({
         request: base64Payload
