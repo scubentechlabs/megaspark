@@ -69,7 +69,9 @@ serve(async (req) => {
     // Make API call to PhonePe
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
+    headers.set('Accept', 'application/json');
     headers.set('X-VERIFY', xVerifyAscii);
+    headers.set('X-MERCHANT-ID', merchantId);
 
     const response = await fetch('https://api.phonepe.com/apis/hermes/pg/v1/pay', {
       method: 'POST',
@@ -79,10 +81,20 @@ serve(async (req) => {
       })
     });
 
-    const result = await response.json();
-    console.log('PhonePe response:', result);
+    const raw = await response.text();
+    let result: any = null;
+    try {
+      result = raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      // not JSON
+    }
+    console.log('PhonePe raw response:', response.status, raw);
 
-    if (result.success && result.data?.instrumentResponse?.redirectInfo?.url) {
+    if (!response.ok) {
+      throw new Error(result?.message || `PhonePe returned ${response.status}`);
+    }
+
+    if (result?.success && result?.data?.instrumentResponse?.redirectInfo?.url) {
       return new Response(
         JSON.stringify({
           success: true,
@@ -95,7 +107,7 @@ serve(async (req) => {
         }
       );
     } else {
-      throw new Error(result.message || 'Payment initiation failed');
+      throw new Error(result?.message || 'Payment initiation failed');
     }
 
   } catch (error) {
