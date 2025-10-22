@@ -4,7 +4,6 @@ import { Smartphone, CreditCard, Wallet, CheckCircle2, Loader2 } from "lucide-re
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 interface PaymentStepProps {
   onPaymentComplete: (orderId: string) => Promise<void>;
@@ -12,7 +11,6 @@ interface PaymentStepProps {
 }
 
 export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) => {
-  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const amount = 50;

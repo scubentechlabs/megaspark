@@ -73,26 +73,24 @@ const RegistrationSuccess = () => {
       
       const formData = JSON.parse(formDataStr);
       
-      // First, ask backend to verify with PhonePe and upsert payment
+      // Verify payment status with PhonePe and upsert payment record
       const { data: statusData, error: statusError } = await supabase.functions.invoke('phonepe-status', {
         body: { merchantTransactionId: txnId }
       });
+      
       if (statusError) {
         console.error('Status check error:', statusError);
-      } else {
-        console.log('Status check result:', statusData);
+        toast.error('Payment verification failed');
+        navigate('/');
+        return;
       }
 
-      // Then check if payment exists in database
-      const { data: paymentData, error: paymentError } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('order_id', txnId)
-        .maybeSingle();
+      console.log('Status check result:', statusData);
 
-      if (paymentError || !paymentData || paymentData.status !== 'success') {
-        toast.error('Payment verification failed');
-        navigate(`/payment-failed?orderId=${txnId}&reason=Payment not verified`);
+      // Check if payment was successful
+      if (!statusData?.success || statusData?.status?.data?.state !== 'COMPLETED') {
+        toast.error('Payment not completed');
+        navigate('/');
         return;
       }
 
