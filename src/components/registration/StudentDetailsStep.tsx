@@ -156,6 +156,26 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
           </Select>
         </div>
 
+        {formData.phoneNumber && formData.phoneNumber.length === 10 && (
+          <div className="md:col-span-2 space-y-2">
+            <div className="flex items-start space-x-2 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <Checkbox
+                id="confirmPhone"
+                checked={formData.confirmPhoneNumber || false}
+                onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <Label htmlFor="confirmPhone" className="text-sm font-medium cursor-pointer block mb-1">
+                  Confirm Mobile Number *
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  I confirm that the phone number <strong className="text-foreground">{formData.phoneNumber}</strong> is correct and I have access to this number.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
