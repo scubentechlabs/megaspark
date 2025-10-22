@@ -4,11 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Edit, Printer, Users, Calendar } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import {
   SidebarProvider,
@@ -50,12 +48,6 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({
-    room_no: "",
-    floor: "",
-    building_name: "",
-    exam_pattern: "",
-  });
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -318,10 +310,6 @@ export default function Admin() {
       "Exam Date",
       "Medium",
       "Exam Center",
-      "Room No",
-      "Floor",
-      "Building Name",
-      "Exam Pattern",
       "Registration Date",
     ];
 
@@ -342,10 +330,6 @@ export default function Admin() {
       reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
       reg.medium,
       reg.exam_center,
-      reg.room_no || 'N/A',
-      reg.floor || 'N/A',
-      reg.building_name || 'N/A',
-      reg.exam_pattern || 'N/A',
       new Date(reg.created_at).toLocaleDateString(),
     ]);
 
@@ -409,10 +393,6 @@ export default function Admin() {
               <th>District</th>
               <th>School</th>
               <th>Exam Date</th>
-              <th>Room</th>
-              <th>Floor</th>
-              <th>Building</th>
-              <th>Pattern</th>
             </tr>
           </thead>
           <tbody>
@@ -427,10 +407,6 @@ export default function Admin() {
                 <td>${reg.district || 'N/A'}</td>
                 <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
-                <td>${reg.room_no || 'N/A'}</td>
-                <td>${reg.floor || 'N/A'}</td>
-                <td>${reg.building_name || 'N/A'}</td>
-                <td>${reg.exam_pattern || 'N/A'}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -480,49 +456,6 @@ export default function Admin() {
 
   const stats = getStats();
 
-  const handleEditClick = (reg: Registration) => {
-    setEditingRegistration(reg);
-    setEditFormData({
-      room_no: reg.room_no || "",
-      floor: reg.floor || "",
-      building_name: reg.building_name || "",
-      exam_pattern: reg.exam_pattern || "",
-    });
-    setIsEditDialogOpen(true);
-  };
-
-  const handleEditSave = async () => {
-    if (!editingRegistration) return;
-
-    try {
-      const { error } = await supabase
-        .from("registrations")
-        .update({
-          room_no: editFormData.room_no || null,
-          floor: editFormData.floor || null,
-          building_name: editFormData.building_name || null,
-          exam_pattern: editFormData.exam_pattern || null,
-        })
-        .eq("id", editingRegistration.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Registration details updated successfully",
-      });
-
-      setIsEditDialogOpen(false);
-      fetchRegistrations();
-    } catch (error) {
-      console.error("Error updating registration:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update registration details",
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <SidebarProvider>
@@ -652,7 +585,6 @@ export default function Admin() {
                             <TableHead className="font-semibold">Standard</TableHead>
                             <TableHead className="font-semibold">Medium</TableHead>
                             <TableHead className="font-semibold">Exam Date</TableHead>
-                            <TableHead className="font-semibold">Room Details</TableHead>
                             <TableHead className="font-semibold">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -667,31 +599,15 @@ export default function Admin() {
                               <TableCell>
                                 {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
                               </TableCell>
-                              <TableCell className="text-xs">
-                                {reg.room_no && <div>Room: {reg.room_no}</div>}
-                                {reg.floor && <div>Floor: {reg.floor}</div>}
-                                {!reg.room_no && !reg.floor && <span className="text-muted-foreground">Not set</span>}
-                              </TableCell>
                               <TableCell>
-                                <div className="flex gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleEditClick(reg)}
-                                    className="gap-2"
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleDownloadHallTicket(reg)}
-                                    className="gap-2"
-                                  >
-                                    <Download className="h-4 w-4" />
-                                    Hall Ticket
-                                  </Button>
-                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleDownloadHallTicket(reg)}
+                                  className="gap-2"
+                                >
+                                  <Download className="h-4 w-4" />
+                                  Hall Ticket
+                                </Button>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -706,63 +622,6 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Edit Registration Details</DialogTitle>
-            <DialogDescription>
-              Update room details and exam pattern for {editingRegistration?.student_name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="room_no">Room No</Label>
-              <Input
-                id="room_no"
-                value={editFormData.room_no}
-                onChange={(e) => setEditFormData({ ...editFormData, room_no: e.target.value })}
-                placeholder="Enter room number"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="floor">Floor</Label>
-              <Input
-                id="floor"
-                value={editFormData.floor}
-                onChange={(e) => setEditFormData({ ...editFormData, floor: e.target.value })}
-                placeholder="Enter floor"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="building_name">Building Name</Label>
-              <Input
-                id="building_name"
-                value={editFormData.building_name}
-                onChange={(e) => setEditFormData({ ...editFormData, building_name: e.target.value })}
-                placeholder="Enter building name"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="exam_pattern">Exam Pattern</Label>
-              <Input
-                id="exam_pattern"
-                value={editFormData.exam_pattern}
-                onChange={(e) => setEditFormData({ ...editFormData, exam_pattern: e.target.value })}
-                placeholder="Enter exam pattern"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleEditSave}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </SidebarProvider>
   );
 }
