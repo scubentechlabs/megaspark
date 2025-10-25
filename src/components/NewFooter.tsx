@@ -65,7 +65,7 @@ export const NewFooter = () => {
 
         <div className="pt-8 border-t border-border text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 P.P. SAVANI Centre for Excellence. All rights reserved. | Crafted With ❤️ by Stabulam
+            © 2025 P.P. SAVANI Centre for Excellence. All rights reserved. | Crafted With ❤️ by Stabulam | Version: 2.5.1 (Beta)
           </p>
         </div>
       </div>
