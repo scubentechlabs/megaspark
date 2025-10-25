@@ -248,7 +248,7 @@ const RegistrationSuccess = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent font-bold">•</span>
-                      <span>Bring valid ID proof and your hall ticket</span>
+                      <span>Bring valid ID proof (Aadhar Card) and your hall ticket</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent font-bold">•</span>
