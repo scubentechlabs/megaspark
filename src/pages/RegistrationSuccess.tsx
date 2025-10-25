@@ -103,11 +103,11 @@ const RegistrationSuccess = () => {
           district: formData.district,
           school_name: formData.schoolName,
           school_medium: formData.schoolMedium,
+          medium: formData.schoolMedium, // Also set medium field to match school_medium
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
           preferred_exam_date: formData.preferredExamDate,
           exam_date: formData.preferredExamDate,
-          medium: formData.schoolMedium,
           exam_center: 'To be announced',
           registration_number: ''
         } as any)

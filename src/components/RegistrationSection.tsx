@@ -129,7 +129,7 @@ export const RegistrationSection = () => {
           previous_year_percentage: formData.previousYearPercentage,
           preferred_exam_date: formData.preferredExamDate,
           exam_date: formData.preferredExamDate, // Set exam_date for trigger
-          medium: (formData.schoolMedium || '').toString().toLowerCase() === 'english' ? 'English' : 'Gujarati',
+          medium: formData.schoolMedium, // Use schoolMedium directly (lowercase)
           exam_center: 'To be announced',
           registration_number: '' // Trigger will override this with auto-generated number
         } as any)
