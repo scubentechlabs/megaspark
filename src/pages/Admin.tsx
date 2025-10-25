@@ -309,7 +309,6 @@ export default function Admin() {
       "Parent Name",
       "Mobile Number",
       "WhatsApp Number",
-      "Email",
       "District",
       "City/Village",
       "School Name",
@@ -329,7 +328,6 @@ export default function Admin() {
       reg.parent_name || 'N/A',
       reg.mobile_number,
       reg.whatsapp_number || 'N/A',
-      reg.email || 'N/A',
       reg.state || 'N/A',
       reg.district || 'N/A',
       reg.school_name || 'N/A',
@@ -339,7 +337,7 @@ export default function Admin() {
       reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
       reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
       reg.medium,
-      reg.exam_center,
+      'PP Savani Center for excellence',
       new Date(reg.created_at).toLocaleDateString(),
     ]);
 
