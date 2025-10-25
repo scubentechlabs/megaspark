@@ -397,11 +397,9 @@ export default function Admin() {
               <th>Reg. No.</th>
               <th>Student Name</th>
               <th>Mobile</th>
-              <th>Email</th>
               <th>Standard</th>
               <th>Medium</th>
               <th>District</th>
-              <th>School</th>
               <th>Exam Date</th>
             </tr>
           </thead>
@@ -411,11 +409,9 @@ export default function Admin() {
                 <td>${reg.registration_number}</td>
                 <td>${reg.student_name}</td>
                 <td>${reg.mobile_number}</td>
-                <td>${reg.email || 'N/A'}</td>
                 <td>${reg.standard}</td>
                 <td>${reg.medium}</td>
                 <td>${reg.district || 'N/A'}</td>
-                <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
               </tr>
             `).join('')}
@@ -423,7 +419,7 @@ export default function Admin() {
         </table>
         
         <div class="footer">
-          <p>MEGA SPARK EXAM COMMITTEE | Website: www.megaspark.com</p>
+          <p>MEGA SPARK EXAM COMMITTEE | Website: www.megasparkexam.com</p>
         </div>
       </body>
       </html>
