@@ -65,6 +65,30 @@ export default function Admin() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    // Set up realtime subscription for registrations
+    const channel = supabase
+      .channel('registrations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'registrations'
+        },
+        (payload) => {
+          console.log('Registration change detected:', payload);
+          // Refresh registrations when any change occurs
+          fetchRegistrations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
