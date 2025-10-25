@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Smartphone, Download, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
-import hallTicketFooterImage from "@/assets/hall-ticket-footer.png";
+import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 
 interface Registration {
   id: string;

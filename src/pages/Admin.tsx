@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
-import hallTicketFooterImage from "@/assets/hall-ticket-footer.png";
+import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 
 interface Registration {
   id: string;
