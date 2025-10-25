@@ -448,16 +448,26 @@ export default function Admin() {
 
   const getStats = () => {
     const total = registrations.length;
-    const byStandard = registrations.reduce((acc, reg) => {
-      acc[reg.standard] = (acc[reg.standard] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    const byMedium = registrations.reduce((acc, reg) => {
-      acc[reg.medium] = (acc[reg.medium] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const todayRegistrations = registrations.filter(reg => {
+      const regDate = new Date(reg.created_at);
+      regDate.setHours(0, 0, 0, 0);
+      return regDate.getTime() === today.getTime();
+    }).length;
+    
+    const yesterdayRegistrations = registrations.filter(reg => {
+      const regDate = new Date(reg.created_at);
+      regDate.setHours(0, 0, 0, 0);
+      return regDate.getTime() === yesterday.getTime();
+    }).length;
 
-    return { total, byStandard, byMedium };
+    return { total, todayRegistrations, yesterdayRegistrations };
   };
 
   const stats = getStats();
@@ -545,35 +555,23 @@ export default function Admin() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      By Standard
+                      Today Registrations
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-1">
-                      {Object.entries(stats.byStandard).map(([std, count]) => (
-                        <p key={std} className="text-sm">
-                          <span className="font-semibold">{std}:</span> {count}
-                        </p>
-                      ))}
-                    </div>
+                    <p className="text-3xl font-bold">{stats.todayRegistrations}</p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      By Medium
+                      <Calendar className="h-4 w-4" />
+                      Yesterday Registrations
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-1">
-                      {Object.entries(stats.byMedium).map(([medium, count]) => (
-                        <p key={medium} className="text-sm">
-                          <span className="font-semibold capitalize">{medium}:</span> {count}
-                        </p>
-                      ))}
-                    </div>
+                    <p className="text-3xl font-bold">{stats.yesterdayRegistrations}</p>
                   </CardContent>
                 </Card>
               </div>
