@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Home, Users, CreditCard, LayoutDashboard, Tag } from "lucide-react";
+import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag } from "lucide-react";
 import logo from "@/assets/logo.png";
 import {
   Sidebar,
@@ -23,7 +23,6 @@ export function AdminSidebar() {
     { title: "Payments", icon: CreditCard, path: "/admin/payments" },
     { title: "Reports", icon: FileText, path: "/admin/reports" },
     { title: "Settings", icon: Settings, path: "/admin/settings" },
-    { title: "Back to Home", icon: Home, path: "/" },
   ];
 
   const isActive = (path: string) => {
