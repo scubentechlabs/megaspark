@@ -46,6 +46,7 @@ interface DashboardStats {
   registrationsByMedium: Record<string, number>;
   recentRegistrations: any[];
   recentPayments: any[];
+  registrationTrendData: Array<{ date: string; registrations: number }>;
 }
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
@@ -122,6 +123,27 @@ export default function Dashboard() {
       const failedPayments = payments?.filter((p) => p.status === "failed") || [];
       const totalRevenue = successfulPayments.reduce((sum, p) => sum + Number(p.amount), 0);
 
+      // Generate registration trend data for last 7 days
+      const registrationTrendData = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        date.setHours(0, 0, 0, 0);
+        
+        const nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + 1);
+        
+        const count = registrations?.filter((reg) => {
+          const regDate = new Date(reg.created_at);
+          return regDate >= date && regDate < nextDate;
+        }).length || 0;
+        
+        registrationTrendData.push({
+          date: format(date, 'MMM dd'),
+          registrations: count,
+        });
+      }
+
       setStats({
         totalRegistrations: registrations?.length || 0,
         todayRegistrations: todayRegistrations.length,
@@ -134,6 +156,7 @@ export default function Dashboard() {
         registrationsByMedium,
         recentRegistrations: registrations?.slice(0, 5) || [],
         recentPayments: payments?.slice(0, 5) || [],
+        registrationTrendData,
       });
 
       toast.success("Dashboard data loaded");
@@ -222,6 +245,96 @@ export default function Dashboard() {
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.yesterdayRegistrations}</div>
                   <p className="text-xs text-muted-foreground">Registered yesterday</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Registration Trend Graph */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Registration Trend (Last 7 Days)
+                </CardTitle>
+                <CardDescription>Daily registration count over the past week</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats.registrationTrendData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        border: '1px solid hsl(var(--border))' 
+                      }}
+                    />
+                    <Legend />
+                    <Bar 
+                      dataKey="registrations" 
+                      fill="hsl(var(--primary))" 
+                      name="Registrations"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Stats Comparison Cards */}
+            <div className="grid gap-4 md:grid-cols-3 mb-6">
+              <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
+                  <Users className="h-5 w-5 text-primary" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-primary">{stats.totalRegistrations}</div>
+                  <p className="text-xs text-muted-foreground mt-1">All-time students enrolled</p>
+                  <ResponsiveContainer width="100%" height={60} className="mt-3">
+                    <BarChart data={[
+                      { name: 'Total', value: stats.totalRegistrations }
+                    ]}>
+                      <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Today Registrations</CardTitle>
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{stats.todayRegistrations}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Registered today</p>
+                  <ResponsiveContainer width="100%" height={60} className="mt-3">
+                    <BarChart data={[
+                      { name: 'Today', value: stats.todayRegistrations }
+                    ]}>
+                      <Bar dataKey="value" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium">Yesterday Registrations</CardTitle>
+                  <Calendar className="h-5 w-5 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-orange-600">{stats.yesterdayRegistrations}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Registered yesterday</p>
+                  <ResponsiveContainer width="100%" height={60} className="mt-3">
+                    <BarChart data={[
+                      { name: 'Yesterday', value: stats.yesterdayRegistrations }
+                    ]}>
+                      <Bar dataKey="value" fill="#ea580c" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
