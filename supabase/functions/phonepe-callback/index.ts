@@ -70,10 +70,37 @@ serve(async (req) => {
       headers
     });
 
-    const statusResult = await statusResponse.json();
-    console.log('Payment status:', statusResult);
+let statusResult = await statusResponse.json();
+console.log('Payment status:', statusResult);
 
-    // Update payment record in database
+// Cross-environment fallback if merchant keys belong to opposite environment
+if ((!statusResponse.ok || statusResult?.code === 'KEY_NOT_CONFIGURED') && merchantId) {
+  try {
+    const otherBaseUrl = isSandbox
+      ? 'https://api.phonepe.com/apis/hermes'
+      : 'https://api-preprod.phonepe.com/apis/pg-sandbox';
+    const otherStatusUrl = `${otherBaseUrl}/pg/v1/status/${merchantId}/${merchantTransactionId}`;
+    const otherStatusPath = `/pg/v1/status/${merchantId}/${merchantTransactionId}`;
+    const otherHash = await sha256Hex(otherStatusPath + saltKey);
+    const otherXVerify = `${otherHash}###${saltIndex}`;
+    const otherHeaders = new Headers();
+    otherHeaders.set('Content-Type', 'application/json');
+    otherHeaders.set('Accept', 'application/json');
+    otherHeaders.set('X-VERIFY', otherXVerify);
+    otherHeaders.set('X-MERCHANT-ID', merchantId);
+    console.log('Retrying status in opposite environment:', otherStatusUrl);
+    const otherResp = await fetch(otherStatusUrl, { method: 'GET', headers: otherHeaders });
+    const otherJson = await otherResp.json().catch(() => null);
+    if (otherJson) {
+      statusResult = otherJson;
+    }
+    console.log('Cross-env status response:', otherResp.status, statusResult);
+  } catch (crossErr) {
+    console.error('Cross-env status retry failed:', crossErr);
+  }
+}
+
+// Update payment record in database
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''

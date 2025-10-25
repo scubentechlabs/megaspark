@@ -166,6 +166,42 @@ serve(async (req) => {
       console.log('PhonePe X-VERIFY raw response:', response.status, raw);
     }
 
+    // Cross-environment fallback if merchant keys are configured for the other environment
+    if (!response.ok && (result?.code === 'KEY_NOT_CONFIGURED')) {
+      try {
+        const otherPayUrl = isSandbox
+          ? 'https://api.phonepe.com/apis/hermes/pg/v1/pay'
+          : 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay';
+
+        const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.trim();
+        const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.trim() || '1';
+        if (!saltKey) {
+          throw new Error('PhonePe salt key not configured for cross-env retry');
+        }
+        const payPath = '/pg/v1/pay';
+        const xVerifyHash = await sha256Hex(base64Payload + payPath + saltKey);
+        const xVerify = `${xVerifyHash}###${saltIndex}`;
+        const crossHeaders = new Headers();
+        crossHeaders.set('Content-Type', 'application/json');
+        crossHeaders.set('Accept', 'application/json');
+        crossHeaders.set('X-VERIFY', xVerify);
+        crossHeaders.set('X-MERCHANT-ID', merchantId);
+        console.log('Retrying PhonePe payment in opposite environment via X-VERIFY:', otherPayUrl);
+        response = await fetch(otherPayUrl, {
+          method: 'POST',
+          headers: crossHeaders,
+          body: JSON.stringify({ request: base64Payload })
+        });
+        raw = await response.text();
+        try {
+          result = raw ? JSON.parse(raw) : null;
+        } catch (_) {}
+        console.log('PhonePe cross-env raw response:', response.status, raw);
+      } catch (crossErr) {
+        console.error('Cross-environment retry failed:', crossErr);
+      }
+    }
+
     if (!response.ok) {
       throw new Error(result?.message || `PhonePe returned ${response.status}`);
     }
