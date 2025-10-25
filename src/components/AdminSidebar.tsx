@@ -1,6 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare } from "lucide-react";
+import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +19,7 @@ import {
 export function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [userEmail, setUserEmail] = useState<string>("");
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
@@ -26,8 +31,29 @@ export function AdminSidebar() {
     { title: "Settings", icon: Settings, path: "/admin/settings" },
   ];
 
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    };
+    getUserInfo();
+  }, []);
+
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/admin/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout");
+    }
   };
 
   return (
@@ -67,6 +93,30 @@ export function AdminSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* User Profile & Logout Section */}
+        <div className="mt-auto border-t p-4 space-y-3">
+          {/* User Profile */}
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-muted/50">
+            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">Admin</p>
+              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Logout</span>
+          </Button>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
