@@ -144,10 +144,20 @@ export const RegistrationSection = () => {
       console.log('Registration saved successfully');
 
       // Link payment to this registration to trigger registration number generation
-      await supabase
+      const { error: updateError } = await supabase
         .from('payments')
         .update({ registration_id: (data as any).id })
         .eq('order_id', orderId);
+
+      if (updateError) {
+        console.error('Payment update error:', updateError);
+      }
+
+      // Force registration update to trigger seat number generation
+      await supabase
+        .from('registrations')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', (data as any).id);
 
       toast.success('Registration Successful!', { description: 'Redirecting to confirmation page...' });
       
