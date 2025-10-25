@@ -6,12 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer.png";
 
@@ -48,6 +57,7 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editedRegNumber, setEditedRegNumber] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -456,6 +466,48 @@ export default function Admin() {
 
   const stats = getStats();
 
+  const handleEditRegNumber = (reg: Registration) => {
+    setEditingRegistration(reg);
+    setEditedRegNumber(reg.registration_number);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveRegNumber = async () => {
+    if (!editingRegistration || !editedRegNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Registration number cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .update({ registration_number: editedRegNumber.trim() })
+        .eq('id', editingRegistration.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Registration number updated successfully",
+      });
+
+      setIsEditDialogOpen(false);
+      setEditingRegistration(null);
+      setEditedRegNumber("");
+      fetchRegistrations();
+    } catch (error: any) {
+      console.error('Error updating registration number:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update registration number",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -600,14 +652,25 @@ export default function Admin() {
                                 {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
                               </TableCell>
                               <TableCell>
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleDownloadHallTicket(reg)}
-                                  className="gap-2"
-                                >
-                                  <Download className="h-4 w-4" />
-                                  Hall Ticket
-                                </Button>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleEditRegNumber(reg)}
+                                    className="gap-2"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleDownloadHallTicket(reg)}
+                                    className="gap-2"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    Hall Ticket
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -621,6 +684,36 @@ export default function Admin() {
           </main>
         </div>
       </div>
+
+      {/* Edit Registration Number Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Registration Number</DialogTitle>
+            <DialogDescription>
+              Update the registration number for {editingRegistration?.student_name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="reg-number">Registration Number</Label>
+            <Input
+              id="reg-number"
+              value={editedRegNumber}
+              onChange={(e) => setEditedRegNumber(e.target.value)}
+              className="mt-2"
+              placeholder="Enter registration number"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveRegNumber}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </SidebarProvider>
   );
