@@ -18,6 +18,7 @@ interface Registration {
   standard: string;
   medium: string;
   exam_center: string;
+  exam_date: string;
   registration_number: string;
   hall_ticket_url: string | null;
   created_at: string;
@@ -86,6 +87,23 @@ export default function Login() {
   };
 
   const handleDownloadHallTicket = (registration: Registration) => {
+    // Format exam date from YYYY-MM-DD to readable format
+    const formatExamDate = (dateString: string) => {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.toLocaleString('en-US', { month: 'long' });
+      const year = date.getFullYear();
+      
+      // Add ordinal suffix (st, nd, rd, th)
+      const ordinal = (n: number) => {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      };
+      
+      return `${ordinal(day)} ${month} ${year}`;
+    };
+
     // Generate hall ticket HTML
     const hallTicketHTML = `
 <!DOCTYPE html>
@@ -143,11 +161,11 @@ export default function Login() {
     </tr>
     <tr>
       <td>Medium :</td>
-      <td><strong>${registration.medium === 'English' ? 'English' : 'ગુજરાતી (Gujarati)'}</strong></td>
+      <td><strong>${registration.medium === 'english' ? 'English' : 'ગુજરાતી (Gujarati)'}</strong></td>
     </tr>
     <tr>
       <td>Exam Date :</td>
-      <td><strong>7th December 2025</strong></td>
+      <td><strong>${formatExamDate(registration.exam_date)}</strong></td>
     </tr>
     <tr>
       <td>Exam Pattern :</td>
