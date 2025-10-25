@@ -5,6 +5,7 @@ import { BenefitsSection } from "@/components/BenefitsSection";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
+import { LimitedOffer } from "@/components/LimitedOffer";
 import { RegistrationSection } from "@/components/RegistrationSection";
 import { HelpBox } from "@/components/HelpBox";
 import { FinalCTA } from "@/components/FinalCTA";
@@ -48,6 +49,7 @@ const Index = () => {
       <ExamDatesVenue />
       <EligibilityCriteria />
       <DownloadGuide />
+      <LimitedOffer />
       <RegistrationSection />
       <HelpBox />
       <FinalCTA onRegisterClick={() => {
