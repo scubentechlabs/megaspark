@@ -98,8 +98,10 @@ export default function Admin() {
         (reg) =>
           reg.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           reg.mobile_number.includes(searchTerm) ||
-          reg.registration_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          reg.email.toLowerCase().includes(searchTerm.toLowerCase())
+          (reg.registration_number && reg.registration_number.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (reg.email && reg.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (reg.parent_name && reg.parent_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (reg.district && reg.district.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredRegistrations(filtered);
     } else {
