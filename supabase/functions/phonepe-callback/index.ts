@@ -61,32 +61,40 @@ serve(async (req) => {
     const statusResult = await statusResponse.json();
     console.log('Payment status:', statusResult);
 
-    // Update registration in database if payment successful
+    // Update payment record in database
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     if (statusResult.success && statusResult.data?.state === 'COMPLETED') {
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
-
-      // Extract registration ID from merchant transaction ID
-      const registrationId = merchantTransactionId.split('_')[0];
-
-      // Save payment record
-      const { error: paymentError } = await supabaseClient
+      // Update payment status to success
+      const { error: updateError } = await supabaseClient
         .from('payments')
-        .insert({
-          order_id: merchantTransactionId,
-          payment_id: statusResult.data.transactionId,
-          amount: statusResult.data.amount / 100, // Convert from paise to rupees
+        .update({
           status: 'success',
-          payment_method: 'phonepe',
-          registration_id: null // Will be linked later when registration is created
-        });
+          transaction_id: statusResult.data.transactionId,
+          payment_method: statusResult.data.paymentInstrument?.type || 'phonepe'
+        })
+        .eq('order_id', merchantTransactionId);
 
-      if (paymentError) {
-        console.error('Error saving payment:', paymentError);
+      if (updateError) {
+        console.error('Error updating payment:', updateError);
       } else {
-        console.log('Payment saved successfully for:', merchantTransactionId);
+        console.log('Payment updated successfully for:', merchantTransactionId);
+      }
+    } else if (statusResult.data?.state === 'FAILED') {
+      // Update payment status to failed
+      const { error: updateError } = await supabaseClient
+        .from('payments')
+        .update({
+          status: 'failed',
+          failure_reason: statusResult.data.responseCode || 'Payment failed'
+        })
+        .eq('order_id', merchantTransactionId);
+
+      if (updateError) {
+        console.error('Error updating failed payment:', updateError);
       }
     }
 

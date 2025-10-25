@@ -12,6 +12,9 @@ interface PaymentRequest {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
+  couponCode?: string;
+  discountAmount?: number;
+  originalAmount?: number;
 }
 
 serve(async (req) => {
@@ -28,7 +31,18 @@ serve(async (req) => {
       throw new Error('PhonePe credentials not configured');
     }
 
-    const { amount, registrationId, customerName, customerPhone, customerEmail }: PaymentRequest = await req.json();
+    const { 
+      amount, 
+      registrationId, 
+      customerName, 
+      customerPhone, 
+      customerEmail,
+      couponCode,
+      discountAmount,
+      originalAmount 
+    }: PaymentRequest = await req.json();
+
+    console.log('Payment request received:', { amount, registrationId, customerName, couponCode });
 
     // Generate unique transaction ID
     const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
@@ -66,7 +80,7 @@ serve(async (req) => {
     const xVerifyHeader = `${checksum}###${saltIndex}`;
     const xVerifyAscii = xVerifyHeader.replace(/[^\x00-\x7F]/g, '');
 
-    console.log('Initiating PhonePe payment for transaction:', merchantTransactionId, 'headerBuilder:v3');
+    console.log('Initiating PhonePe payment for transaction:', merchantTransactionId);
 
     // Decide PhonePe environment
     const phonepeEnv = Deno.env.get('PHONEPE_ENV')?.toUpperCase().trim();
@@ -120,6 +134,31 @@ serve(async (req) => {
 
     if (!response.ok) {
       throw new Error(result?.message || `PhonePe returned ${response.status}`);
+    }
+
+    // Create initial payment record with pending status
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { error: paymentError } = await supabaseClient
+      .from('payments')
+      .insert({
+        order_id: merchantTransactionId,
+        transaction_id: merchantTransactionId,
+        student_name: customerName,
+        payment_type: 'online',
+        status: 'pending',
+        amount: amount,
+        original_amount: originalAmount || amount,
+        discount_amount: discountAmount || 0,
+        coupon_code: couponCode || null,
+        payment_method: 'phonepe'
+      });
+
+    if (paymentError) {
+      console.error('Error creating payment record:', paymentError);
     }
 
     if (result?.success && result?.data?.instrumentResponse?.redirectInfo?.url) {
