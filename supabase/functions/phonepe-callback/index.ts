@@ -12,11 +12,11 @@ serve(async (req) => {
   }
 
   try {
+    const clientId = Deno.env.get('PHONEPE_CLIENT_ID')?.trim();
+    const clientSecret = Deno.env.get('PHONEPE_CLIENT_SECRET')?.trim();
     const merchantId = Deno.env.get('PHONEPE_MERCHANT_ID')?.trim();
-    const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.replace(/\r?\n/g, '').trim();
-    const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.replace(/\r?\n/g, '').trim();
 
-    if (!merchantId || !saltKey || !saltIndex) {
+    if (!clientId || !clientSecret || !merchantId) {
       throw new Error('PhonePe credentials not configured');
     }
 
@@ -29,14 +29,9 @@ serve(async (req) => {
       throw new Error('Missing transaction ID');
     }
 
-    // Verify payment status with PhonePe
-    const checksumString = `/pg/v1/status/${merchantId}/${merchantTransactionId}${saltKey}`;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(checksumString);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    const xVerifyHeader = `${checksum}###${saltIndex}`.replace(/[\r\n]/g, '').trim();
+    // Get OAuth token
+    const authString = `${clientId}:${clientSecret}`;
+    const authBase64 = btoa(authString);
 
     // Decide PhonePe environment
     const phonepeEnv = Deno.env.get('PHONEPE_ENV')?.toUpperCase().trim();
@@ -50,8 +45,7 @@ serve(async (req) => {
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
-    headers.set('X-VERIFY', xVerifyHeader);
-    headers.set('X-MERCHANT-ID', merchantId);
+    headers.set('Authorization', `Basic ${authBase64}`);
 
     const statusResponse = await fetch(statusUrl, {
       method: 'GET',

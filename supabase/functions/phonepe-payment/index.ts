@@ -23,11 +23,11 @@ serve(async (req) => {
   }
 
   try {
+    const clientId = Deno.env.get('PHONEPE_CLIENT_ID')?.trim();
+    const clientSecret = Deno.env.get('PHONEPE_CLIENT_SECRET')?.trim();
     const merchantId = Deno.env.get('PHONEPE_MERCHANT_ID')?.trim();
-    const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.replace(/\r?\n/g, '').trim();
-    const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.replace(/\r?\n/g, '').trim();
 
-    if (!merchantId || !saltKey || !saltIndex) {
+    if (!clientId || !clientSecret || !merchantId) {
       throw new Error('PhonePe credentials not configured');
     }
 
@@ -65,20 +65,14 @@ serve(async (req) => {
 
     console.log('Payment payload:', paymentPayload);
 
+    // Get OAuth token
+    const authString = `${clientId}:${clientSecret}`;
+    const authBase64 = btoa(authString);
+    
     // Encode payload to base64 (UTF-8 safe)
     const payloadString = JSON.stringify(paymentPayload);
     const payloadBytes = new TextEncoder().encode(payloadString);
     const base64Payload = btoa(String.fromCharCode(...payloadBytes));
-
-    // Generate X-VERIFY checksum
-    const checksumString = `${base64Payload}/pg/v1/pay${saltKey}`;
-    const encoder = new TextEncoder();
-    const data = encoder.encode(checksumString);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    const xVerifyHeader = `${checksum}###${saltIndex}`;
-    const xVerifyAscii = xVerifyHeader.replace(/[^\x00-\x7F]/g, '');
 
     console.log('Initiating PhonePe payment for transaction:', merchantTransactionId);
 
@@ -90,12 +84,11 @@ serve(async (req) => {
       : 'https://api.phonepe.com/apis/hermes/pg/v1/pay';
     console.log('PhonePe environment:', isSandbox ? 'SANDBOX' : 'PROD', 'URL:', payUrl);
 
-    // Make API call to PhonePe
+    // Make API call to PhonePe with OAuth authentication
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
-    headers.set('X-VERIFY', xVerifyAscii);
-    headers.set('X-MERCHANT-ID', merchantId);
+    headers.set('Authorization', `Basic ${authBase64}`);
 
     let response = await fetch(payUrl, {
       method: 'POST',
