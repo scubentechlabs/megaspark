@@ -11,11 +11,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Settings as SettingsIcon, Save } from "lucide-react";
+import { Settings as SettingsIcon, Save, Download, Database, FileText } from "lucide-react";
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
   const [examSettings, setExamSettings] = useState({
     examName: "MEGA SPARK EXAM 2025",
@@ -134,6 +135,116 @@ export default function Settings() {
     }
   };
 
+  const downloadBackup = async (type: 'registrations' | 'payments' | 'coupons' | 'all') => {
+    setIsDownloading(true);
+    try {
+      let data: any[] = [];
+      let filename = '';
+      
+      if (type === 'all') {
+        // Download all data as complete backup
+        const [regData, payData, couponData, settingsData] = await Promise.all([
+          supabase.from('registrations').select('*').order('created_at', { ascending: false }),
+          supabase.from('payments').select('*').order('created_at', { ascending: false }),
+          supabase.from('coupons').select('*').order('created_at', { ascending: false }),
+          supabase.from('settings').select('*')
+        ]);
+
+        const backup = {
+          backup_date: new Date().toISOString(),
+          version: '2.5.1',
+          data: {
+            registrations: regData.data || [],
+            payments: payData.data || [],
+            coupons: couponData.data || [],
+            settings: settingsData.data || []
+          },
+          stats: {
+            total_registrations: regData.data?.length || 0,
+            total_payments: payData.data?.length || 0,
+            total_coupons: couponData.data?.length || 0
+          }
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `full-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        toast({
+          title: "Backup Complete",
+          description: "Complete database backup downloaded successfully",
+        });
+        return;
+      }
+
+      // Download specific table data
+      const { data: tableData, error } = await supabase
+        .from(type)
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      data = tableData || [];
+      filename = `${type}-backup-${new Date().toISOString().split('T')[0]}.csv`;
+
+      // Convert to CSV
+      if (data.length === 0) {
+        toast({
+          title: "No Data",
+          description: `No ${type} data found to download`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const headers = Object.keys(data[0]);
+      const csv = [
+        headers.join(','),
+        ...data.map(row => 
+          headers.map(header => {
+            const value = row[header];
+            if (value === null || value === undefined) return '';
+            const stringValue = String(value);
+            return stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')
+              ? `"${stringValue.replace(/"/g, '""')}"`
+              : stringValue;
+          }).join(',')
+        )
+      ].join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Download Complete",
+        description: `${type} data downloaded successfully (${data.length} records)`,
+      });
+    } catch (error: any) {
+      console.error('Error downloading backup:', error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download backup data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <SidebarProvider>
@@ -215,6 +326,74 @@ export default function Settings() {
               </CardContent>
             </Card>
 
+            {/* Backup & Download */}
+            <Card>
+              <CardHeader className="border-b">
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Backup & Download
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <p className="text-sm text-muted-foreground mb-6">
+                  Download backup copies of your database for safekeeping and data analysis.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('all')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <Database className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Complete Backup</div>
+                      <div className="text-xs text-muted-foreground">All data (JSON)</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('registrations')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <FileText className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Registrations</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('payments')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <Download className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Payments</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('coupons')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <FileText className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Coupons</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* System Information */}
             <Card>
               <CardHeader className="border-b">
@@ -224,7 +403,7 @@ export default function Settings() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Version:</span>
-                    <span className="font-medium">1.0.0</span>
+                    <span className="font-medium">2.5.1 (Beta)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Last Updated:</span>
