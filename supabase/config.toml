@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.phonepe-status]
 verify_jwt = false
+
+[functions.expire-pending-payments]
+verify_jwt = false
