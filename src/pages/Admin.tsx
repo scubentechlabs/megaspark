@@ -396,16 +396,16 @@ export default function Admin() {
         <meta charset="UTF-8">
         <title>Registration Data - MEGA SPARK EXAM 2025</title>
         <style>
-          @page { size: A4 landscape; margin: 15mm; }
-          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; font-size: 10px; }
-          .header { text-align: center; margin-bottom: 20px; }
-          .header h1 { margin: 0; font-size: 20px; }
-          .header p { margin: 5px 0; font-size: 12px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-          th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-          th { background: #f0f0f0; font-weight: bold; font-size: 9px; }
-          td { font-size: 9px; }
-          .footer { margin-top: 20px; text-align: center; font-size: 9px; }
+          @page { size: A4 landscape; margin: 10mm; }
+          body { margin: 0; padding: 10px; font-family: Arial, sans-serif; font-size: 7px; }
+          .header { text-align: center; margin-bottom: 10px; }
+          .header h1 { margin: 0; font-size: 16px; }
+          .header p { margin: 3px 0; font-size: 9px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+          th, td { border: 1px solid #000; padding: 3px 4px; text-align: left; word-wrap: break-word; }
+          th { background: #f0f0f0; font-weight: bold; font-size: 7px; white-space: nowrap; }
+          td { font-size: 7px; }
+          .footer { margin-top: 10px; text-align: center; font-size: 7px; }
           @media print { body { padding: 0; } }
         </style>
       </head>
@@ -418,13 +418,19 @@ export default function Admin() {
         <table>
           <thead>
             <tr>
-              <th>Reg. No.</th>
-              <th>Student Name</th>
-              <th>Mobile</th>
-              <th>Standard</th>
-              <th>Medium</th>
-              <th>District</th>
-              <th>Exam Date</th>
+              <th style="width: 6%;">Reg. No.</th>
+              <th style="width: 13%;">Student Name</th>
+              <th style="width: 11%;">Parent Name</th>
+              <th style="width: 8%;">Mobile</th>
+              <th style="width: 8%;">WhatsApp</th>
+              <th style="width: 7%;">State</th>
+              <th style="width: 7%;">District</th>
+              <th style="width: 13%;">School Name</th>
+              <th style="width: 5%;">Std</th>
+              <th style="width: 5%;">Medium</th>
+              <th style="width: 5%;">Sch. Med.</th>
+              <th style="width: 4%;">Prev %</th>
+              <th style="width: 8%;">Exam Date</th>
             </tr>
           </thead>
           <tbody>
@@ -432,10 +438,16 @@ export default function Admin() {
               <tr>
                 <td>${reg.registration_number}</td>
                 <td>${reg.student_name}</td>
+                <td>${reg.parent_name || 'N/A'}</td>
                 <td>${reg.mobile_number}</td>
+                <td>${reg.whatsapp_number || 'N/A'}</td>
+                <td>${reg.state || 'N/A'}</td>
+                <td>${reg.district || 'N/A'}</td>
+                <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.standard}</td>
                 <td>${reg.medium}</td>
-                <td>${reg.district || 'N/A'}</td>
+                <td>${reg.school_medium || 'N/A'}</td>
+                <td>${reg.previous_year_percentage || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
               </tr>
             `).join('')}
