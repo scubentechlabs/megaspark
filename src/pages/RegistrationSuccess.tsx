@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PartyPopper, Download, Share2, Home, Phone, Loader2 } from "lucide-react";
+import { PartyPopper, Download, Share2, Home, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
@@ -13,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 const RegistrationSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [mobile, setMobile] = useState("");
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
 
   useEffect(() => {
@@ -144,15 +141,9 @@ const RegistrationSuccess = () => {
     }
   };
 
-  const handleDownloadHallTicket = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!mobile || mobile.length !== 10) {
-      toast.error("Please enter a valid 10-digit mobile number");
-      return;
-    }
-    
-    // Navigate to login page with mobile number
-    navigate(`/login?mobile=${mobile}`);
+  const handleDownloadHallTicket = () => {
+    // Navigate to login page for hall ticket download
+    navigate('/login');
     toast.success("Redirecting to download hall ticket...");
   };
 
@@ -210,36 +201,14 @@ const RegistrationSuccess = () => {
                 <Download className="h-6 w-6 text-accent" />
                 <h3 className="text-xl font-bold text-foreground">Download Hall Ticket</h3>
               </div>
-              <form onSubmit={handleDownloadHallTicket} className="space-y-4">
-                <div>
-                  <Label htmlFor="mobile" className="text-sm font-semibold">
-                    Enter Mobile Number
-                  </Label>
-                  <div className="flex gap-3 mt-2">
-                    <div className="relative flex-1">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input
-                        id="mobile"
-                        type="tel"
-                        placeholder="Enter 10-digit mobile number"
-                        value={mobile}
-                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        className="pl-10 h-12 text-lg"
-                        maxLength={10}
-                        required
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white px-8 h-12 font-semibold"
-                    >
-                      <Download className="mr-2 h-5 w-5" />
-                      Generate PDF
-                    </Button>
-                  </div>
-                </div>
-              </form>
+              <Button
+                onClick={handleDownloadHallTicket}
+                size="lg"
+                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white h-12 font-semibold"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download Hall Ticket
+              </Button>
             </CardContent>
           </Card>
 
