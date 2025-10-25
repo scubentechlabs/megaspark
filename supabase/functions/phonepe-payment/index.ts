@@ -89,6 +89,8 @@ serve(async (req) => {
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
     headers.set('Authorization', `Basic ${authBase64}`);
+    headers.set('X-CLIENT-ID', clientId);
+    headers.set('X-CLIENT-VERSION', '1');
 
     let response = await fetch(payUrl, {
       method: 'POST',
