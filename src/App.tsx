@@ -10,6 +10,7 @@ import AdminLogin from "./pages/AdminLogin";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Coupons from "./pages/Coupons";
 import PaymentSummary from "./pages/PaymentSummary";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -28,11 +29,12 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/reports" element={<Reports />} />
-          <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/coupons" element={<Coupons />} />
+        <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/settings" element={<Settings />} />
           <Route path="/admin/payments" element={<PaymentSummary />} />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
