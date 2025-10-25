@@ -271,6 +271,7 @@ const RegistrationSuccess = () => {
               Back to Home
             </Button>
             <Button
+              onClick={() => window.open('https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn', '_blank')}
               className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white py-6 text-lg font-semibold"
             >
               <Download className="mr-2 h-5 w-5" />
