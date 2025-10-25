@@ -250,10 +250,6 @@ const RegistrationSuccess = () => {
                       <span className="text-accent font-bold">•</span>
                       <span>Bring valid ID proof (Aadhar Card) and your hall ticket</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-accent font-bold">•</span>
-                      <span>Check your email for confirmation and study materials</span>
-                    </li>
                   </ul>
                 </div>
               </div>
