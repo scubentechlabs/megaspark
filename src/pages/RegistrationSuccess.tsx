@@ -149,7 +149,7 @@ const RegistrationSuccess = () => {
 
   const handleWhatsAppShare = () => {
     const message = encodeURIComponent(
-      "🎉 I just registered for Mega Spark Exam 2025! Join me and compete for scholarships worth ₹2 Crores. Register now at: https://megasparkexam.com"
+      "🎉 I just registered for Mega Spark Exam 2025! Join me and compete for scholarships worth ₹75 Crores. Register now at: https://megasparkexam.com"
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
