@@ -36,6 +36,8 @@ import {
 
 interface DashboardStats {
   totalRegistrations: number;
+  todayRegistrations: number;
+  yesterdayRegistrations: number;
   totalPayments: number;
   successfulPayments: number;
   failedPayments: number;
@@ -86,6 +88,25 @@ export default function Dashboard() {
 
       if (payError) throw payError;
 
+      // Get today and yesterday dates
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // Calculate today's and yesterday's registrations
+      const todayRegistrations = registrations?.filter((reg) => {
+        const regDate = new Date(reg.created_at);
+        return regDate >= today && regDate < tomorrow;
+      }) || [];
+
+      const yesterdayRegistrations = registrations?.filter((reg) => {
+        const regDate = new Date(reg.created_at);
+        return regDate >= yesterday && regDate < today;
+      }) || [];
+
       // Calculate statistics
       const registrationsByStandard = registrations?.reduce((acc: any, reg) => {
         acc[reg.standard] = (acc[reg.standard] || 0) + 1;
@@ -103,6 +124,8 @@ export default function Dashboard() {
 
       setStats({
         totalRegistrations: registrations?.length || 0,
+        todayRegistrations: todayRegistrations.length,
+        yesterdayRegistrations: yesterdayRegistrations.length,
         totalPayments: payments?.length || 0,
         successfulPayments: successfulPayments.length,
         failedPayments: failedPayments.length,
@@ -168,7 +191,7 @@ export default function Dashboard() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+            <div className="grid gap-4 md:grid-cols-3 mb-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Total Registrations</CardTitle>
@@ -176,40 +199,29 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.totalRegistrations}</div>
-                  <p className="text-xs text-muted-foreground">Students enrolled</p>
+                  <p className="text-xs text-muted-foreground">All-time students enrolled</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Successful Payments</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-success" />
+                  <CardTitle className="text-sm font-medium">Today Registrations</CardTitle>
+                  <Calendar className="h-4 w-4 text-primary" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.successfulPayments}</div>
-                  <p className="text-xs text-muted-foreground">Completed transactions</p>
+                  <div className="text-2xl font-bold">{stats.todayRegistrations}</div>
+                  <p className="text-xs text-muted-foreground">Registered today</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Failed Payments</CardTitle>
-                  <XCircle className="h-4 w-4 text-destructive" />
+                  <CardTitle className="text-sm font-medium">Yesterday Registrations</CardTitle>
+                  <Calendar className="h-4 w-4 text-accent" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.failedPayments}</div>
-                  <p className="text-xs text-muted-foreground">Needs attention</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground">From successful payments</p>
+                  <div className="text-2xl font-bold">{stats.yesterdayRegistrations}</div>
+                  <p className="text-xs text-muted-foreground">Registered yesterday</p>
                 </CardContent>
               </Card>
             </div>
