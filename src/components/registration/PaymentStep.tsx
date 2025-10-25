@@ -91,7 +91,36 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
       
       const orderId = `FREE${Date.now()}`;
       
-      // Complete registration directly
+      // Create payment record first (required for registration number generation)
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          order_id: orderId,
+          transaction_id: orderId,
+          student_name: formData?.studentName || 'Student',
+          payment_type: 'free',
+          status: 'completed',
+          amount: 0,
+          original_amount: baseAmount,
+          discount_amount: discountAmount,
+          coupon_code: appliedCoupon?.code || null,
+          payment_method: 'coupon'
+        });
+
+      if (paymentError) {
+        console.error('Payment record creation error:', paymentError);
+        throw new Error('Failed to create payment record');
+      }
+
+      // Update coupon usage if applied
+      if (appliedCoupon) {
+        await supabase
+          .from('coupons')
+          .update({ current_uses: appliedCoupon.current_uses + 1 })
+          .eq('id', appliedCoupon.id);
+      }
+      
+      // Complete registration
       await onPaymentComplete(orderId);
       
       toast.success('Registration completed successfully!');
