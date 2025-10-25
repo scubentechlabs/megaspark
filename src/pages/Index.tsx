@@ -49,8 +49,8 @@ const Index = () => {
       <ExamDatesVenue />
       <EligibilityCriteria />
       <DownloadGuide />
-      <LimitedOffer />
       <RegistrationSection />
+      <LimitedOffer />
       <HelpBox />
       <FinalCTA onRegisterClick={() => {
         document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
