@@ -6,6 +6,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 interface PaymentRequest {
   amount: number;
   registrationId: string;
@@ -125,6 +132,38 @@ serve(async (req) => {
         // not JSON
       }
       console.log('PhonePe SANDBOX raw response:', response.status, raw);
+    }
+
+    // Fallback to X-VERIFY flow if OAuth is not configured for this merchant
+    if (!response.ok && (result?.code === 'KEY_NOT_CONFIGURED' || response.status === 401)) {
+      const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.trim();
+      const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.trim() || '1';
+      if (!saltKey) {
+        throw new Error('PhonePe salt key not configured for fallback');
+      }
+
+      const payPath = '/pg/v1/pay';
+      const xVerifyHash = await sha256Hex(base64Payload + payPath + saltKey);
+      const xVerify = `${xVerifyHash}###${saltIndex}`;
+
+      const headersV2 = new Headers();
+      headersV2.set('Content-Type', 'application/json');
+      headersV2.set('Accept', 'application/json');
+      headersV2.set('X-VERIFY', xVerify);
+      headersV2.set('X-MERCHANT-ID', merchantId);
+
+      console.log('Retrying PhonePe payment with X-VERIFY flow');
+      response = await fetch(payUrl, {
+        method: 'POST',
+        headers: headersV2,
+        body: JSON.stringify({ request: base64Payload })
+      });
+
+      raw = await response.text();
+      try {
+        result = raw ? JSON.parse(raw) : null;
+      } catch (_) {}
+      console.log('PhonePe X-VERIFY raw response:', response.status, raw);
     }
 
     if (!response.ok) {

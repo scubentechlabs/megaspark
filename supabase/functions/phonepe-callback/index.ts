@@ -6,6 +6,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -42,12 +49,21 @@ serve(async (req) => {
     const statusUrl = `${baseUrl}/pg/v1/status/${merchantId}/${merchantTransactionId}`;
     console.log('PhonePe callback env:', isSandbox ? 'SANDBOX' : 'PROD', 'URL:', statusUrl);
 
+    const saltKey = Deno.env.get('PHONEPE_SALT_KEY')?.trim();
+    const saltIndex = Deno.env.get('PHONEPE_SALT_INDEX')?.trim() || '1';
+    if (!saltKey) {
+      throw new Error('PhonePe salt key not configured');
+    }
+
+    const statusPath = `/pg/v1/status/${merchantId}/${merchantTransactionId}`;
+    const xVerifyHash = await sha256Hex(statusPath + saltKey);
+    const xVerify = `${xVerifyHash}###${saltIndex}`;
+
     const headers = new Headers();
     headers.set('Content-Type', 'application/json');
     headers.set('Accept', 'application/json');
-    headers.set('Authorization', `Basic ${authBase64}`);
-    headers.set('X-CLIENT-ID', clientId);
-    headers.set('X-CLIENT-VERSION', '1');
+    headers.set('X-VERIFY', xVerify);
+    headers.set('X-MERCHANT-ID', merchantId);
 
     const statusResponse = await fetch(statusUrl, {
       method: 'GET',
