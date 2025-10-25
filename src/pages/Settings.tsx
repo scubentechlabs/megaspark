@@ -15,6 +15,8 @@ import { Settings as SettingsIcon, Save } from "lucide-react";
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
   const [examSettings, setExamSettings] = useState({
     examName: "MEGA SPARK EXAM 2025",
     organizationName: "P.R. SAVANI",
@@ -34,14 +36,102 @@ export default function Settings() {
       navigate("/admin/login");
       return;
     }
-    setIsLoading(false);
+    await loadSettings();
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Settings Saved",
-      description: "Your settings have been updated successfully",
-    });
+  const loadSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No settings found, create default
+          const { data: newSettings, error: insertError } = await supabase
+            .from("settings")
+            .insert({
+              exam_name: "MEGA SPARK EXAM 2025",
+              organization_name: "P.R. SAVANI",
+              contact_email: "info@megaspark.com",
+              contact_phone: "+91 1234567890"
+            })
+            .select()
+            .single();
+
+          if (insertError) throw insertError;
+          if (newSettings) {
+            setSettingsId(newSettings.id);
+            setExamSettings({
+              examName: newSettings.exam_name,
+              organizationName: newSettings.organization_name,
+              contactEmail: newSettings.contact_email,
+              contactPhone: newSettings.contact_phone,
+            });
+          }
+        } else {
+          throw error;
+        }
+      } else if (data) {
+        setSettingsId(data.id);
+        setExamSettings({
+          examName: data.exam_name,
+          organizationName: data.organization_name,
+          contactEmail: data.contact_email,
+          contactPhone: data.contact_phone,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error loading settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!settingsId) {
+      toast({
+        title: "Error",
+        description: "Settings not initialized",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({
+          exam_name: examSettings.examName,
+          organization_name: examSettings.organizationName,
+          contact_email: examSettings.contactEmail,
+          contact_phone: examSettings.contactPhone,
+        })
+        .eq("id", settingsId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Settings Saved",
+        description: "Your settings have been updated successfully",
+      });
+    } catch (error: any) {
+      console.error("Error saving settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -117,9 +207,9 @@ export default function Settings() {
                 </div>
                 
                 <div className="flex justify-end">
-                  <Button onClick={handleSave} className="gap-2">
+                  <Button onClick={handleSave} className="gap-2" disabled={isSaving}>
                     <Save className="h-4 w-4" />
-                    Save Settings
+                    {isSaving ? "Saving..." : "Save Settings"}
                   </Button>
                 </div>
               </CardContent>
