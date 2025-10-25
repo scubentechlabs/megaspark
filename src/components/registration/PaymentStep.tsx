@@ -83,6 +83,28 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
     toast.success('Coupon removed');
   };
 
+  const handleFreeRegistration = async () => {
+    setIsProcessing(true);
+    
+    try {
+      console.log('Processing free registration...');
+      
+      const orderId = `FREE${Date.now()}`;
+      
+      // Complete registration directly
+      await onPaymentComplete(orderId);
+      
+      toast.success('Registration completed successfully!');
+      
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed', {
+        description: error.message || 'Please try again'
+      });
+      setIsProcessing(false);
+    }
+  };
+
   const handlePhonePePayment = async () => {
     setIsProcessing(true);
     
@@ -197,36 +219,52 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
         <div className="text-sm opacity-90">One-time payment for Mega Spark Exam 2025</div>
       </Card>
 
-      {/* PhonePe Payment Button */}
+      {/* Payment/Registration Button */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-foreground">Complete Payment</h3>
+        <h3 className="text-lg font-bold text-foreground">
+          {finalAmount === 0 ? 'Complete Registration' : 'Complete Payment'}
+        </h3>
         
-        <Button
-          onClick={handlePhonePePayment}
-          disabled={isProcessing || finalAmount === 0}
-          className="w-full h-auto py-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:opacity-90 text-white text-xl font-bold shadow-lg"
-        >
-          {isProcessing ? (
-            <div className="flex items-center gap-3">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Processing Payment...</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Wallet className="h-8 w-8" />
-              <span>Pay ₹{finalAmount.toFixed(2)} with PhonePe</span>
-            </div>
-          )}
-        </Button>
-
-        {finalAmount === 0 && (
-          <p className="text-center text-sm text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded">
-            Payment amount is ₹0. Please contact support to complete registration.
-          </p>
+        {finalAmount === 0 ? (
+          <Button
+            onClick={handleFreeRegistration}
+            disabled={isProcessing}
+            className="w-full h-auto py-8 bg-gradient-to-r from-green-600 to-green-700 hover:opacity-90 text-white text-xl font-bold shadow-lg"
+          >
+            {isProcessing ? (
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span>Processing Registration...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-8 w-8" />
+                <span>Register Now - FREE</span>
+              </div>
+            )}
+          </Button>
+        ) : (
+          <Button
+            onClick={handlePhonePePayment}
+            disabled={isProcessing}
+            className="w-full h-auto py-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:opacity-90 text-white text-xl font-bold shadow-lg"
+          >
+            {isProcessing ? (
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span>Processing Payment...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Wallet className="h-8 w-8" />
+                <span>Pay ₹{finalAmount.toFixed(2)} with PhonePe</span>
+              </div>
+            )}
+          </Button>
         )}
 
         <p className="text-center text-sm text-muted-foreground">
-          Secure payment powered by PhonePe
+          {finalAmount === 0 ? 'Complete your free registration' : 'Secure payment powered by PhonePe'}
         </p>
       </div>
 
