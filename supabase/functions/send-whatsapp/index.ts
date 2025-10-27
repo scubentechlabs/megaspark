@@ -56,12 +56,38 @@ serve(async (req) => {
     console.log('Message record created:', messageRecord.id);
 
     // Prepare API request based on message type
-    let apiUrl = '';
+    let apiUrl = 'https://bot.officialwa.com/api/v1/whatsapp/message/send';
     let apiPayload = {};
 
-    if (templateName) {
+    if (messageType === 'hall_ticket' && messageBody) {
+      // Send hall ticket template with document
+      apiPayload = {
+        to: formattedPhone,
+        recipient_type: "individual",
+        type: "template",
+        template: {
+          language: {
+            policy: "deterministic",
+            code: "en"
+          },
+          name: "hall_ticket_mega",
+          components: [
+            {
+              type: "header",
+              parameters: [
+                {
+                  type: "document",
+                  document: {
+                    link: messageBody // messageBody contains the hall ticket URL
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      };
+    } else if (templateName) {
       // Send template message
-      apiUrl = `https://bot.officialwa.com/api/v1/whatsapp/template/send`;
       apiPayload = {
         instance_id: OFFICIALWA_INSTANCE_ID,
         phone: formattedPhone,
@@ -70,7 +96,6 @@ serve(async (req) => {
       };
     } else {
       // Send text message
-      apiUrl = `https://bot.officialwa.com/api/v1/whatsapp/message/send`;
       apiPayload = {
         instance_id: OFFICIALWA_INSTANCE_ID,
         phone: formattedPhone,
