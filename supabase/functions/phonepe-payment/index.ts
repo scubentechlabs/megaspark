@@ -55,6 +55,9 @@ serve(async (req) => {
     const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
     const merchantTransactionId = `${registrationId}_${transactionId}`;
 
+    // Clean phone number - remove any non-digit characters and ensure 10 digits
+    const cleanPhone = customerPhone?.replace(/\D/g, '').slice(-10) || '';
+    
     // PhonePe payment request payload
     const paymentPayload = {
       merchantId: merchantId,
@@ -64,7 +67,7 @@ serve(async (req) => {
       redirectUrl: `${(req.headers.get('origin') || (req.headers.get('referer') ? new URL(req.headers.get('referer')!).origin : 'https://megasparkexam.com'))}/registration-success?txnId=${merchantTransactionId}`,
       redirectMode: "REDIRECT",
       callbackUrl: `${Deno.env.get('SUPABASE_URL')}/functions/v1/phonepe-callback`,
-      mobileNumber: customerPhone,
+      mobileNumber: cleanPhone,
       paymentInstrument: {
         type: "PAY_PAGE"
       }
