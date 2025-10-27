@@ -22,6 +22,7 @@ serve(async (req) => {
     const { phoneNumber, messageType, registrationId, messageBody, templateName, variables } = await req.json();
 
     console.log('Sending WhatsApp message:', { phoneNumber, messageType, registrationId });
+    let messageId: string | null = null;
 
     if (!OFFICIALWA_API_KEY || !OFFICIALWA_INSTANCE_ID) {
       throw new Error('OfficialWA API credentials not configured');
@@ -53,34 +54,34 @@ serve(async (req) => {
       throw insertError;
     }
 
+    messageId = messageRecord.id;
     console.log('Message record created:', messageRecord.id);
 
-    // Prepare API request based on message type
-    let apiUrl = 'https://crm.officialwa.com/api/v1/whatsapp/message/send';
-    let apiPayload = {};
+    // Prepare API request and fallback paths
+    const tryPaths = [
+      'https://crm.officialwa.com/whatsapp/message/send',
+      'https://crm.officialwa.com/v1/whatsapp/message/send',
+      'https://crm.officialwa.com/api/whatsapp/message/send',
+      'https://crm.officialwa.com/api/v1/whatsapp/message/send',
+    ];
+
+    let apiPayload: any;
 
     if (messageType === 'hall_ticket' && messageBody) {
-      // Send hall ticket template with document
+      // Send hall ticket template with document (add instance_id to be safe)
       apiPayload = {
+        instance_id: OFFICIALWA_INSTANCE_ID,
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
         template: {
-          language: {
-            policy: "deterministic",
-            code: "en"
-          },
+          language: { policy: "deterministic", code: "en" },
           name: "hall_ticket_mega",
           components: [
             {
               type: "header",
               parameters: [
-                {
-                  type: "document",
-                  document: {
-                    link: messageBody // messageBody contains the hall ticket URL
-                  }
-                }
+                { type: "document", document: { link: messageBody } }
               ]
             }
           ]
@@ -95,7 +96,7 @@ serve(async (req) => {
         variables: variables || [],
       };
     } else {
-      // Send text message
+      // Send plain text message (default)
       apiPayload = {
         instance_id: OFFICIALWA_INSTANCE_ID,
         phone: formattedPhone,
@@ -103,23 +104,45 @@ serve(async (req) => {
       };
     }
 
-    console.log('Sending to OfficialWA API:', apiUrl, apiPayload);
+    console.log('Attempting OfficialWA API paths with fallback...', { tryPaths });
 
-    // Send WhatsApp message via OfficialWA API
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OFFICIALWA_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(apiPayload),
-    });
+    let successResponse: any = null;
+    let lastError: any = null;
 
-    const responseData = await response.json();
-    console.log('OfficialWA API response:', responseData);
+    for (const apiUrl of tryPaths) {
+      try {
+        console.log('Trying OfficialWA path:', apiUrl);
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OFFICIALWA_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(apiPayload),
+        });
 
-    if (!response.ok) {
-      throw new Error(`OfficialWA API error: ${JSON.stringify(responseData)}`);
+        const responseData = await response.json().catch(() => ({}));
+        console.log('OfficialWA API response:', apiUrl, response.status, responseData);
+
+        if (response.ok && !(typeof responseData?.error === 'string' && responseData.error.length)) {
+          successResponse = responseData;
+          break;
+        }
+
+        // Prepare next attempt if path invalid
+        lastError = new Error(`HTTP ${response.status}: ${JSON.stringify(responseData)}`);
+        if (typeof responseData?.error === 'string' && responseData.error.toLowerCase().includes('invalid path')) {
+          continue; // try next path
+        } else {
+          break; // other errors: don't spin across paths unnecessarily
+        }
+      } catch (e) {
+        lastError = e;
+      }
+    }
+
+    if (!successResponse) {
+      throw lastError || new Error('OfficialWA API error: all paths failed');
     }
 
     // Update message status to sent
@@ -141,7 +164,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         messageId: messageRecord.id,
-        apiResponse: responseData 
+        apiResponse: successResponse 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -149,10 +172,29 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error in send-whatsapp function:', error);
 
+    try {
+      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      if (messageId) {
+        const { error: failUpdateError } = await supabase
+          .from('whatsapp_messages')
+          .update({
+            status: 'failed',
+            error_message: String(error?.message || error),
+            failed_at: new Date().toISOString(),
+          })
+          .eq('id', messageId);
+        if (failUpdateError) {
+          console.error('Error updating failed message status:', failUpdateError);
+        }
+      }
+    } catch (e) {
+      console.error('Error while marking message as failed:', e);
+    }
+
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: error?.message || 'Unknown error' 
       }),
       { 
         status: 500,
