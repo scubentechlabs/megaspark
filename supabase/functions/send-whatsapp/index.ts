@@ -56,7 +56,7 @@ serve(async (req) => {
     console.log('Message record created:', messageRecord.id);
 
     // Prepare API request based on message type
-    let apiUrl = 'https://bot.officialwa.com/api/v1/whatsapp/message/send';
+    let apiUrl = 'https://crm.officialwa.com/api/v1/whatsapp/message/send';
     let apiPayload = {};
 
     if (messageType === 'hall_ticket' && messageBody) {
