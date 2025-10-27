@@ -18,11 +18,12 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let messageId: string | null = null;
   try {
     const { phoneNumber, messageType, registrationId, messageBody, templateName, variables } = await req.json();
 
     console.log('Sending WhatsApp message:', { phoneNumber, messageType, registrationId });
-    let messageId: string | null = null;
+    // messageId declared above for catch scope
 
     if (!OFFICIALWA_API_KEY || !OFFICIALWA_INSTANCE_ID) {
       throw new Error('OfficialWA API credentials not configured');
@@ -88,20 +89,29 @@ serve(async (req) => {
         }
       };
     } else if (templateName) {
-      // Send template message
+      // Send template message using OfficialWA template format
       apiPayload = {
         instance_id: OFFICIALWA_INSTANCE_ID,
-        phone: formattedPhone,
-        template_name: templateName,
-        variables: variables || [],
+        to: formattedPhone,
+        recipient_type: "individual",
+        type: "template",
+        template: {
+          language: { policy: "deterministic", code: "en" },
+          name: templateName,
+          components: Array.isArray(variables) && variables.length > 0
+            ? [
+                {
+                  type: "body",
+                  parameters: variables.map((v: any) =>
+                    typeof v === "object" && v?.type ? v : { type: "text", text: String(v) }
+                  ),
+                },
+              ]
+            : [],
+        },
       };
-    } else {
-      // Send plain text message (default)
-      apiPayload = {
-        instance_id: OFFICIALWA_INSTANCE_ID,
-        phone: formattedPhone,
-        message: messageBody,
-      };
+
+
     }
 
     console.log('Attempting OfficialWA API paths with fallback...', { tryPaths });
