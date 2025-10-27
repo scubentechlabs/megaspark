@@ -192,6 +192,9 @@ export const RegistrationSection = () => {
             <CardTitle className="text-3xl font-bold text-center mb-2 text-primary">
               Registration Form
             </CardTitle>
+            <p className="text-center text-sm font-medium text-green-600 mb-3">
+              Use code FIRST1000 at checkout to get ₹50 off — enjoy free entry!
+            </p>
             <CardDescription className="text-center text-lg">
               {steps[currentStep - 1].description}
             </CardDescription>
