@@ -54,6 +54,21 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
     updateFormData({ [field]: value });
   };
 
+  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove any non-digit characters
+    let value = e.target.value.replace(/\D/g, '');
+    
+    // If user starts typing and doesn't have 91 prefix, add it
+    if (value.length > 0 && !value.startsWith('91')) {
+      value = '91' + value;
+    }
+    
+    // Cap at 12 digits (91 + 10 digit number)
+    value = value.slice(0, 12);
+    
+    updateFormData({ whatsappNumber: value });
+  };
+
   const handleStateChange = (value: string) => {
     updateFormData({ state: value, district: "" });
   };
@@ -107,13 +122,13 @@ export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsS
             id="whatsappNumber"
             type="text"
             value={formData.whatsappNumber || ""}
-            onChange={(e) => handlePhoneChange(e, 'whatsappNumber')}
-            placeholder="Enter 10-digit mobile number"
-            maxLength={10}
+            onChange={handleWhatsAppChange}
+            placeholder="91XXXXXXXXXX"
+            maxLength={12}
             required
           />
-          {formData.whatsappNumber && formData.whatsappNumber.length !== 10 && (
-            <p className="text-xs text-destructive">WhatsApp number must be 10 digits</p>
+          {formData.whatsappNumber && formData.whatsappNumber.length !== 12 && (
+            <p className="text-xs text-destructive">WhatsApp number must be 12 digits (91 + 10-digit number)</p>
           )}
         </div>
 

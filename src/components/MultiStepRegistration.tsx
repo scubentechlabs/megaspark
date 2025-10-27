@@ -52,9 +52,9 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Please confirm your mobile number by checking the confirmation box");
         return false;
       }
-      // Validate WhatsApp number - must be exactly 10 digits
-      if (!formData.whatsappNumber || formData.whatsappNumber.length !== 10) {
-        toast.error("WhatsApp number must be exactly 10 digits");
+      // Validate WhatsApp number - must be exactly 12 digits (91 + 10)
+      if (!formData.whatsappNumber || formData.whatsappNumber.length !== 12 || !formData.whatsappNumber.startsWith('91')) {
+        toast.error("WhatsApp number must be in format 91XXXXXXXXXX");
         return false;
       }
       if (!formData.state || formData.state.trim() === "") {
