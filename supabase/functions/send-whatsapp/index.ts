@@ -58,20 +58,47 @@ serve(async (req) => {
     messageId = messageRecord.id;
     console.log('Message record created:', messageRecord.id);
 
-    // Prepare API request and fallback paths
-    const tryPaths = [
-      'https://crm.officialwa.com/whatsapp/message/send',
-      'https://crm.officialwa.com/v1/whatsapp/message/send',
-      'https://crm.officialwa.com/api/whatsapp/message/send',
-      'https://crm.officialwa.com/api/v1/whatsapp/message/send',
-    ];
+    // Use the exact API endpoint from the provided code
+    const apiUrl = 'https://crm.officialwa.com/api/meta/v19.0/593103693876020/messages';
 
     let apiPayload: any;
 
-    if (messageType === 'hall_ticket' && messageBody) {
-      // Send hall ticket template with document (add instance_id to be safe)
+    if (messageType === 'registration_confirmation' || templateName === 'megamsg_1') {
+      // Send registration confirmation with megamsg_1 template
       apiPayload = {
-        instance_id: OFFICIALWA_INSTANCE_ID,
+        to: formattedPhone,
+        recipient_type: "individual",
+        type: "template",
+        template: {
+          language: { policy: "deterministic", code: "en" },
+          name: "megamsg_1",
+          components: [
+            {
+              type: "body",
+              parameters: [
+                {
+                  type: "text",
+                  text: "Hello\n\n🎉 You have been successfully registered for the Mega Spark Exam!\n\n📄 Here is your hall ticket\n\nIf you find any incorrect or invalid details on your hall ticket, please reply to this message so we can assist you.\n\nGood luck with your exam! 🍀"
+                }
+              ]
+            },
+            {
+              type: "button",
+              sub_type: "url",
+              index: 0,
+              parameters: [
+                {
+                  type: "Download Hall Ticket",
+                  text: "https://megasparkexam.com/login"
+                }
+              ]
+            }
+          ]
+        }
+      };
+    } else if (messageType === 'hall_ticket' && messageBody) {
+      // Send hall ticket template with document
+      apiPayload = {
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
@@ -91,7 +118,6 @@ serve(async (req) => {
     } else if (templateName) {
       // Send template message using OfficialWA template format
       apiPayload = {
-        instance_id: OFFICIALWA_INSTANCE_ID,
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
@@ -110,45 +136,35 @@ serve(async (req) => {
             : [],
         },
       };
-
-
     }
 
-    console.log('Attempting OfficialWA API paths with fallback...', { tryPaths });
+    console.log('Sending WhatsApp message via OfficialWA API...', { apiUrl });
 
     let successResponse: any = null;
     let lastError: any = null;
 
-    for (const apiUrl of tryPaths) {
-      try {
-        console.log('Trying OfficialWA path:', apiUrl);
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OFFICIALWA_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(apiPayload),
-        });
+    try {
+      console.log('Calling OfficialWA API:', apiUrl);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'API-KEY': OFFICIALWA_API_KEY || '',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OFFICIALWA_INSTANCE_ID || ''}`,
+        },
+        body: JSON.stringify(apiPayload),
+      });
 
-        const responseData = await response.json().catch(() => ({}));
-        console.log('OfficialWA API response:', apiUrl, response.status, responseData);
+      const responseData = await response.json().catch(() => ({}));
+      console.log('OfficialWA API response:', response.status, responseData);
 
-        if (response.ok && !(typeof responseData?.error === 'string' && responseData.error.length)) {
-          successResponse = responseData;
-          break;
-        }
-
-        // Prepare next attempt if path invalid
+      if (response.ok) {
+        successResponse = responseData;
+      } else {
         lastError = new Error(`HTTP ${response.status}: ${JSON.stringify(responseData)}`);
-        if (typeof responseData?.error === 'string' && responseData.error.toLowerCase().includes('invalid path')) {
-          continue; // try next path
-        } else {
-          break; // other errors: don't spin across paths unnecessarily
-        }
-      } catch (e) {
-        lastError = e;
       }
+    } catch (e) {
+      lastError = e;
     }
 
     if (!successResponse) {
