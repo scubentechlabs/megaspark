@@ -9,8 +9,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { MessageSquare, CheckCircle, XCircle, Link, Download, RefreshCw } from "lucide-react";
+import { MessageSquare, CheckCircle, XCircle, Link, Download, RefreshCw, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface WhatsAppMessage {
   id: string;
@@ -42,6 +44,9 @@ export default function WhatsAppManagement() {
     linksOpened: 0,
     certificatesDownloaded: 0,
   });
+  const [testPhone, setTestPhone] = useState("919909928890");
+  const [isSending, setIsSending] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -99,6 +104,51 @@ export default function WhatsAppManagement() {
     }
   };
 
+  const sendTestMessage = async () => {
+    if (!testPhone || testPhone.length < 10) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid phone number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-whatsapp', {
+        body: {
+          phoneNumber: testPhone,
+          messageType: 'registration_confirmation',
+          templateName: 'megamsg_1'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Test Message Sent",
+        description: `WhatsApp message sent to ${testPhone}`,
+      });
+      
+      setIsDialogOpen(false);
+      
+      // Refresh messages after a short delay
+      setTimeout(() => {
+        fetchData();
+      }, 2000);
+    } catch (error: any) {
+      console.error("Error sending test message:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send test message",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <SidebarProvider>
@@ -124,6 +174,43 @@ export default function WhatsAppManagement() {
             <div className="flex-1">
               <h1 className="text-2xl font-semibold">WhatsApp Management</h1>
             </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="default" size="sm" className="gap-2">
+                  <Send className="h-4 w-4" />
+                  Send Test Message
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Send Test WhatsApp Message</DialogTitle>
+                  <DialogDescription>
+                    Send a test message using the megamsg_1 template to verify WhatsApp integration
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <label htmlFor="testPhone" className="text-sm font-medium">
+                      Phone Number (with country code)
+                    </label>
+                    <Input
+                      id="testPhone"
+                      value={testPhone}
+                      onChange={(e) => setTestPhone(e.target.value)}
+                      placeholder="919909928890"
+                      type="tel"
+                    />
+                  </div>
+                  <Button 
+                    onClick={sendTestMessage} 
+                    disabled={isSending}
+                    className="w-full"
+                  >
+                    {isSending ? "Sending..." : "Send Test Message"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button variant="outline" size="sm" onClick={fetchData} className="gap-2">
               <RefreshCw className="h-4 w-4" />
               Refresh
