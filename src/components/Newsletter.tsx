@@ -3,17 +3,43 @@ import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Newsletter = () => {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      toast.success("Thank you for subscribing!", {
-        description: "You'll receive updates about scholarships and opportunities."
+    if (!email) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ email });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error("Already subscribed!", {
+            description: "This email is already registered for updates."
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success("Thank you for subscribing!", {
+          description: "You'll receive updates about scholarships and opportunities."
+        });
+        setEmail("");
+      }
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error);
+      toast.error("Subscription failed", {
+        description: "Please try again later."
       });
-      setEmail("");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,8 +71,9 @@ export const Newsletter = () => {
               type="submit"
               size="lg"
               className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-full px-8 h-12 font-semibold"
+              disabled={isLoading}
             >
-              Subscribe
+              {isLoading ? "Subscribing..." : "Subscribe"}
             </Button>
           </form>
         </div>

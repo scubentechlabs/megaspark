@@ -17,6 +17,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import WhatsAppManagement from "./pages/WhatsAppManagement";
+import NewsletterManagement from "./pages/NewsletterManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/coupons" element={<Coupons />} />
         <Route path="/admin/whatsapp" element={<WhatsAppManagement />} />
+        <Route path="/admin/newsletter" element={<NewsletterManagement />} />
         <Route path="/admin/reports" element={<Reports />} />
         <Route path="/admin/settings" element={<Settings />} />
           <Route path="/admin/payments" element={<PaymentSummary />} />

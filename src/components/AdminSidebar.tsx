@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User } from "lucide-react";
+import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ export function AdminSidebar() {
     { title: "Coupons", icon: Tag, path: "/admin/coupons" },
     { title: "Payments", icon: CreditCard, path: "/admin/payments" },
     { title: "WhatsApp", icon: MessageSquare, path: "/admin/whatsapp" },
+    { title: "Newsletter", icon: Mail, path: "/admin/newsletter" },
     { title: "Reports", icon: FileText, path: "/admin/reports" },
     { title: "Settings", icon: Settings, path: "/admin/settings" },
   ];
