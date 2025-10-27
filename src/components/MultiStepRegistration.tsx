@@ -54,7 +54,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
       }
       // Validate WhatsApp number - must be exactly 12 digits (91 + 10)
       if (!formData.whatsappNumber || formData.whatsappNumber.length !== 12 || !formData.whatsappNumber.startsWith('91')) {
-        toast.error("WhatsApp number must be in format 91XXXXXXXXXX");
+        toast.error("WhatsApp number must be exactly 12 digits (91 + 10-digit number)");
         return false;
       }
       if (!formData.state || formData.state.trim() === "") {
