@@ -64,45 +64,59 @@ serve(async (req) => {
     let apiPayload: any;
 
     if (messageType === 'registration_confirmation' || templateName === 'megamsg_1') {
-      // Send registration confirmation with megamsg_1 template using Meta API format
+      // Send registration confirmation with megamsg_1 template using OfficialWA format
       apiPayload = {
-        messaging_product: "whatsapp",
         to: formattedPhone,
+        recipient_type: "individual",
         type: "template",
         template: {
+          language: {
+            policy: "deterministic",
+            code: "en"
+          },
           name: "megamsg_1",
-          language: { code: "en" },
           components: []
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
-      // Send hall ticket template with document using Meta API format
+      // Send hall ticket template with document using OfficialWA format
       apiPayload = {
-        messaging_product: "whatsapp",
         to: formattedPhone,
+        recipient_type: "individual",
         type: "template",
         template: {
+          language: {
+            policy: "deterministic",
+            code: "en"
+          },
           name: "hall_ticket_mega",
-          language: { code: "en" },
           components: [
             {
               type: "header",
               parameters: [
-                { type: "document", document: { link: messageBody } }
+                {
+                  type: "document",
+                  document: {
+                    link: messageBody
+                  }
+                }
               ]
             }
           ]
         }
       };
     } else if (templateName) {
-      // Send template message using Meta API format
+      // Send template message using OfficialWA format
       apiPayload = {
-        messaging_product: "whatsapp",
         to: formattedPhone,
+        recipient_type: "individual",
         type: "template",
         template: {
+          language: {
+            policy: "deterministic",
+            code: "en"
+          },
           name: templateName,
-          language: { code: "en" },
           components: Array.isArray(variables) && variables.length > 0
             ? [
                 {
