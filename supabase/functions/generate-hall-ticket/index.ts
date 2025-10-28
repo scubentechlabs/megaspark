@@ -55,200 +55,225 @@ serve(async (req) => {
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     
     const { width, height } = page.getSize();
-    let yPosition = height - 50;
+    let yPosition = height - 30;
 
-    // Header
-    page.drawText('P.P. SAVANI CFE', {
-      x: 50,
-      y: yPosition,
-      size: 24,
-      font: helveticaBold,
-      color: rgb(0.1, 0.2, 0.4),
-    });
-    
-    yPosition -= 30;
-    page.drawText('MEGA SPARK EXAM 2025', {
-      x: 50,
-      y: yPosition,
-      size: 18,
-      font: helveticaBold,
-      color: rgb(0.2, 0.3, 0.5),
-    });
-    
-    yPosition -= 25;
-    page.drawText('Hall Ticket', {
-      x: 50,
-      y: yPosition,
-      size: 14,
-      font: helveticaFont,
-      color: rgb(0.3, 0.3, 0.3),
-    });
-
-    // Draw header line
-    yPosition -= 15;
-    page.drawLine({
-      start: { x: 50, y: yPosition },
-      end: { x: width - 50, y: yPosition },
-      thickness: 2,
-      color: rgb(0, 0, 0),
-    });
-
-    // Registration Number Box
-    yPosition -= 40;
-    page.drawRectangle({
-      x: 50,
-      y: yPosition - 30,
-      width: width - 100,
-      height: 40,
-      borderColor: rgb(0.26, 0.6, 0.88),
-      borderWidth: 2,
-      color: rgb(0.97, 0.98, 0.99),
-    });
-    
-    page.drawText(`Registration Number: ${registration.registration_number || 'Pending'}`, {
-      x: 60,
-      y: yPosition - 15,
-      size: 16,
-      font: helveticaBold,
-      color: rgb(0.1, 0.2, 0.4),
-    });
-
-    yPosition -= 60;
-
-    // Student Information
-    const drawInfoRow = (label: string, value: string, y: number) => {
-      page.drawText(label + ':', {
-        x: 50,
-        y,
-        size: 11,
-        font: helveticaBold,
-        color: rgb(0.2, 0.2, 0.2),
-      });
-      
-      page.drawText(value, {
-        x: 220,
-        y,
-        size: 11,
-        font: helveticaFont,
-        color: rgb(0, 0, 0),
-      });
-      
-      // Draw separator line
-      page.drawLine({
-        start: { x: 50, y: y - 5 },
-        end: { x: width - 50, y: y - 5 },
-        thickness: 0.5,
-        color: rgb(0.8, 0.8, 0.8),
-      });
-    };
-
-    drawInfoRow('Student Name', registration.student_name, yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Date of Birth', formatExamDate(registration.date_of_birth), yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Gender', registration.gender || 'N/A', yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Standard', registration.standard, yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Medium', registration.medium, yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('School Name', registration.school_name || 'N/A', yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Exam Center', registration.exam_center, yPosition);
-    yPosition -= 25;
-    
-    if (registration.building_name) {
-      drawInfoRow('Building', registration.building_name, yPosition);
-      yPosition -= 25;
-    }
-    
-    if (registration.floor) {
-      drawInfoRow('Floor', registration.floor, yPosition);
-      yPosition -= 25;
-    }
-    
-    if (registration.room_no) {
-      drawInfoRow('Room Number', registration.room_no, yPosition);
-      yPosition -= 25;
-    }
-    
-    drawInfoRow('Mobile Number', registration.mobile_number, yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Email', registration.email || 'N/A', yPosition);
-    yPosition -= 40;
-
-    // Important Instructions Box
-    page.drawRectangle({
-      x: 50,
-      y: yPosition - 110,
-      width: width - 100,
-      height: 120,
-      borderColor: rgb(0.96, 0.34, 0.40),
-      borderWidth: 2,
-      color: rgb(1, 0.96, 0.96),
-    });
-
-    page.drawText('Important Instructions:', {
-      x: 60,
+    // Header - P.P. SAVANI GROUP
+    page.drawText('P.P. SAVANI GROUP', {
+      x: (width - 140) / 2,
       y: yPosition,
       size: 12,
       font: helveticaBold,
-      color: rgb(0.77, 0.19, 0.19),
+      color: rgb(0, 0, 0),
     });
-
+    
+    yPosition -= 25;
+    // MEGA SPARK EXAM 2025 - Blue
+    page.drawText('MEGA SPARK EXAM 2025', {
+      x: (width - 280) / 2,
+      y: yPosition,
+      size: 20,
+      font: helveticaBold,
+      color: rgb(0.2, 0.4, 0.9),
+    });
+    
     yPosition -= 20;
-    const instructions = [
-      '• Please bring this hall ticket on the day of examination',
-      '• Arrive at the exam center 30 minutes before the exam time',
-      '• Bring a valid ID proof along with this hall ticket',
-      '• Mobile phones and electronic devices are not allowed',
-      '• Follow all instructions given by the exam invigilators',
-    ];
-
-    instructions.forEach(instruction => {
-      page.drawText(instruction, {
-        x: 60,
-        y: yPosition,
-        size: 9,
-        font: helveticaFont,
-        color: rgb(0.2, 0.2, 0.2),
-      });
-      yPosition -= 15;
-    });
-
-    // Footer
-    yPosition = 80;
-    page.drawLine({
-      start: { x: 50, y: yPosition },
-      end: { x: width - 50, y: yPosition },
-      thickness: 2,
+    page.drawText('EXAMINATION HALL TICKET', {
+      x: (width - 180) / 2,
+      y: yPosition,
+      size: 11,
+      font: helveticaBold,
       color: rgb(0, 0, 0),
     });
 
+    yPosition -= 30;
+
+    // Student Information Table
+    const drawTableRow = (label: string, value: string, y: number, isHeader: boolean = false) => {
+      // Left column (label)
+      page.drawRectangle({
+        x: 50,
+        y: y - 15,
+        width: 180,
+        height: 20,
+        borderColor: rgb(0, 0, 0),
+        borderWidth: 1,
+        color: isHeader ? rgb(0.95, 0.95, 0.95) : rgb(1, 1, 1),
+      });
+      
+      page.drawText(label, {
+        x: 55,
+        y: y - 10,
+        size: 9,
+        font: helveticaBold,
+        color: rgb(0, 0, 0),
+      });
+      
+      // Right column (value)
+      page.drawRectangle({
+        x: 230,
+        y: y - 15,
+        width: 315,
+        height: 20,
+        borderColor: rgb(0, 0, 0),
+        borderWidth: 1,
+        color: rgb(1, 1, 1),
+      });
+      
+      page.drawText(value, {
+        x: 235,
+        y: y - 10,
+        size: 9,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      });
+    };
+
+    drawTableRow('Student Name :', registration.student_name, yPosition);
     yPosition -= 20;
-    page.drawText('Best wishes for your examination!', {
-      x: (width - 200) / 2,
-      y: yPosition,
-      size: 11,
+    
+    drawTableRow('Seat No :', registration.registration_number || 'Pending', yPosition);
+    yPosition -= 20;
+    
+    drawTableRow('Std :', registration.standard, yPosition);
+    yPosition -= 20;
+    
+    drawTableRow('Medium :', registration.medium, yPosition);
+    yPosition -= 20;
+    
+    drawTableRow('Exam Date :', formatExamDate(registration.exam_date), yPosition);
+    yPosition -= 20;
+    
+    // Exam Pattern with subjects
+    const examPattern = registration.exam_pattern || 'MCQ (Multiple Choice Questions)';
+    const subjects = registration.standard === '8th' 
+      ? 'Science (ગણિત), Maths (વિજ્ઞાન), English (અંગ્રેજી)'
+      : 'Science, Maths, English';
+    
+    page.drawRectangle({
+      x: 50,
+      y: yPosition - 15,
+      width: 180,
+      height: 40,
+      borderColor: rgb(0, 0, 0),
+      borderWidth: 1,
+      color: rgb(1, 1, 1),
+    });
+    
+    page.drawText('Exam Pattern :', {
+      x: 55,
+      y: yPosition - 10,
+      size: 9,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    });
+    
+    page.drawRectangle({
+      x: 230,
+      y: yPosition - 15,
+      width: 315,
+      height: 40,
+      borderColor: rgb(0, 0, 0),
+      borderWidth: 1,
+      color: rgb(1, 1, 1),
+    });
+    
+    page.drawText(examPattern, {
+      x: 235,
+      y: yPosition - 10,
+      size: 9,
       font: helveticaFont,
-      color: rgb(0.4, 0.4, 0.4),
+      color: rgb(0, 0, 0),
+    });
+    
+    page.drawText('Subjects / ધોરણ:', {
+      x: 235,
+      y: yPosition - 25,
+      size: 8,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    });
+    
+    page.drawText(subjects, {
+      x: 235,
+      y: yPosition - 38,
+      size: 8,
+      font: helveticaFont,
+      color: rgb(0, 0, 0),
+    });
+    
+    yPosition -= 50;
+
+    // Exam Centre Section
+    page.drawText('Exam Centre', {
+      x: 50,
+      y: yPosition,
+      size: 10,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    });
+    
+    yPosition -= 15;
+    const examCenterDetails = `P P Savani Chaitanya Vidya Sankul
+Opposite Abhrama Road, Abrama, Kamrej,
+Surat-394150 (Gujarat) India`;
+    
+    const centerLines = examCenterDetails.split('\n');
+    centerLines.forEach(line => {
+      page.drawText(line, {
+        x: 50,
+        y: yPosition,
+        size: 9,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      });
+      yPosition -= 12;
     });
 
+    yPosition -= 10;
+
+    // Notes Section in Gujarati
+    page.drawText('નોંધ (Notes):', {
+      x: 50,
+      y: yPosition,
+      size: 10,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    });
+    
     yPosition -= 15;
-    page.drawText('For queries: +91 9104158001', {
+    page.drawText('1. પરીક્ષાના દિવસે આ હોલ ટિકિટ અને ફોટો આઈ.ડી લાવવી ફરજીયાત છે.', {
+      x: 50,
+      y: yPosition,
+      size: 8,
+      font: helveticaFont,
+      color: rgb(0, 0, 0),
+    });
+    
+    yPosition -= 12;
+    page.drawText('2. વધુ વિગતોના માટે સંપર્ક કરો: +91 9104158001 તથા વ્હોટ્સએપ.', {
+      x: 50,
+      y: yPosition,
+      size: 8,
+      font: helveticaFont,
+      color: rgb(0, 0, 0),
+    });
+
+    yPosition -= 180;
+
+    // Footer
+    page.drawText('MEGA SPARK EXAM COMMITTEE', {
       x: (width - 180) / 2,
       y: yPosition,
       size: 10,
+      font: helveticaBold,
+      color: rgb(0, 0, 0),
+    });
+
+    yPosition -= 15;
+    page.drawText('Best Wishes for Your Examination / તમારી પરીક્ષા માટે શુભેચ્છાઓ', {
+      x: (width - 360) / 2,
+      y: yPosition,
+      size: 9,
       font: helveticaFont,
       color: rgb(0.4, 0.4, 0.4),
     });
