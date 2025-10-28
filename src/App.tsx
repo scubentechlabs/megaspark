@@ -19,6 +19,7 @@ import TermsConditions from "./pages/TermsConditions";
 import WhatsAppManagement from "./pages/WhatsAppManagement";
 import NewsletterManagement from "./pages/NewsletterManagement";
 import NotFound from "./pages/NotFound";
+import UploadPoster from "./pages/UploadPoster";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="/upload-poster" element={<UploadPoster />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
