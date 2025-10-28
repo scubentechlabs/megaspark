@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { PDFDocument, rgb, StandardFonts } from 'https://esm.sh/pdf-lib@1.17.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,7 +35,7 @@ serve(async (req) => {
 
     // Format exam date
     const formatExamDate = (dateStr: string | null) => {
-      if (!dateStr) return '';
+      if (!dateStr) return 'TBA';
       const date = new Date(dateStr);
       const options: Intl.DateTimeFormatOptions = { 
         day: '2-digit', 
@@ -44,265 +45,223 @@ serve(async (req) => {
       return date.toLocaleDateString('en-IN', options);
     };
 
-    // Generate HTML for hall ticket
-    const hallTicketHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    @page { size: A4; margin: 0; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: Arial, sans-serif; 
-      background: white;
-      padding: 20px;
-    }
-    .hall-ticket {
-      max-width: 800px;
-      margin: 0 auto;
-      border: 2px solid #000;
-      padding: 20px;
-    }
-    .header {
-      text-align: center;
-      border-bottom: 2px solid #000;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      color: #1a365d;
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-    .header h2 {
-      color: #2d3748;
-      font-size: 20px;
-      margin-bottom: 5px;
-    }
-    .content {
-      padding: 20px 0;
-    }
-    .info-row {
-      display: flex;
-      padding: 12px 0;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .info-label {
-      font-weight: bold;
-      width: 250px;
-      color: #2d3748;
-    }
-    .info-value {
-      flex: 1;
-      color: #000;
-    }
-    .registration-number {
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: #1a365d;
-      padding: 20px;
-      background: #f7fafc;
-      border: 2px dashed #4299e1;
-      margin: 20px 0;
-    }
-    .instructions {
-      margin-top: 30px;
-      padding: 15px;
-      background: #fff5f5;
-      border-left: 4px solid #f56565;
-    }
-    .instructions h3 {
-      color: #c53030;
-      margin-bottom: 10px;
-    }
-    .instructions ul {
-      margin-left: 20px;
-    }
-    .instructions li {
-      margin: 5px 0;
-      color: #2d3748;
-    }
-    .footer {
-      margin-top: 30px;
-      text-align: center;
-      padding-top: 15px;
-      border-top: 2px solid #000;
-      color: #718096;
-    }
-  </style>
-</head>
-<body>
-  <div class="hall-ticket">
-    <div class="header">
-      <h1>P.P. SAVANI CFE</h1>
-      <h2>MEGA SPARK EXAM 2025</h2>
-      <p style="margin-top: 10px; color: #4a5568;">Hall Ticket</p>
-    </div>
+    console.log('Creating PDF document...');
 
-    <div class="registration-number">
-      Registration Number: ${registration.registration_number || 'Pending'}
-    </div>
+    // Create a new PDF document
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4 size
+    
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    
+    const { width, height } = page.getSize();
+    let yPosition = height - 50;
 
-    <div class="content">
-      <div class="info-row">
-        <div class="info-label">Student Name:</div>
-        <div class="info-value">${registration.student_name}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Date of Birth:</div>
-        <div class="info-value">${formatExamDate(registration.date_of_birth)}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Gender:</div>
-        <div class="info-value">${registration.gender || 'N/A'}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Standard:</div>
-        <div class="info-value">${registration.standard}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Medium:</div>
-        <div class="info-value">${registration.medium}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">School Name:</div>
-        <div class="info-value">${registration.school_name || 'N/A'}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Exam Date:</div>
-        <div class="info-value">${formatExamDate(registration.exam_date)}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Exam Center:</div>
-        <div class="info-value">${registration.exam_center}</div>
-      </div>
-      ${registration.building_name ? `
-      <div class="info-row">
-        <div class="info-label">Building:</div>
-        <div class="info-value">${registration.building_name}</div>
-      </div>
-      ` : ''}
-      ${registration.floor ? `
-      <div class="info-row">
-        <div class="info-label">Floor:</div>
-        <div class="info-value">${registration.floor}</div>
-      </div>
-      ` : ''}
-      ${registration.room_no ? `
-      <div class="info-row">
-        <div class="info-label">Room Number:</div>
-        <div class="info-value">${registration.room_no}</div>
-      </div>
-      ` : ''}
-      <div class="info-row">
-        <div class="info-label">Mobile Number:</div>
-        <div class="info-value">${registration.mobile_number}</div>
-      </div>
-      <div class="info-row">
-        <div class="info-label">Email:</div>
-        <div class="info-value">${registration.email || 'N/A'}</div>
-      </div>
-    </div>
-
-    <div class="instructions">
-      <h3>Important Instructions:</h3>
-      <ul>
-        <li>Please bring this hall ticket on the day of examination</li>
-        <li>Arrive at the exam center 30 minutes before the exam time</li>
-        <li>Bring a valid ID proof along with this hall ticket</li>
-        <li>Mobile phones and electronic devices are not allowed in the exam hall</li>
-        <li>Follow all instructions given by the exam invigilators</li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      <p>Best wishes for your examination!</p>
-      <p style="margin-top: 5px;">For queries: +91 9104158001</p>
-    </div>
-  </div>
-</body>
-</html>
-    `;
-
-    console.log('Generating PDF using PDFShift API...');
-
-    // Use PDFShift API to convert HTML to PDF
-    const pdfResponse = await fetch('https://api.pdfshift.io/v3/convert/pdf', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic ' + btoa('api:' + (Deno.env.get('PDFSHIFT_API_KEY') || 'dummy')),
-      },
-      body: JSON.stringify({
-        source: hallTicketHTML,
-        format: 'A4',
-        margin: '0mm',
-        landscape: false,
-      }),
+    // Header
+    page.drawText('P.P. SAVANI CFE', {
+      x: 50,
+      y: yPosition,
+      size: 24,
+      font: helveticaBold,
+      color: rgb(0.1, 0.2, 0.4),
+    });
+    
+    yPosition -= 30;
+    page.drawText('MEGA SPARK EXAM 2025', {
+      x: 50,
+      y: yPosition,
+      size: 18,
+      font: helveticaBold,
+      color: rgb(0.2, 0.3, 0.5),
+    });
+    
+    yPosition -= 25;
+    page.drawText('Hall Ticket', {
+      x: 50,
+      y: yPosition,
+      size: 14,
+      font: helveticaFont,
+      color: rgb(0.3, 0.3, 0.3),
     });
 
-    if (!pdfResponse.ok) {
-      const errorText = await pdfResponse.text();
-      console.error('PDFShift error:', errorText);
-      
-      // Fallback: Just store the HTML as a file and provide that link
-      console.log('Falling back to HTML file...');
-      const htmlFileName = `hall-ticket-${registration.registration_number || registrationId}.html`;
-      const { error: htmlUploadError } = await supabase.storage
-        .from('hall-tickets')
-        .upload(htmlFileName, new Blob([hallTicketHTML], { type: 'text/html' }), {
-          contentType: 'text/html',
-          upsert: true,
-        });
+    // Draw header line
+    yPosition -= 15;
+    page.drawLine({
+      start: { x: 50, y: yPosition },
+      end: { x: width - 50, y: yPosition },
+      thickness: 2,
+      color: rgb(0, 0, 0),
+    });
 
-      if (htmlUploadError) {
-        console.error('HTML upload error:', htmlUploadError);
-        throw htmlUploadError;
-      }
+    // Registration Number Box
+    yPosition -= 40;
+    page.drawRectangle({
+      x: 50,
+      y: yPosition - 30,
+      width: width - 100,
+      height: 40,
+      borderColor: rgb(0.26, 0.6, 0.88),
+      borderWidth: 2,
+      color: rgb(0.97, 0.98, 0.99),
+    });
+    
+    page.drawText(`Registration Number: ${registration.registration_number || 'Pending'}`, {
+      x: 60,
+      y: yPosition - 15,
+      size: 16,
+      font: helveticaBold,
+      color: rgb(0.1, 0.2, 0.4),
+    });
 
-      const { data: { publicUrl: htmlUrl } } = supabase.storage
-        .from('hall-tickets')
-        .getPublicUrl(htmlFileName);
+    yPosition -= 60;
 
-      console.log('HTML uploaded, sending WhatsApp...');
-
-      // Update registration with HTML URL
-      await supabase
-        .from('registrations')
-        .update({ hall_ticket_url: htmlUrl })
-        .eq('id', registrationId);
-
-      // Send WhatsApp with HTML link
-      const whatsappPhone = registration.whatsapp_number || registration.mobile_number;
-      await supabase.functions.invoke('send-whatsapp', {
-        body: {
-          phoneNumber: whatsappPhone,
-          messageType: 'hall_ticket',
-          registrationId: registrationId,
-          messageBody: htmlUrl,
-        },
+    // Student Information
+    const drawInfoRow = (label: string, value: string, y: number) => {
+      page.drawText(label + ':', {
+        x: 50,
+        y,
+        size: 11,
+        font: helveticaBold,
+        color: rgb(0.2, 0.2, 0.2),
       });
+      
+      page.drawText(value, {
+        x: 220,
+        y,
+        size: 11,
+        font: helveticaFont,
+        color: rgb(0, 0, 0),
+      });
+      
+      // Draw separator line
+      page.drawLine({
+        start: { x: 50, y: y - 5 },
+        end: { x: width - 50, y: y - 5 },
+        thickness: 0.5,
+        color: rgb(0.8, 0.8, 0.8),
+      });
+    };
 
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          hallTicketUrl: htmlUrl,
-          format: 'html'
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    drawInfoRow('Student Name', registration.student_name, yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Date of Birth', formatExamDate(registration.date_of_birth), yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Gender', registration.gender || 'N/A', yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Standard', registration.standard, yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Medium', registration.medium, yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('School Name', registration.school_name || 'N/A', yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Exam Center', registration.exam_center, yPosition);
+    yPosition -= 25;
+    
+    if (registration.building_name) {
+      drawInfoRow('Building', registration.building_name, yPosition);
+      yPosition -= 25;
     }
+    
+    if (registration.floor) {
+      drawInfoRow('Floor', registration.floor, yPosition);
+      yPosition -= 25;
+    }
+    
+    if (registration.room_no) {
+      drawInfoRow('Room Number', registration.room_no, yPosition);
+      yPosition -= 25;
+    }
+    
+    drawInfoRow('Mobile Number', registration.mobile_number, yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Email', registration.email || 'N/A', yPosition);
+    yPosition -= 40;
 
-    const pdfBuffer = await pdfResponse.arrayBuffer();
-    console.log('PDF generated, uploading to storage...');
+    // Important Instructions Box
+    page.drawRectangle({
+      x: 50,
+      y: yPosition - 110,
+      width: width - 100,
+      height: 120,
+      borderColor: rgb(0.96, 0.34, 0.40),
+      borderWidth: 2,
+      color: rgb(1, 0.96, 0.96),
+    });
+
+    page.drawText('Important Instructions:', {
+      x: 60,
+      y: yPosition,
+      size: 12,
+      font: helveticaBold,
+      color: rgb(0.77, 0.19, 0.19),
+    });
+
+    yPosition -= 20;
+    const instructions = [
+      '• Please bring this hall ticket on the day of examination',
+      '• Arrive at the exam center 30 minutes before the exam time',
+      '• Bring a valid ID proof along with this hall ticket',
+      '• Mobile phones and electronic devices are not allowed',
+      '• Follow all instructions given by the exam invigilators',
+    ];
+
+    instructions.forEach(instruction => {
+      page.drawText(instruction, {
+        x: 60,
+        y: yPosition,
+        size: 9,
+        font: helveticaFont,
+        color: rgb(0.2, 0.2, 0.2),
+      });
+      yPosition -= 15;
+    });
+
+    // Footer
+    yPosition = 80;
+    page.drawLine({
+      start: { x: 50, y: yPosition },
+      end: { x: width - 50, y: yPosition },
+      thickness: 2,
+      color: rgb(0, 0, 0),
+    });
+
+    yPosition -= 20;
+    page.drawText('Best wishes for your examination!', {
+      x: (width - 200) / 2,
+      y: yPosition,
+      size: 11,
+      font: helveticaFont,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+
+    yPosition -= 15;
+    page.drawText('For queries: +91 9104158001', {
+      x: (width - 180) / 2,
+      y: yPosition,
+      size: 10,
+      font: helveticaFont,
+      color: rgb(0.4, 0.4, 0.4),
+    });
+
+    // Save PDF
+    const pdfBytes = await pdfDoc.save();
+    console.log('PDF created, uploading to storage...');
 
     // Upload PDF to Supabase Storage
     const fileName = `hall-ticket-${registration.registration_number || registrationId}.pdf`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('hall-tickets')
-      .upload(fileName, pdfBuffer, {
+      .upload(fileName, pdfBytes, {
         contentType: 'application/pdf',
         upsert: true,
       });
