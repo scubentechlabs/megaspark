@@ -303,10 +303,13 @@ serve(async (req) => {
     // Fetch and embed poster image
     yPosition -= 30;
     try {
-      const posterUrl = 'https://tgfpewbymloyxhpdfnzk.supabase.co/storage/v1/object/public/hall-tickets/poster.jpg';
-      const posterResponse = await fetch(posterUrl);
-      if (posterResponse.ok) {
-        const posterBytes = await posterResponse.arrayBuffer();
+      // Try to fetch poster from storage bucket
+      const { data: posterData } = await supabase.storage
+        .from('hall-tickets')
+        .download('poster.jpg');
+      
+      if (posterData) {
+        const posterBytes = await posterData.arrayBuffer();
         const posterImage = await pdfDoc.embedJpg(posterBytes);
         const posterDims = posterImage.scale(0.35);
         
@@ -317,6 +320,9 @@ serve(async (req) => {
           height: posterDims.height,
         });
         yPosition -= posterDims.height + 20;
+      } else {
+        console.log('Poster image not found in storage');
+        yPosition -= 20;
       }
     } catch (error) {
       console.log('Could not load poster image:', error);
