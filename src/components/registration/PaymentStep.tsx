@@ -134,29 +134,11 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
     }
   };
 
-  const loadRazorpayScript = (): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
   const handleRazorpayPayment = async () => {
     setIsProcessing(true);
     
     try {
       console.log('Initiating Razorpay payment...');
-      
-      // Load Razorpay script
-      const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) {
-        toast.error("Failed to load payment gateway. Please try again.");
-        setIsProcessing(false);
-        return;
-      }
 
       // Save form data to session storage
       sessionStorage.setItem('registrationFormData', JSON.stringify(formData));
