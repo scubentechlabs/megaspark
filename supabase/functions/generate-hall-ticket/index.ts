@@ -57,9 +57,13 @@ serve(async (req) => {
     const { width, height } = page.getSize();
     let yPosition = height - 50;
 
-    // Header
-    page.drawText('P.P. SAVANI CFE', {
-      x: 50,
+    // Header - Center aligned
+    const headerText1 = 'P.P. SAVANI GROUP';
+    const headerText2 = 'MEGA SPARK EXAM 2025';
+    const headerText3 = 'EXAMINATION HALL TICKET';
+    
+    page.drawText(headerText1, {
+      x: (width - helveticaBold.widthOfTextAtSize(headerText1, 24)) / 2,
       y: yPosition,
       size: 24,
       font: helveticaBold,
@@ -67,8 +71,8 @@ serve(async (req) => {
     });
     
     yPosition -= 30;
-    page.drawText('MEGA SPARK EXAM 2025', {
-      x: 50,
+    page.drawText(headerText2, {
+      x: (width - helveticaBold.widthOfTextAtSize(headerText2, 18)) / 2,
       y: yPosition,
       size: 18,
       font: helveticaBold,
@@ -76,11 +80,11 @@ serve(async (req) => {
     });
     
     yPosition -= 25;
-    page.drawText('Hall Ticket', {
-      x: 50,
+    page.drawText(headerText3, {
+      x: (width - helveticaBold.widthOfTextAtSize(headerText3, 14)) / 2,
       y: yPosition,
       size: 14,
-      font: helveticaFont,
+      font: helveticaBold,
       color: rgb(0.3, 0.3, 0.3),
     });
 
@@ -151,9 +155,6 @@ serve(async (req) => {
     drawInfoRow('Medium', registration.medium, yPosition);
     yPosition -= 25;
     
-    drawInfoRow('School Name', registration.school_name || 'N/A', yPosition);
-    yPosition -= 25;
-    
     drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
     yPosition -= 25;
     
@@ -177,6 +178,88 @@ serve(async (req) => {
     
     drawInfoRow('Mobile Number', registration.mobile_number, yPosition);
     yPosition -= 40;
+
+    // Exam Pattern Box
+    page.drawRectangle({
+      x: 50,
+      y: yPosition - 70,
+      width: width - 100,
+      height: 80,
+      borderColor: rgb(0.26, 0.6, 0.88),
+      borderWidth: 2,
+      color: rgb(0.97, 0.98, 0.99),
+    });
+
+    page.drawText('Exam Pattern:', {
+      x: 60,
+      y: yPosition - 20,
+      size: 11,
+      font: helveticaBold,
+      color: rgb(0.1, 0.2, 0.4),
+    });
+
+    page.drawText('MCQ (Multiple Choice Questions)', {
+      x: 160,
+      y: yPosition - 20,
+      size: 11,
+      font: helveticaFont,
+      color: rgb(0, 0, 0),
+    });
+
+    page.drawText('Subjects:', {
+      x: 60,
+      y: yPosition - 45,
+      size: 11,
+      font: helveticaBold,
+      color: rgb(0.1, 0.2, 0.4),
+    });
+
+    page.drawText('Science, Maths, English', {
+      x: 160,
+      y: yPosition - 45,
+      size: 11,
+      font: helveticaFont,
+      color: rgb(0, 0, 0),
+    });
+
+    yPosition -= 90;
+
+    // Notes Section
+    page.drawRectangle({
+      x: 50,
+      y: yPosition - 60,
+      width: width - 100,
+      height: 70,
+      borderColor: rgb(0.96, 0.34, 0.40),
+      borderWidth: 2,
+      color: rgb(1, 0.96, 0.96),
+    });
+
+    page.drawText('Notes:', {
+      x: 60,
+      y: yPosition - 20,
+      size: 11,
+      font: helveticaBold,
+      color: rgb(0.77, 0.19, 0.19),
+    });
+
+    page.drawText('• The reporting time for the exam will be 8:00 a.m.', {
+      x: 60,
+      y: yPosition - 40,
+      size: 10,
+      font: helveticaFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    page.drawText('• Every student must carry a printed copy of this hall ticket.', {
+      x: 60,
+      y: yPosition - 55,
+      size: 10,
+      font: helveticaFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+
+    yPosition -= 80;
 
     // Important Instructions Box
     page.drawRectangle({
@@ -217,6 +300,29 @@ serve(async (req) => {
       yPosition -= 15;
     });
 
+    // Fetch and embed poster image
+    yPosition -= 30;
+    try {
+      const posterUrl = 'https://tgfpewbymloyxhpdfnzk.supabase.co/storage/v1/object/public/hall-tickets/poster.jpg';
+      const posterResponse = await fetch(posterUrl);
+      if (posterResponse.ok) {
+        const posterBytes = await posterResponse.arrayBuffer();
+        const posterImage = await pdfDoc.embedJpg(posterBytes);
+        const posterDims = posterImage.scale(0.35);
+        
+        page.drawImage(posterImage, {
+          x: (width - posterDims.width) / 2,
+          y: yPosition - posterDims.height,
+          width: posterDims.width,
+          height: posterDims.height,
+        });
+        yPosition -= posterDims.height + 20;
+      }
+    } catch (error) {
+      console.log('Could not load poster image:', error);
+      yPosition -= 20;
+    }
+
     // Footer
     yPosition = 80;
     page.drawLine({
@@ -227,17 +333,19 @@ serve(async (req) => {
     });
 
     yPosition -= 20;
-    page.drawText('Best wishes for your examination!', {
-      x: (width - 200) / 2,
+    const footerText1 = 'MEGA SPARK EXAM COMMITTEE';
+    page.drawText(footerText1, {
+      x: (width - helveticaBold.widthOfTextAtSize(footerText1, 11)) / 2,
       y: yPosition,
       size: 11,
-      font: helveticaFont,
+      font: helveticaBold,
       color: rgb(0.4, 0.4, 0.4),
     });
 
     yPosition -= 15;
-    page.drawText('For queries: +91 9104158001', {
-      x: (width - 180) / 2,
+    const footerText2 = 'Best Wishes for Your Examination!';
+    page.drawText(footerText2, {
+      x: (width - helveticaFont.widthOfTextAtSize(footerText2, 10)) / 2,
       y: yPosition,
       size: 10,
       font: helveticaFont,
