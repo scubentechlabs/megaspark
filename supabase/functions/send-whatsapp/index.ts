@@ -7,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const OFFICIALWA_API_KEY = Deno.env.get('OFFICIALWA_API_KEY');
-const OFFICIALWA_INSTANCE_ID = Deno.env.get('OFFICIALWA_INSTANCE_ID');
+const META_WHATSAPP_ACCESS_TOKEN = Deno.env.get('META_WHATSAPP_ACCESS_TOKEN');
+const META_WHATSAPP_PHONE_NUMBER_ID = Deno.env.get('META_WHATSAPP_PHONE_NUMBER_ID');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -25,8 +25,8 @@ serve(async (req) => {
     console.log('Sending WhatsApp message:', { phoneNumber, messageType, registrationId });
     // messageId declared above for catch scope
 
-    if (!OFFICIALWA_API_KEY || !OFFICIALWA_INSTANCE_ID) {
-      throw new Error('OfficialWA API credentials not configured');
+    if (!META_WHATSAPP_ACCESS_TOKEN || !META_WHATSAPP_PHONE_NUMBER_ID) {
+      throw new Error('Meta WhatsApp API credentials not configured');
     }
 
     // Clean phone number (remove spaces, dashes, etc.)
@@ -58,32 +58,32 @@ serve(async (req) => {
     messageId = messageRecord.id;
     console.log('Message record created:', messageRecord.id);
 
-    // Use the exact API endpoint from the provided code
-    const apiUrl = 'https://crm.officialwa.com/api/meta/v19.0/593103693876020/messages';
+    // Use Meta's official WhatsApp Business API
+    const apiUrl = `https://graph.facebook.com/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     let apiPayload: any;
 
     if (messageType === 'registration_confirmation' || templateName === 'megamsg_1') {
-      // Send registration confirmation with megamsg_1 template
+      // Send registration confirmation with megamsg_1 template using Meta API format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
-        recipient_type: "individual",
         type: "template",
         template: {
-          language: { policy: "deterministic", code: "en" },
           name: "megamsg_1",
+          language: { code: "en" },
           components: []
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
-      // Send hall ticket template with document
+      // Send hall ticket template with document using Meta API format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
-        recipient_type: "individual",
         type: "template",
         template: {
-          language: { policy: "deterministic", code: "en" },
           name: "hall_ticket_mega",
+          language: { code: "en" },
           components: [
             {
               type: "header",
@@ -95,14 +95,14 @@ serve(async (req) => {
         }
       };
     } else if (templateName) {
-      // Send template message using OfficialWA template format
+      // Send template message using Meta API format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
-        recipient_type: "individual",
         type: "template",
         template: {
-          language: { policy: "deterministic", code: "en" },
           name: templateName,
+          language: { code: "en" },
           components: Array.isArray(variables) && variables.length > 0
             ? [
                 {
@@ -117,25 +117,24 @@ serve(async (req) => {
       };
     }
 
-    console.log('Sending WhatsApp message via OfficialWA API...', { apiUrl });
+    console.log('Sending WhatsApp message via Meta API...', { apiUrl });
 
     let successResponse: any = null;
     let lastError: any = null;
 
     try {
-      console.log('Calling OfficialWA API:', apiUrl);
+      console.log('Calling Meta WhatsApp API:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'API-KEY': OFFICIALWA_API_KEY || '',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OFFICIALWA_INSTANCE_ID || ''}`,
+          'Authorization': `Bearer ${META_WHATSAPP_ACCESS_TOKEN}`,
         },
         body: JSON.stringify(apiPayload),
       });
 
       const responseData = await response.json().catch(() => ({}));
-      console.log('OfficialWA API response:', response.status, responseData);
+      console.log('Meta API response:', response.status, responseData);
 
       if (response.ok) {
         successResponse = responseData;
@@ -147,7 +146,7 @@ serve(async (req) => {
     }
 
     if (!successResponse) {
-      throw lastError || new Error('OfficialWA API error: all paths failed');
+      throw lastError || new Error('Meta WhatsApp API error: all paths failed');
     }
 
     // Update message status to sent
