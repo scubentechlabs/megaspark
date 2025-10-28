@@ -157,7 +157,7 @@ serve(async (req) => {
     drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
     yPosition -= 25;
     
-    drawInfoRow('Exam Center', registration.exam_center, yPosition);
+    drawInfoRow('Exam Center', 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150', yPosition);
     yPosition -= 25;
     
     if (registration.building_name) {
