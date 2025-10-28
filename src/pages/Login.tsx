@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Smartphone, Download, ArrowLeft } from "lucide-react";
+import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
@@ -83,6 +83,37 @@ export default function Login() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSendHallTicket = async (registrationId: string) => {
+    try {
+      toast({
+        title: "Sending...",
+        description: "Generating and sending hall ticket via WhatsApp",
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast({
+          title: "Success",
+          description: "Hall ticket sent successfully via WhatsApp",
+        });
+      } else {
+        throw new Error(data?.error || 'Failed to send hall ticket');
+      }
+    } catch (error: any) {
+      console.error("Error sending hall ticket:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send hall ticket",
+        variant: "destructive",
+      });
     }
   };
 
@@ -303,13 +334,23 @@ export default function Login() {
                             Center: {registration.exam_center}
                           </p>
                         </div>
-                        <Button
-                          onClick={() => handleDownloadHallTicket(registration)}
-                          className="bg-accent hover:bg-accent/90 gap-2"
-                        >
-                          <Download className="h-4 w-4" />
-                          Download Hall Ticket
-                        </Button>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button
+                            onClick={() => handleDownloadHallTicket(registration)}
+                            className="bg-accent hover:bg-accent/90 gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download Hall Ticket
+                          </Button>
+                          <Button
+                            onClick={() => handleSendHallTicket(registration.id)}
+                            variant="default"
+                            className="gap-2"
+                          >
+                            <Send className="h-4 w-4" />
+                            Get on WhatsApp
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
