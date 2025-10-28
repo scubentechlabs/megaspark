@@ -145,12 +145,6 @@ serve(async (req) => {
     drawInfoRow('Student Name', registration.student_name, yPosition);
     yPosition -= 25;
     
-    drawInfoRow('Date of Birth', formatExamDate(registration.date_of_birth), yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Gender', registration.gender || 'N/A', yPosition);
-    yPosition -= 25;
-    
     drawInfoRow('Standard', registration.standard, yPosition);
     yPosition -= 25;
     
@@ -182,9 +176,6 @@ serve(async (req) => {
     }
     
     drawInfoRow('Mobile Number', registration.mobile_number, yPosition);
-    yPosition -= 25;
-    
-    drawInfoRow('Email', registration.email || 'N/A', yPosition);
     yPosition -= 40;
 
     // Important Instructions Box
