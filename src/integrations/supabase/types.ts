@@ -287,6 +287,7 @@ export type Database = {
           created_at: string
           delivered_at: string | null
           error_message: string | null
+          failed_at: string | null
           id: string
           link_opened: boolean | null
           link_opened_at: string | null
@@ -303,6 +304,7 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           error_message?: string | null
+          failed_at?: string | null
           id?: string
           link_opened?: boolean | null
           link_opened_at?: string | null
@@ -319,6 +321,7 @@ export type Database = {
           created_at?: string
           delivered_at?: string | null
           error_message?: string | null
+          failed_at?: string | null
           id?: string
           link_opened?: boolean | null
           link_opened_at?: string | null
