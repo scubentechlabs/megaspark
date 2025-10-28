@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { PartyPopper, Download, Share2, Home, Loader2, MessageCircle } from "lucide-react";
+import { PartyPopper, Download, Share2, Home, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
@@ -12,8 +12,6 @@ const RegistrationSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
-  const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
-  const [registrationId, setRegistrationId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if this is a PhonePe redirect
@@ -122,9 +120,6 @@ const RegistrationSuccess = () => {
         return;
       }
 
-      // Store registration ID for WhatsApp functionality
-      setRegistrationId((registrationData as any).id);
-
       // Link payment to registration
       await supabase
         .from('payments')
@@ -157,34 +152,6 @@ const RegistrationSuccess = () => {
       "🎉 I just registered for Mega Spark Exam 2025! Join me and compete for scholarships worth ₹75 Crores. Register now at: https://megasparkexam.com"
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
-  };
-
-  const handleSendHallTicketWhatsApp = async () => {
-    if (!registrationId) {
-      toast.error("Registration ID not found. Please contact support.");
-      return;
-    }
-
-    try {
-      setSendingWhatsApp(true);
-      
-      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
-        body: { registrationId }
-      });
-
-      if (error) throw error;
-
-      if (data?.success) {
-        toast.success("Hall ticket sent to your WhatsApp number!");
-      } else {
-        throw new Error(data?.error || "Failed to send hall ticket");
-      }
-    } catch (error: any) {
-      console.error('Error sending hall ticket:', error);
-      toast.error(error.message || "Failed to send hall ticket. Please try again.");
-    } finally {
-      setSendingWhatsApp(false);
-    }
   };
 
   // Show loading state while verifying payment
@@ -232,37 +199,16 @@ const RegistrationSuccess = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Download className="h-6 w-6 text-accent" />
-                <h3 className="text-xl font-bold text-foreground">Get Your Hall Ticket</h3>
+                <h3 className="text-xl font-bold text-foreground">Download Hall Ticket</h3>
               </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <Button
-                  onClick={handleDownloadHallTicket}
-                  size="lg"
-                  variant="outline"
-                  className="h-12 font-semibold border-2 border-primary hover:bg-primary/10"
-                >
-                  <Download className="mr-2 h-5 w-5" />
-                  Download Hall Ticket
-                </Button>
-                <Button
-                  onClick={handleSendHallTicketWhatsApp}
-                  disabled={sendingWhatsApp || !registrationId}
-                  size="lg"
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white h-12 font-semibold"
-                >
-                  {sendingWhatsApp ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <MessageCircle className="mr-2 h-5 w-5" />
-                      Get on WhatsApp
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                onClick={handleDownloadHallTicket}
+                size="lg"
+                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white h-12 font-semibold"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download Hall Ticket
+              </Button>
             </CardContent>
           </Card>
 
