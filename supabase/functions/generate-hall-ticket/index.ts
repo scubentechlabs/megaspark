@@ -226,29 +226,73 @@ serve(async (req) => {
 </html>
     `;
 
-    console.log('Converting HTML to PDF using API...');
+    console.log('Generating PDF using PDFShift API...');
 
-    // Use HTML2PDF API service
-    const pdfResponse = await fetch('https://api.html2pdf.app/v1/generate', {
+    // Use PDFShift API to convert HTML to PDF
+    const pdfResponse = await fetch('https://api.pdfshift.io/v3/convert/pdf', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + btoa('api:' + (Deno.env.get('PDFSHIFT_API_KEY') || 'dummy')),
       },
       body: JSON.stringify({
-        html: hallTicketHTML,
+        source: hallTicketHTML,
         format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '0',
-          right: '0',
-          bottom: '0',
-          left: '0',
-        },
+        margin: '0mm',
+        landscape: false,
       }),
     });
 
     if (!pdfResponse.ok) {
-      throw new Error(`PDF generation failed: ${pdfResponse.statusText}`);
+      const errorText = await pdfResponse.text();
+      console.error('PDFShift error:', errorText);
+      
+      // Fallback: Just store the HTML as a file and provide that link
+      console.log('Falling back to HTML file...');
+      const htmlFileName = `hall-ticket-${registration.registration_number || registrationId}.html`;
+      const { error: htmlUploadError } = await supabase.storage
+        .from('hall-tickets')
+        .upload(htmlFileName, new Blob([hallTicketHTML], { type: 'text/html' }), {
+          contentType: 'text/html',
+          upsert: true,
+        });
+
+      if (htmlUploadError) {
+        console.error('HTML upload error:', htmlUploadError);
+        throw htmlUploadError;
+      }
+
+      const { data: { publicUrl: htmlUrl } } = supabase.storage
+        .from('hall-tickets')
+        .getPublicUrl(htmlFileName);
+
+      console.log('HTML uploaded, sending WhatsApp...');
+
+      // Update registration with HTML URL
+      await supabase
+        .from('registrations')
+        .update({ hall_ticket_url: htmlUrl })
+        .eq('id', registrationId);
+
+      // Send WhatsApp with HTML link
+      const whatsappPhone = registration.whatsapp_number || registration.mobile_number;
+      await supabase.functions.invoke('send-whatsapp', {
+        body: {
+          phoneNumber: whatsappPhone,
+          messageType: 'hall_ticket',
+          registrationId: registrationId,
+          messageBody: htmlUrl,
+        },
+      });
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          hallTicketUrl: htmlUrl,
+          format: 'html'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const pdfBuffer = await pdfResponse.arrayBuffer();
