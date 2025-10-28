@@ -58,8 +58,8 @@ serve(async (req) => {
     messageId = messageRecord.id;
     console.log('Message record created:', messageRecord.id);
 
-    // Use Meta's official WhatsApp Business API
-    const apiUrl = `https://graph.facebook.com/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
+    // Use OfficialWA gateway for Meta API
+    const apiUrl = `https://crm.officialwa.com/api/meta/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     let apiPayload: any;
 
