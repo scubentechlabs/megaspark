@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Printer, FileText } from "lucide-react";
+import { Download, Printer, FileText, Send, Loader2 } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import {
   SidebarProvider,
@@ -42,6 +43,7 @@ interface Registration {
 export default function Reports() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sendingHallTicket, setSendingHallTicket] = useState<string | null>(null);
   const [reportType, setReportType] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedExamDate, setSelectedExamDate] = useState<string>("");
@@ -300,6 +302,35 @@ export default function Reports() {
     }
   };
 
+  const handleSendHallTicket = async (registrationId: string) => {
+    try {
+      setSendingHallTicket(registrationId);
+      
+      const { error } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Hall ticket sent via WhatsApp",
+      });
+
+      // Refresh registrations to show updated hall_ticket_url
+      await fetchRegistrations();
+    } catch (error: any) {
+      console.error("Error sending hall ticket:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send hall ticket",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingHallTicket(null);
+    }
+  };
+
   const uniqueValues = getUniqueValues();
   const filteredData = getFilteredReportData();
 
@@ -446,6 +477,90 @@ export default function Reports() {
                   Print filtered registration data
                 </p>
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* All Registrations Table */}
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle className="text-xl font-semibold">All Registrations</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Reg. No.</TableHead>
+                    <TableHead>Student Name</TableHead>
+                    <TableHead>Mobile</TableHead>
+                    <TableHead>Standard</TableHead>
+                    <TableHead>Medium</TableHead>
+                    <TableHead>School</TableHead>
+                    <TableHead>Exam Date</TableHead>
+                    <TableHead>Hall Ticket</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredData.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                        No registrations found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredData.map((reg) => (
+                      <TableRow key={reg.id}>
+                        <TableCell className="font-medium">{reg.registration_number}</TableCell>
+                        <TableCell>{reg.student_name}</TableCell>
+                        <TableCell>{reg.mobile_number}</TableCell>
+                        <TableCell>{reg.standard}</TableCell>
+                        <TableCell className="capitalize">{reg.medium}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">{reg.school_name || 'N/A'}</TableCell>
+                        <TableCell>
+                          {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
+                        </TableCell>
+                        <TableCell>
+                          {reg.hall_ticket_url ? (
+                            <a 
+                              href={reg.hall_ticket_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline"
+                            >
+                              View
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">Pending</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSendHallTicket(reg.id)}
+                            disabled={sendingHallTicket === reg.id || !reg.registration_number}
+                            className="gap-2"
+                          >
+                            {sendingHallTicket === reg.id ? (
+                              <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Sending...
+                              </>
+                            ) : (
+                              <>
+                                <Send className="h-4 w-4" />
+                                Send Hall Ticket
+                              </>
+                            )}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
