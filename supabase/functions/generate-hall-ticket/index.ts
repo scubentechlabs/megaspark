@@ -53,7 +53,29 @@ serve(async (req) => {
     
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-    
+
+    // Embed Gujarati fonts (Noto Sans Gujarati) for Unicode support
+    const gujaratiRegularUrl = 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansGujarati/NotoSansGujarati-Regular.ttf';
+    const gujaratiBoldUrl = 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSansGujarati/NotoSansGujarati-Bold.ttf';
+
+    let gujaratiFont = helveticaFont;
+    let gujaratiBold = helveticaBold;
+    try {
+      const [regRes, boldRes] = await Promise.all([
+        fetch(gujaratiRegularUrl),
+        fetch(gujaratiBoldUrl),
+      ]);
+      const [regBytes, boldBytes] = await Promise.all([
+        regRes.arrayBuffer(),
+        boldRes.arrayBuffer(),
+      ]);
+      gujaratiFont = await pdfDoc.embedFont(new Uint8Array(regBytes));
+      gujaratiBold = await pdfDoc.embedFont(new Uint8Array(boldBytes));
+      console.log('Gujarati fonts embedded');
+    } catch (e) {
+      console.warn('Failed to load Gujarati fonts, falling back to Helvetica', e);
+    }
+
     const { width, height } = page.getSize();
     let yPosition = height - 30;
 
@@ -189,7 +211,7 @@ serve(async (req) => {
       x: 235,
       y: yPosition - 25,
       size: 8,
-      font: helveticaBold,
+      font: gujaratiBold,
       color: rgb(0, 0, 0),
     });
     
@@ -197,7 +219,7 @@ serve(async (req) => {
       x: 235,
       y: yPosition - 38,
       size: 8,
-      font: helveticaFont,
+      font: gujaratiFont,
       color: rgb(0, 0, 0),
     });
     
@@ -236,7 +258,7 @@ Surat-394150 (Gujarat) India`;
       x: 50,
       y: yPosition,
       size: 10,
-      font: helveticaBold,
+      font: gujaratiBold,
       color: rgb(0, 0, 0),
     });
     
@@ -245,7 +267,7 @@ Surat-394150 (Gujarat) India`;
       x: 50,
       y: yPosition,
       size: 8,
-      font: helveticaFont,
+      font: gujaratiFont,
       color: rgb(0, 0, 0),
     });
     
@@ -254,7 +276,7 @@ Surat-394150 (Gujarat) India`;
       x: 50,
       y: yPosition,
       size: 8,
-      font: helveticaFont,
+      font: gujaratiFont,
       color: rgb(0, 0, 0),
     });
 
