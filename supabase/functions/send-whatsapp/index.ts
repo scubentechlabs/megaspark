@@ -72,28 +72,7 @@ serve(async (req) => {
         template: {
           language: { policy: "deterministic", code: "en" },
           name: "megamsg_1",
-          components: [
-            {
-              type: "body",
-              parameters: [
-                {
-                  type: "text",
-                  text: "Hello\n\n🎉 You have been successfully registered for the Mega Spark Exam!\n\n📄 Here is your hall ticket\n\nIf you find any incorrect or invalid details on your hall ticket, please reply to this message so we can assist you.\n\nGood luck with your exam! 🍀"
-                }
-              ]
-            },
-            {
-              type: "button",
-              sub_type: "url",
-              index: 0,
-              parameters: [
-                {
-                  type: "Download Hall Ticket",
-                  text: "https://megasparkexam.com/login"
-                }
-              ]
-            }
-          ]
+          components: []
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
