@@ -75,7 +75,7 @@ serve(async (req) => {
       .from('payments')
       .update({
         status: 'success',
-        payment_id: razorpay_payment_id,
+        transaction_id: razorpay_payment_id,
         updated_at: new Date().toISOString(),
       })
       .eq('order_id', razorpay_order_id)
