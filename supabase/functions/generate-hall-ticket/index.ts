@@ -259,47 +259,6 @@ serve(async (req) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    yPosition -= 80;
-
-    // Important Instructions Box
-    page.drawRectangle({
-      x: 50,
-      y: yPosition - 110,
-      width: width - 100,
-      height: 120,
-      borderColor: rgb(0.96, 0.34, 0.40),
-      borderWidth: 2,
-      color: rgb(1, 0.96, 0.96),
-    });
-
-    page.drawText('Important Instructions:', {
-      x: 60,
-      y: yPosition,
-      size: 12,
-      font: helveticaBold,
-      color: rgb(0.77, 0.19, 0.19),
-    });
-
-    yPosition -= 20;
-    const instructions = [
-      '• Please bring this hall ticket on the day of examination',
-      '• Arrive at the exam center 30 minutes before the exam time',
-      '• Bring a valid ID proof along with this hall ticket',
-      '• Mobile phones and electronic devices are not allowed',
-      '• Follow all instructions given by the exam invigilators',
-    ];
-
-    instructions.forEach(instruction => {
-      page.drawText(instruction, {
-        x: 60,
-        y: yPosition,
-        size: 9,
-        font: helveticaFont,
-        color: rgb(0.2, 0.2, 0.2),
-      });
-      yPosition -= 15;
-    });
-
     // Fetch and embed poster image
     yPosition -= 30;
     try {
