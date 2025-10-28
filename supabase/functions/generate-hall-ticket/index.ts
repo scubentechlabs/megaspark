@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { Chromiumly } from 'https://deno.land/x/chromiumly@v3.1.3/mod.ts';
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -229,14 +229,17 @@ serve(async (req) => {
 
     console.log('Generating PDF from HTML...');
 
-    // Generate PDF using Chromiumly
-    const chromiumly = new Chromiumly({
-      browserWsEndpoint: `wss://production-sfo.browserless.io?token=${Deno.env.get('BROWSERLESS_TOKEN')}`,
+    // Generate PDF using Puppeteer with Browserless
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://production-sfo.browserless.io?token=${Deno.env.get('BROWSERLESS_TOKEN')}`,
     });
 
-    const pdfBuffer = await chromiumly.pdf(hallTicketHTML, {
-      printBackground: true,
+    const page = await browser.newPage();
+    await page.setContent(hallTicketHTML, { waitUntil: 'networkidle0' });
+    
+    const pdfBuffer = await page.pdf({
       format: 'A4',
+      printBackground: true,
       margin: {
         top: '0',
         right: '0',
@@ -244,6 +247,8 @@ serve(async (req) => {
         left: '0',
       },
     });
+
+    await browser.close();
 
     console.log('PDF generated, uploading to storage...');
 
