@@ -134,48 +134,115 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
     }
   };
 
-  const handlePhonePePayment = async () => {
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayPayment = async () => {
     setIsProcessing(true);
     
     try {
-      console.log('Initiating PhonePe payment...');
+      console.log('Initiating Razorpay payment...');
       
-      // Save form data to session storage for later use after redirect
+      // Load Razorpay script
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Failed to load payment gateway. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Save form data to session storage
       sessionStorage.setItem('registrationFormData', JSON.stringify(formData));
       if (appliedCoupon) {
         sessionStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
       }
       
-      const { data, error } = await supabase.functions.invoke('phonepe-payment', {
+      const { data, error } = await supabase.functions.invoke('razorpay-create-order', {
         body: {
           amount: finalAmount,
-          customerName: formData?.studentName || 'Student',
-          customerPhone: formData?.phoneNumber || '9999999999',
-          customerEmail: formData?.email || undefined,
-          registrationId: `REG${Date.now()}`,
-          couponCode: appliedCoupon?.code || null,
+          studentName: formData?.studentName || 'Student',
+          mobileNumber: formData?.phoneNumber || '9999999999',
+          email: formData?.email || '',
           discountAmount: discountAmount,
-          originalAmount: baseAmount
+          couponCode: appliedCoupon?.code || null,
         }
       });
 
       if (error) {
-        console.error('Payment initiation error:', error);
-        throw new Error(error.message || 'Failed to initiate payment');
+        console.error('Order creation error:', error);
+        throw new Error(error.message || 'Failed to create order');
       }
 
-      console.log('PhonePe payment response:', data);
+      console.log('Razorpay order response:', data);
 
-      if (data?.success && data?.paymentUrl) {
-        toast.success('Redirecting to PhonePe payment gateway...');
-        // Redirect to PhonePe payment page
-        setTimeout(() => {
-          window.location.href = data.paymentUrl;
-        }, 1000);
-      } else {
-        throw new Error('Payment URL not received');
+      if (!data?.success || !data?.orderId) {
+        throw new Error(data?.error || 'Failed to create order');
       }
 
+      // Initialize Razorpay checkout
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "MEGA SPARK EXAM",
+        description: "Registration Fee",
+        order_id: data.orderId,
+        prefill: {
+          name: formData?.studentName || 'Student',
+          contact: formData?.phoneNumber || '9999999999',
+          email: formData?.email || '',
+        },
+        theme: {
+          color: "#8B5CF6",
+        },
+        handler: async function (response: any) {
+          console.log("Payment successful:", response);
+          
+          try {
+            // Verify payment
+            const { data: verifyData, error: verifyError } = await supabase.functions.invoke("razorpay-verify", {
+              body: {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+            });
+
+            if (verifyError || !verifyData?.verified) {
+              console.error("Payment verification failed:", verifyError);
+              toast.error("Payment verification failed");
+              setIsProcessing(false);
+              return;
+            }
+
+            toast.success("Payment successful!");
+            
+            // Call onPaymentComplete with order ID
+            await onPaymentComplete(response.razorpay_order_id);
+          } catch (err: any) {
+            console.error("Payment completion error:", err);
+            toast.error("Failed to complete registration");
+            setIsProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("Payment cancelled by user");
+            toast.error("Payment cancelled");
+            setIsProcessing(false);
+          },
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
     } catch (error: any) {
       console.error('Payment error:', error);
       toast.error('Payment failed', {
@@ -274,7 +341,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           </Button>
         ) : (
           <Button
-            onClick={handlePhonePePayment}
+            onClick={handleRazorpayPayment}
             disabled={isProcessing}
             className="w-full h-auto py-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:opacity-90 text-white text-xl font-bold shadow-lg"
           >
@@ -286,14 +353,14 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
             ) : (
               <div className="flex items-center gap-3">
                 <Wallet className="h-8 w-8" />
-                <span>Pay ₹{finalAmount.toFixed(2)} with PhonePe</span>
+                <span>Pay ₹{finalAmount.toFixed(2)} with Razorpay</span>
               </div>
             )}
           </Button>
         )}
 
         <p className="text-center text-sm text-muted-foreground">
-          {finalAmount === 0 ? 'Complete your free registration' : 'Secure payment powered by PhonePe'}
+          {finalAmount === 0 ? 'Complete your free registration' : 'Secure payment powered by Razorpay'}
         </p>
       </div>
 
@@ -305,14 +372,14 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           </div>
           <div className="flex-1 text-sm text-muted-foreground">
             <p className="font-semibold text-foreground mb-1">Secure Payment</p>
-            <p>Your payment is processed securely through PhonePe. Registration will be confirmed immediately after successful payment.</p>
+            <p>Your payment is processed securely through Razorpay. Registration will be confirmed immediately after successful payment.</p>
           </div>
         </div>
       </Card>
 
       {/* Accepted Payment Methods */}
       <Card className="p-4 border-accent/20">
-        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via PhonePe:</h4>
+        <h4 className="font-semibold text-sm mb-3 text-foreground">Accepted Payment Methods via Razorpay:</h4>
         <div className="flex flex-wrap gap-3 items-center justify-center">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Wallet className="h-4 w-4 text-blue-500" />
