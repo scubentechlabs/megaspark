@@ -1,7 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -227,29 +226,32 @@ serve(async (req) => {
 </html>
     `;
 
-    console.log('Generating PDF from HTML...');
+    console.log('Converting HTML to PDF using API...');
 
-    // Generate PDF using Puppeteer with Browserless
-    const browser = await puppeteer.connect({
-      browserWSEndpoint: `wss://production-sfo.browserless.io?token=${Deno.env.get('BROWSERLESS_TOKEN')}`,
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(hallTicketHTML, { waitUntil: 'networkidle0' });
-    
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '0',
-        right: '0',
-        bottom: '0',
-        left: '0',
+    // Use HTML2PDF API service
+    const pdfResponse = await fetch('https://api.html2pdf.app/v1/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        html: hallTicketHTML,
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '0',
+          right: '0',
+          bottom: '0',
+          left: '0',
+        },
+      }),
     });
 
-    await browser.close();
+    if (!pdfResponse.ok) {
+      throw new Error(`PDF generation failed: ${pdfResponse.statusText}`);
+    }
 
+    const pdfBuffer = await pdfResponse.arrayBuffer();
     console.log('PDF generated, uploading to storage...');
 
     // Upload PDF to Supabase Storage
