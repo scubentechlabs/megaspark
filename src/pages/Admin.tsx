@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import {
   SidebarProvider,
@@ -111,6 +111,38 @@ export default function Admin() {
       toast({
         title: "Error",
         description: "Failed to logout",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendHallTicket = async (registrationId: string) => {
+    try {
+      toast({
+        title: "Sending...",
+        description: "Generating and sending hall ticket via WhatsApp",
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast({
+          title: "Success",
+          description: "Hall ticket sent successfully via WhatsApp",
+        });
+        fetchRegistrations();
+      } else {
+        throw new Error(data?.error || 'Failed to send hall ticket');
+      }
+    } catch (error: any) {
+      console.error("Error sending hall ticket:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send hall ticket",
         variant: "destructive",
       });
     }
@@ -699,6 +731,15 @@ export default function Admin() {
                                   >
                                     <Download className="h-4 w-4" />
                                     Hall Ticket
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() => handleSendHallTicket(reg.id)}
+                                    className="gap-2"
+                                  >
+                                    <Send className="h-4 w-4" />
+                                    Send on WhatsApp
                                   </Button>
                                 </div>
                               </TableCell>
