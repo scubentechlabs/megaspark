@@ -191,39 +191,19 @@ export default function UserManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
 
-      // Create auth user with admin API
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.email.trim(),
-        password: formData.password,
-        email_confirm: true,
+      // Call edge function to create user
+      const { data, error } = await supabase.functions.invoke('create-admin-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          phone: formData.phone,
+          role: formData.role,
+        },
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("Failed to create user");
-
-      // Create admin_users record
-      const { error: adminUserError } = await supabase
-        .from("admin_users")
-        .insert({
-          user_id: authData.user.id,
-          full_name: formData.fullName.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim() || null,
-          created_by: session.user.id,
-        });
-
-      if (adminUserError) throw adminUserError;
-
-      // Assign role
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({
-          user_id: authData.user.id,
-          role: formData.role,
-          created_by: session.user.id,
-        });
-
-      if (roleError) throw roleError;
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Failed to create user');
 
       toast({
         title: "Success",
@@ -258,17 +238,12 @@ export default function UserManagement() {
     }
 
     try {
-      // Delete from admin_users (cascade will handle user_roles)
-      const { error: deleteError } = await supabase
-        .from("admin_users")
-        .delete()
-        .eq("user_id", userId);
+      const { data, error } = await supabase.functions.invoke('delete-admin-user', {
+        body: { userId },
+      });
 
-      if (deleteError) throw deleteError;
-
-      // Delete auth user
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-      if (authError) throw authError;
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || 'Failed to delete user');
 
       toast({
         title: "Success",

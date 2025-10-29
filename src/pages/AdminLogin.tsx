@@ -52,39 +52,59 @@ export default function AdminLogin() {
       if (error) throw error;
 
       if (data.session) {
-        // Get IP and location info (basic implementation)
-        let ipAddress = null;
+        // Get IP and location info with fallback
+        let ipAddress = 'Unknown';
         let city = null;
         let country = null;
 
         try {
+          // Try to get IP
           const ipResponse = await fetch('https://api.ipify.org?format=json');
-          const ipData = await ipResponse.json();
-          ipAddress = ipData.ip;
+          if (ipResponse.ok) {
+            const ipData = await ipResponse.json();
+            ipAddress = ipData.ip;
 
-          // Get location from IP
-          const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`);
-          const locationData = await locationResponse.json();
-          city = locationData.city;
-          country = locationData.country_name;
+            // Try to get location from IP (with timeout)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            
+            try {
+              const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`, {
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+              
+              if (locationResponse.ok) {
+                const locationData = await locationResponse.json();
+                city = locationData.city;
+                country = locationData.country_name;
+              }
+            } catch (locErr) {
+              console.log('Could not fetch location:', locErr);
+            }
+          }
         } catch (err) {
-          console.log('Could not fetch location:', err);
+          console.log('Could not fetch IP:', err);
         }
 
-        // Create admin session record
-        const { error: sessionError } = await supabase
-          .from('admin_sessions')
-          .insert({
-            user_id: data.session.user.id,
-            user_email: email,
-            ip_address: ipAddress,
-            user_agent: navigator.userAgent,
-            city: city,
-            country: country,
-          });
+        // Create admin session record - don't block login if this fails
+        try {
+          const { error: sessionError } = await supabase
+            .from('admin_sessions')
+            .insert({
+              user_id: data.session.user.id,
+              user_email: email,
+              ip_address: ipAddress,
+              user_agent: navigator.userAgent,
+              city: city,
+              country: country,
+            });
 
-        if (sessionError) {
-          console.error('Error creating session record:', sessionError);
+          if (sessionError) {
+            console.error('Error creating session record:', sessionError);
+          }
+        } catch (sessionErr) {
+          console.error('Session tracking failed:', sessionErr);
         }
 
         toast({
