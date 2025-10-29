@@ -79,6 +79,20 @@ serve(async (req) => {
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
+      // Get registration number from database to use as filename
+      let registrationNumber = 'Hall-Ticket';
+      if (registrationId) {
+        const { data: regData } = await supabase
+          .from('registrations')
+          .select('registration_number')
+          .eq('id', registrationId)
+          .single();
+        
+        if (regData?.registration_number) {
+          registrationNumber = regData.registration_number;
+        }
+      }
+      
       // Send hall ticket template with document using OfficialWA format
       apiPayload = {
         to: formattedPhone,
@@ -97,7 +111,8 @@ serve(async (req) => {
                 {
                   type: "document",
                   document: {
-                    link: messageBody
+                    link: messageBody,
+                    filename: `${registrationNumber}.pdf`
                   }
                 }
               ]
