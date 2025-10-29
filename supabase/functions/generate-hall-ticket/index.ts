@@ -259,7 +259,7 @@ serve(async (req) => {
     });
 
     // Fetch and embed poster image with safe scaling and fallbacks
-    yPosition -= 30;
+    yPosition -= 60;
     try {
       const tryDownload = async (path: string) => {
         const res = await supabase.storage.from('hall-tickets').download(path);
