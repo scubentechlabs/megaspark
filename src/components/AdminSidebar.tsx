@@ -28,6 +28,7 @@ export function AdminSidebar() {
     { title: "Payments", icon: CreditCard, path: "/admin/payments" },
     { title: "WhatsApp", icon: MessageSquare, path: "/admin/whatsapp" },
     { title: "Newsletter", icon: Mail, path: "/admin/newsletter" },
+    { title: "Upload Poster", icon: FileText, path: "/upload-poster" },
     { title: "Reports", icon: FileText, path: "/admin/reports" },
     { title: "Settings", icon: Settings, path: "/admin/settings" },
   ];
