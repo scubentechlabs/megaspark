@@ -287,7 +287,7 @@ serve(async (req) => {
         const drawHeight = posterImage.height * scale;
 
         // Ensure there is room above the footer
-        const minY = 120;
+        const minY = 95;
         const targetY = Math.max(minY, yPosition - drawHeight);
 
         page.drawImage(posterImage, {
