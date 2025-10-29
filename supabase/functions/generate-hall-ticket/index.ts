@@ -176,8 +176,7 @@ serve(async (req) => {
       yPosition -= 25;
     }
     
-    drawInfoRow('Mobile Number', registration.mobile_number, yPosition);
-    yPosition -= 40;
+    yPosition -= 15;
 
     // Exam Pattern Box
     page.drawRectangle({
