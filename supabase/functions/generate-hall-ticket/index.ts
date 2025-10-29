@@ -258,7 +258,7 @@ serve(async (req) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    yPosition -= 75;
+    yPosition -= 100;
 
     // Fetch and embed poster image with safe scaling and fallbacks
     try {
