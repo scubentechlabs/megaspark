@@ -259,28 +259,48 @@ serve(async (req) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
-    // Fetch and embed poster image
+    // Fetch and embed poster image with safe scaling and fallbacks
     yPosition -= 30;
     try {
-      // Try to fetch poster from storage bucket
-      const { data: posterData } = await supabase.storage
-        .from('hall-tickets')
-        .download('poster.jpg');
-      
-      if (posterData) {
-        const posterBytes = await posterData.arrayBuffer();
+      const tryDownload = async (path: string) => {
+        const res = await supabase.storage.from('hall-tickets').download(path);
+        return res.data || null;
+      };
+
+      let posterBlob = await tryDownload('poster.jpg');
+      if (!posterBlob) {
+        posterBlob = await tryDownload('hall-ticket-poster.jpg');
+      }
+
+      if (posterBlob) {
+        const posterBytes = await posterBlob.arrayBuffer();
         const posterImage = await pdfDoc.embedJpg(posterBytes);
-        const posterDims = posterImage.scale(0.35);
-        
+
+        // Fit within page margins
+        const maxWidth = width - 100;
+        const maxHeight = 300;
+        const scaleX = maxWidth / posterImage.width;
+        const scaleY = maxHeight / posterImage.height;
+        const scale = Math.min(scaleX, scaleY, 1);
+
+        const drawWidth = posterImage.width * scale;
+        const drawHeight = posterImage.height * scale;
+
+        // Ensure there is room above the footer
+        const minY = 120;
+        const targetY = Math.max(minY, yPosition - drawHeight);
+
         page.drawImage(posterImage, {
-          x: (width - posterDims.width) / 2,
-          y: yPosition - posterDims.height,
-          width: posterDims.width,
-          height: posterDims.height,
+          x: (width - drawWidth) / 2,
+          y: targetY,
+          width: drawWidth,
+          height: drawHeight,
         });
-        yPosition -= posterDims.height + 20;
+
+        yPosition = targetY - 20;
+        console.log('Poster embedded:', { drawWidth, drawHeight, targetY });
       } else {
-        console.log('Poster image not found in storage');
+        console.log('Poster image not found in storage (poster.jpg or hall-ticket-poster.jpg)');
         yPosition -= 20;
       }
     } catch (error) {
