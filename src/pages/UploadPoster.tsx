@@ -3,17 +3,29 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Upload, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { Upload, Image as ImageIcon, RefreshCw, Trash2 } from 'lucide-react';
 import { AdminSidebar } from "@/components/AdminSidebar";
 import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const UploadPoster = () => {
   const [uploading, setUploading] = useState(false);
   const [posterUrl, setPosterUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const uploadPosterFromPublic = async () => {
     setUploading(true);
@@ -62,6 +74,42 @@ const UploadPoster = () => {
     }
   };
 
+  const deleteOldPDFs = async () => {
+    setDeleting(true);
+    try {
+      // List all files in the hall-tickets bucket
+      const { data: files, error: listError } = await supabase.storage
+        .from('hall-tickets')
+        .list();
+
+      if (listError) throw listError;
+
+      // Filter to get only PDF files (not poster.jpg)
+      const pdfFiles = files?.filter(file => 
+        file.name.endsWith('.pdf')
+      ) || [];
+
+      if (pdfFiles.length === 0) {
+        toast.info('No PDF files found to delete');
+        return;
+      }
+
+      // Delete all PDF files
+      const filePaths = pdfFiles.map(file => file.name);
+      const { error: deleteError } = await supabase.storage
+        .from('hall-tickets')
+        .remove(filePaths);
+
+      if (deleteError) throw deleteError;
+
+      toast.success(`Successfully deleted ${pdfFiles.length} PDF file(s)`);
+    } catch (error: any) {
+      toast.error('Failed to delete PDFs: ' + error.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -102,6 +150,34 @@ const UploadPoster = () => {
                     <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                     {loading ? 'Loading...' : 'View Current Poster'}
                   </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive"
+                        disabled={deleting}
+                        className="gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        {deleting ? 'Deleting...' : 'Delete All PDFs'}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete all generated hall ticket PDFs from the storage bucket. 
+                          The poster image will not be deleted. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={deleteOldPDFs} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Delete All PDFs
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
 
                 {posterUrl && (
