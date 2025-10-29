@@ -20,6 +20,7 @@ import WhatsAppManagement from "./pages/WhatsAppManagement";
 import NewsletterManagement from "./pages/NewsletterManagement";
 import NotFound from "./pages/NotFound";
 import UploadPoster from "./pages/UploadPoster";
+import ActiveSessions from "./pages/ActiveSessions";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/active-sessions" element={<ActiveSessions />} />
         <Route path="/admin/coupons" element={<Coupons />} />
         <Route path="/admin/whatsapp" element={<WhatsAppManagement />} />
         <Route path="/admin/newsletter" element={<NewsletterManagement />} />

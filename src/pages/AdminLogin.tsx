@@ -52,6 +52,41 @@ export default function AdminLogin() {
       if (error) throw error;
 
       if (data.session) {
+        // Get IP and location info (basic implementation)
+        let ipAddress = null;
+        let city = null;
+        let country = null;
+
+        try {
+          const ipResponse = await fetch('https://api.ipify.org?format=json');
+          const ipData = await ipResponse.json();
+          ipAddress = ipData.ip;
+
+          // Get location from IP
+          const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`);
+          const locationData = await locationResponse.json();
+          city = locationData.city;
+          country = locationData.country_name;
+        } catch (err) {
+          console.log('Could not fetch location:', err);
+        }
+
+        // Create admin session record
+        const { error: sessionError } = await supabase
+          .from('admin_sessions')
+          .insert({
+            user_id: data.session.user.id,
+            user_email: email,
+            ip_address: ipAddress,
+            user_agent: navigator.userAgent,
+            city: city,
+            country: country,
+          });
+
+        if (sessionError) {
+          console.error('Error creating session record:', sessionError);
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to the admin panel",

@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_sessions: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          is_active: boolean
+          last_activity: string
+          logged_out_by: string | null
+          login_time: string
+          logout_time: string | null
+          updated_at: string
+          user_agent: string | null
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          last_activity?: string
+          logged_out_by?: string | null
+          login_time?: string
+          logout_time?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_email: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          last_activity?: string
+          logged_out_by?: string | null
+          login_time?: string
+          logout_time?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           code: string
