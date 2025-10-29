@@ -278,7 +278,7 @@ serve(async (req) => {
 
         // Fit within page margins
         const maxWidth = width - 100;
-        const maxHeight = 250;
+        const maxHeight = 180;
         const scaleX = maxWidth / posterImage.width;
         const scaleY = maxHeight / posterImage.height;
         const scale = Math.min(scaleX, scaleY, 1);
