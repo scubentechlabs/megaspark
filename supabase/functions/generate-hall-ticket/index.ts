@@ -258,8 +258,9 @@ serve(async (req) => {
       color: rgb(0.2, 0.2, 0.2),
     });
 
+    yPosition -= 80;
+
     // Fetch and embed poster image with safe scaling and fallbacks
-    yPosition -= 60;
     try {
       const tryDownload = async (path: string) => {
         const res = await supabase.storage.from('hall-tickets').download(path);
@@ -277,7 +278,7 @@ serve(async (req) => {
 
         // Fit within page margins
         const maxWidth = width - 100;
-        const maxHeight = 300;
+        const maxHeight = 250;
         const scaleX = maxWidth / posterImage.width;
         const scaleY = maxHeight / posterImage.height;
         const scale = Math.min(scaleX, scaleY, 1);
@@ -296,15 +297,13 @@ serve(async (req) => {
           height: drawHeight,
         });
 
-        yPosition = targetY - 20;
-        console.log('Poster embedded:', { drawWidth, drawHeight, targetY });
+        yPosition = targetY - 10;
+        console.log('Poster embedded after Notes section:', { drawWidth, drawHeight, targetY });
       } else {
         console.log('Poster image not found in storage (poster.jpg or hall-ticket-poster.jpg)');
-        yPosition -= 20;
       }
     } catch (error) {
       console.log('Could not load poster image:', error);
-      yPosition -= 20;
     }
 
     // Footer
