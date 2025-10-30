@@ -27,6 +27,11 @@ import jeeMains2025 from "@/assets/toppers/jee-mains-2025.jpg";
 import chiefMinisterVisit from "@/assets/toppers/chief-minister-visit.jpg";
 import aimFocus from "@/assets/toppers/aim-focus.jpg";
 import neet2025Rank from "@/assets/toppers/neet-2025-rank.jpg";
+import sandipThakkar from "@/assets/toppers/sandip-thakkar.webp";
+import shikhaPatel2 from "@/assets/toppers/shikha-patel-2.webp";
+import subhashMalviya2 from "@/assets/toppers/subhash-malviya-2.webp";
+import jadhavVarad2 from "@/assets/toppers/jadhav-varad-2.webp";
+import yugKhokhariya2 from "@/assets/toppers/yug-khokhariya-2.webp";
 
 const toppersData = [
   { image: dhruvPansuriya, alt: "Dhruv Pansuriya - AIR 50, IIT Guwahati" },
@@ -49,6 +54,11 @@ const toppersData = [
   { image: chiefMinisterVisit, alt: "Chief Minister Visit - Congratulations" },
   { image: aimFocus, alt: "Gujarat #1 & AIR 6 Achievement" },
   { image: neet2025Rank, alt: "NEET 2025 - First Rank Achievement" },
+  { image: sandipThakkar, alt: "Sandip Thakkar - BJ Medical, NEET 701/720" },
+  { image: shikhaPatel2, alt: "Shikha Patel - BJ Medical, NEET 685/720" },
+  { image: subhashMalviya2, alt: "Subhash Malviya - AIR 3, IIT Delhi" },
+  { image: jadhavVarad2, alt: "Jadhav Varad - AIR 2, AIIMS Delhi, NEET 700/720" },
+  { image: yugKhokhariya2, alt: "Yug Khokhariya - AIR 8, AIIMS Delhi, GUJCET 120/120" },
 ];
 
 export const Toppers = () => {
