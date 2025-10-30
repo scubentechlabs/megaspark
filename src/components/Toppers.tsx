@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 import dhruvPansuriya from "@/assets/toppers/dhruv-pansuriya.webp";
 import harshVavadiya from "@/assets/toppers/harsh-vavadiya.webp";
@@ -77,6 +78,11 @@ export const Toppers = () => {
             align: "start",
             loop: true,
           }}
+          plugins={[
+            Autoplay({
+              delay: 3000,
+            }),
+          ]}
           className="w-full max-w-6xl mx-auto"
         >
           <CarouselContent className="-ml-2 md:-ml-4">
