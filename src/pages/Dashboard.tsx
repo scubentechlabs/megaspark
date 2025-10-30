@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { formatMedium } from "@/lib/formatters";
 import {
   BarChart,
   Bar,
@@ -185,7 +186,7 @@ export default function Dashboard() {
   }));
 
   const mediumChartData = Object.entries(stats.registrationsByMedium).map(([key, value]) => ({
-    name: key === "gujarati" ? "Gujarati" : "English",
+    name: formatMedium(key),
     value: value,
   }));
 

@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
+import { formatMedium } from "@/lib/formatters";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -261,7 +262,7 @@ export default function Admin() {
             </tr>
             <tr>
               <td>Medium<br>માધ્યમ</td>
-              <td>${reg.medium === 'gujarati' ? 'ગુજરાતી (Gujarati)' : 'English (આંગ્લ)'}</td>
+              <td>${formatMedium(reg.medium)}</td>
             </tr>
             <tr>
               <td>School Name<br>શાળાનું નામ</td>
@@ -394,7 +395,7 @@ export default function Admin() {
       reg.previous_year_percentage || 'N/A',
       reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
       reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
-      reg.medium,
+      formatMedium(reg.medium),
       'PP Savani Center for excellence',
       new Date(reg.created_at).toLocaleDateString(),
     ]);
@@ -477,8 +478,8 @@ export default function Admin() {
                 <td>${reg.district || 'N/A'}</td>
                 <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.standard}</td>
-                <td>${reg.medium}</td>
-                <td>${reg.school_medium || 'N/A'}</td>
+                <td>${formatMedium(reg.medium)}</td>
+                <td>${formatMedium(reg.school_medium || '')}</td>
                 <td>${reg.previous_year_percentage || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
               </tr>
@@ -709,7 +710,7 @@ export default function Admin() {
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
-                              <TableCell className="capitalize">{reg.medium}</TableCell>
+                              <TableCell>{formatMedium(reg.medium)}</TableCell>
                               <TableCell>
                                 {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
                               </TableCell>

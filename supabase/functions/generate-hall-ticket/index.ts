@@ -152,7 +152,14 @@ serve(async (req) => {
     drawInfoRow('Standard', registration.standard, yPosition);
     yPosition -= 25;
     
-    drawInfoRow('Medium', registration.medium, yPosition);
+    const formatMedium = (medium: string): string => {
+      const mediumLower = medium?.toLowerCase() || '';
+      if (mediumLower === 'gujarati') return 'Gujarati';
+      if (mediumLower === 'english') return 'English Medium';
+      return medium;
+    };
+    
+    drawInfoRow('Medium', formatMedium(registration.medium), yPosition);
     yPosition -= 25;
     
     drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);

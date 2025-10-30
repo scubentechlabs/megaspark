@@ -13,6 +13,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatMedium } from "@/lib/formatters";
 
 interface Registration {
   id: string;
@@ -177,7 +178,7 @@ export default function Reports() {
       reg.previous_year_percentage || 'N/A',
       reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
       reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
-      reg.medium,
+      formatMedium(reg.medium),
       reg.exam_center,
       new Date(reg.created_at).toLocaleDateString(),
     ]);
@@ -265,7 +266,7 @@ export default function Reports() {
                 <td>${reg.mobile_number}</td>
                 <td>${reg.email || 'N/A'}</td>
                 <td>${reg.standard}</td>
-                <td>${reg.medium}</td>
+                <td>${formatMedium(reg.medium)}</td>
                 <td>${reg.district || 'N/A'}</td>
                 <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
@@ -516,7 +517,7 @@ export default function Reports() {
                         <TableCell>{reg.student_name}</TableCell>
                         <TableCell>{reg.mobile_number}</TableCell>
                         <TableCell>{reg.standard}</TableCell>
-                        <TableCell className="capitalize">{reg.medium}</TableCell>
+                        <TableCell>{formatMedium(reg.medium)}</TableCell>
                         <TableCell className="max-w-[200px] truncate">{reg.school_name || 'N/A'}</TableCell>
                         <TableCell>
                           {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}

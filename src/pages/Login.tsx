@@ -9,6 +9,7 @@ import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
+import { formatMedium } from "@/lib/formatters";
 
 interface Registration {
   id: string;
@@ -192,7 +193,7 @@ export default function Login() {
     </tr>
     <tr>
       <td>Medium :</td>
-      <td><strong>${registration.medium === 'english' ? 'English' : 'ગુજરાતી (Gujarati)'}</strong></td>
+      <td><strong>${formatMedium(registration.medium)}</strong></td>
     </tr>
     <tr>
       <td>Exam Date :</td>
@@ -328,7 +329,7 @@ export default function Login() {
                             Reg. No: <span className="font-semibold text-primary">{registration.registration_number}</span>
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Class {registration.standard} | {registration.medium} Medium
+                            Class {registration.standard} | {formatMedium(registration.medium)}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Center: {registration.exam_center}
