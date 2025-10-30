@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NewHeader } from "@/components/NewHeader";
 import { NewHero } from "@/components/NewHero";
 import { BenefitsSection } from "@/components/BenefitsSection";
+import { ResultsPoster } from "@/components/ResultsPoster";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
@@ -46,6 +47,7 @@ const Index = () => {
         document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
       }} />
       <BenefitsSection />
+      <ResultsPoster />
       <ExamDatesVenue />
       <EligibilityCriteria />
       <DownloadGuide />
