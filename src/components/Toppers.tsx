@@ -17,6 +17,16 @@ import malayShah from "@/assets/toppers/malay-shah.webp";
 import vanshDhanani from "@/assets/toppers/vansh-dhanani.webp";
 import yugKhokhariya from "@/assets/toppers/yug-khokhariya.jpg";
 import dhruvPansuriyaGujarati from "@/assets/toppers/dhruv-pansuriya-gujarati.jpg";
+import navneetAnghan2 from "@/assets/toppers/navneet-anghan-2.jpg";
+import shikhaPatel from "@/assets/toppers/shikha-patel.jpg";
+import subhashMalviya from "@/assets/toppers/subhash-malviya.jpg";
+import harshVavadiya2 from "@/assets/toppers/harsh-vavadiya-2.jpg";
+import jadhavVarad from "@/assets/toppers/jadhav-varad.jpg";
+import monilChandgadhiya2 from "@/assets/toppers/monil-chandgadhiya-2.jpg";
+import jeeMains2025 from "@/assets/toppers/jee-mains-2025.jpg";
+import chiefMinisterVisit from "@/assets/toppers/chief-minister-visit.jpg";
+import aimFocus from "@/assets/toppers/aim-focus.jpg";
+import neet2025Rank from "@/assets/toppers/neet-2025-rank.jpg";
 
 const toppersData = [
   { image: dhruvPansuriya, alt: "Dhruv Pansuriya - AIR 50, IIT Guwahati" },
@@ -29,6 +39,16 @@ const toppersData = [
   { image: vanshDhanani, alt: "Vansh Dhanani - Rank 3, CBSE Board Commerce" },
   { image: yugKhokhariya, alt: "Yug Khokhariya - AIR 8, AIIMS Delhi" },
   { image: dhruvPansuriyaGujarati, alt: "Dhruv Pansuriya - AIR 50, IIT Guwahati" },
+  { image: navneetAnghan2, alt: "Navneet Anghan - 1st Ranker, NEET 695/720" },
+  { image: shikhaPatel, alt: "Shikha Patel - NEET 685/720, BJ Medical" },
+  { image: subhashMalviya, alt: "Subhash Malviya - AIR 3, IIT Delhi" },
+  { image: harshVavadiya2, alt: "Harsh Vavadiya - AIR 26, IIT Ropar" },
+  { image: jadhavVarad, alt: "Jadhav Varad - AIR 2, AIIMS Delhi" },
+  { image: monilChandgadhiya2, alt: "Monil Chandgadhiya - AIR 11, IIT Dhanbad" },
+  { image: jeeMains2025, alt: "JEE Mains 2025 Results" },
+  { image: chiefMinisterVisit, alt: "Chief Minister Visit - Congratulations" },
+  { image: aimFocus, alt: "Gujarat #1 & AIR 6 Achievement" },
+  { image: neet2025Rank, alt: "NEET 2025 - First Rank Achievement" },
 ];
 
 export const Toppers = () => {
