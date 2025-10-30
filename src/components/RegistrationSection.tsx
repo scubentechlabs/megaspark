@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, User, Users, CreditCard } from "lucide-react";
+import { ChevronRight, ChevronLeft, User, Users, CheckCircle } from "lucide-react";
 import { StudentDetailsStep } from "./registration/StudentDetailsStep";
 import { ParentSchoolStep } from "./registration/ParentSchoolStep";
-import { PaymentStep } from "./registration/PaymentStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,13 +13,13 @@ export const RegistrationSection = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
-  const totalSteps = 3;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const totalSteps = 2;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
-    { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
-    { number: 3, title: "Payment", icon: CreditCard, description: "Complete registration" }
+    { number: 2, title: "School Info", icon: Users, description: "School and academic details" }
   ];
 
   const updateFormData = (updates: any) => {
@@ -110,7 +109,10 @@ export const RegistrationSection = () => {
     }
   };
 
-  const handlePaymentComplete = async (orderId: string) => {
+  const handleSubmit = async () => {
+    if (!validateStep()) return;
+    
+    setIsSubmitting(true);
     try {
       console.log('Starting registration save with data:', formData);
 
@@ -128,10 +130,10 @@ export const RegistrationSection = () => {
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
           preferred_exam_date: formData.preferredExamDate,
-          exam_date: formData.preferredExamDate, // Set exam_date for trigger
-          medium: formData.schoolMedium, // Use schoolMedium directly (lowercase)
+          exam_date: formData.preferredExamDate,
+          medium: formData.schoolMedium,
           exam_center: 'To be announced',
-          registration_number: '' // Trigger will override this with auto-generated number
+          registration_number: ''
         } as any)
         .select()
         .single();
@@ -143,30 +145,14 @@ export const RegistrationSection = () => {
 
       console.log('Registration saved successfully');
 
-      // Link payment to this registration to trigger registration number generation
-      const { error: updateError } = await supabase
-        .from('payments')
-        .update({ registration_id: (data as any).id })
-        .eq('order_id', orderId);
-
-      if (updateError) {
-        console.error('Payment update error:', updateError);
-      }
-
-      // Force registration update to trigger seat number generation
-      await supabase
-        .from('registrations')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', (data as any).id);
-
       toast.success('Registration Successful!', { description: 'Redirecting to confirmation page...' });
       
-      // Navigate immediately to success page
       navigate('/registration-success');
     } catch (err: any) {
       console.error('Registration save error:', err);
       toast.error('Could not save registration', { description: err.message || 'Please contact support.' });
-      throw err; // Re-throw to be caught by PaymentStep
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -192,9 +178,6 @@ export const RegistrationSection = () => {
             <CardTitle className="text-3xl font-bold text-center mb-2 text-primary">
               Registration Form
             </CardTitle>
-            <p className="text-center text-sm font-medium text-green-600 mb-3">
-              Use code FIRST1000 at checkout to get ₹50 off — enjoy free entry!
-            </p>
             <CardDescription className="text-center text-lg">
               {steps[currentStep - 1].description}
             </CardDescription>
@@ -246,23 +229,20 @@ export const RegistrationSection = () => {
               {currentStep === 2 && (
                 <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
               )}
-              {currentStep === 3 && (
-                <PaymentStep onPaymentComplete={handlePaymentComplete} formData={formData} />
-              )}
             </div>
 
-            {currentStep < 3 && (
-              <div className="flex justify-between mt-8 pt-6 border-t">
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  disabled={currentStep === 1}
-                  className="min-w-[140px] py-6 text-lg"
-                >
-                  <ChevronLeft className="mr-2 h-5 w-5" />
-                  Back
-                </Button>
+            <div className="flex justify-between mt-8 pt-6 border-t">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={currentStep === 1}
+                className="min-w-[140px] py-6 text-lg"
+              >
+                <ChevronLeft className="mr-2 h-5 w-5" />
+                Back
+              </Button>
 
+              {currentStep < totalSteps ? (
                 <Button 
                   onClick={handleNext} 
                   className="min-w-[140px] py-6 text-lg bg-accent hover:bg-accent/90"
@@ -270,8 +250,23 @@ export const RegistrationSection = () => {
                   Next
                   <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
-              </div>
-            )}
+              ) : (
+                <Button 
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="min-w-[180px] py-6 text-lg bg-primary hover:bg-primary/90"
+                >
+                  {isSubmitting ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <CheckCircle className="mr-2 h-5 w-5" />
+                      Confirm Registration
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
