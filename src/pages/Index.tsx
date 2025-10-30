@@ -24,8 +24,12 @@ const Index = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
-    // Open popup when website loads
-    setIsPopupOpen(true);
+    // Open popup after 10 seconds
+    const timer = setTimeout(() => {
+      setIsPopupOpen(true);
+    }, 10000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
