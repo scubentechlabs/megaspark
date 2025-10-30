@@ -5,7 +5,7 @@ import { BenefitsSection } from "@/components/BenefitsSection";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
 import { EligibilityCriteria } from "@/components/EligibilityCriteria";
 import { DownloadGuide } from "@/components/DownloadGuide";
-import { LimitedOffer } from "@/components/LimitedOffer";
+import { Toppers } from "@/components/Toppers";
 import { RegistrationSection } from "@/components/RegistrationSection";
 import { HelpBox } from "@/components/HelpBox";
 import { FinalCTA } from "@/components/FinalCTA";
@@ -50,7 +50,7 @@ const Index = () => {
       <EligibilityCriteria />
       <DownloadGuide />
       <RegistrationSection />
-      <LimitedOffer />
+      <Toppers />
       <HelpBox />
       <FinalCTA onRegisterClick={() => {
         document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
