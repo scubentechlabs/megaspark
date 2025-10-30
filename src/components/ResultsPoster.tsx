@@ -1,4 +1,4 @@
-import megaSparkPoster from "@/assets/mega-spark-results-poster.png";
+import megaSparkPoster from "@/assets/toppers/jee-mains-2025.jpg";
 
 export const ResultsPoster = () => {
   return (
