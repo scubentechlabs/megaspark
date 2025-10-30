@@ -1,10 +1,12 @@
+import megaSparkPoster from "@/assets/toppers/jee-mains-2025.jpg";
+
 export const ResultsPoster = () => {
   return (
     <section className="py-12 px-4 bg-background">
       <div className="container mx-auto max-w-7xl">
         <div className="w-full max-w-5xl mx-auto">
           <img 
-            src="user-uploads://Mega_Spark_web poster.png"
+            src={megaSparkPoster}
             alt="PP Savani CFE - JEE 2025 and NEET 2025 Results - Top Rankers"
             className="w-full h-auto rounded-lg shadow-lg"
           />
