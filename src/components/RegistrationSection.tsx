@@ -132,7 +132,7 @@ export const RegistrationSection = () => {
           preferred_exam_date: formData.preferredExamDate,
           exam_date: formData.preferredExamDate,
           medium: formData.schoolMedium,
-          exam_center: 'To be announced',
+          exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
           registration_number: ''
         } as any)
         .select()
@@ -286,7 +286,7 @@ export const RegistrationSection = () => {
             <Card className="p-6 hover:shadow-card transition-all">
               <div className="text-3xl font-bold text-primary mb-2">💯</div>
               <div className="font-semibold text-foreground mb-1">100% Genuine</div>
-              <div className="text-sm text-muted-foreground">Official P.P. Savani CFE registration</div>
+              <div className="text-sm text-muted-foreground">Official PP Savani Cfe registration</div>
             </Card>
           </div>
         </div>

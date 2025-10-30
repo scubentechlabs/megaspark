@@ -213,7 +213,7 @@ export default function Login() {
 
   <div class="exam-center">
     <h4>Exam Centre</h4>
-    <p>P P Savani Chaitanya Vidya Sankul<br>Mota Varachha-Abrama Road, Abrama, Kamrej,<br>Surat-394150. (Gujarat) India.</p>
+    <p>PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</p>
   </div>
 
   <div class="notes">

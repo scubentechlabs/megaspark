@@ -29,7 +29,7 @@ export const About = () => {
             <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-6 text-primary">
               Free <span className="text-accent">Scholarship</span>
               <br />
-              Provider By P.P. SAVANI CFE
+              Provider By PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Have the opportunity to go to school or college without thinking about the cost? 

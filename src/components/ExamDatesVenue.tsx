@@ -92,7 +92,7 @@ export const ExamDatesVenue = () => {
               <MapPin className="h-8 w-8 text-accent" />
               Exam Centre Location
             </h3>
-            <p className="text-muted-foreground">P.P. Savani CFE, Abrama, Surat, Gujarat</p>
+            <p className="text-muted-foreground">PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -104,9 +104,9 @@ export const ExamDatesVenue = () => {
                 className="w-full h-[300px] object-cover"
               />
               <CardContent className="p-6">
-                <h4 className="text-xl font-bold text-foreground mb-2">P.P. Savani CFE</h4>
+                <h4 className="text-xl font-bold text-foreground mb-2">PP Savani Cfe</h4>
                 <p className="text-sm text-muted-foreground">
-                  State-of-the-art facilities with air-conditioned examination halls and 
+                  Abrama Rd, Mota Varachha, Surat, Gujarat 394150 - State-of-the-art facilities with air-conditioned examination halls and 
                   comfortable seating arrangements for all candidates.
                 </p>
               </CardContent>
@@ -137,9 +137,9 @@ export const ExamDatesVenue = () => {
                   <div>
                     <h4 className="font-bold text-foreground mb-1">Click for Directions</h4>
                     <p className="text-sm text-muted-foreground">
-                      P.P. Savani CFE<br />
-                      Abrama, Surat<br />
-                      Gujarat, India
+                      PP Savani Cfe<br />
+                      Abrama Rd, Mota Varachha<br />
+                      Surat, Gujarat 394150
                     </p>
                   </div>
                 </div>

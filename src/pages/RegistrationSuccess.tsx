@@ -108,7 +108,7 @@ const RegistrationSuccess = () => {
           previous_year_percentage: formData.previousYearPercentage,
           preferred_exam_date: formData.preferredExamDate,
           exam_date: formData.preferredExamDate,
-          exam_center: 'To be announced',
+          exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
           registration_number: ''
         } as any)
         .select()

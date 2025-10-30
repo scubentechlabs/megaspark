@@ -314,7 +314,7 @@ export default function Admin() {
             </tr>
             <tr>
               <td>Exam Center<br>પરીક્ષા કેન્દ્ર</td>
-              <td>P P Savani Chaitanya Vidya Sankul<br>Mota Varachha-Abrama Road, Abrama, Kamrej,<br>Surat-394150. (Gujarat) India.</td>
+              <td>PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</td>
             </tr>
           </table>
 

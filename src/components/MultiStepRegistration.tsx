@@ -132,7 +132,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           preferred_exam_date: formData.preferredExamDate,
           exam_date: formData.preferredExamDate,
           medium: formData.schoolMedium,
-          exam_center: 'To be announced',
+          exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
           registration_number: ''
         } as any)
         .select()
