@@ -52,17 +52,13 @@ export const Toppers = () => {
             {toppersData.map((topper, index) => (
               <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
                 <Card className="border-2 border-primary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-card overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="flex justify-center">
-                      <div className="relative">
-                        <div className="w-48 h-48 overflow-hidden border-4 border-accent rounded-lg">
-                          <img 
-                            src={topper.image} 
-                            alt={topper.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
+                  <CardContent className="p-0">
+                    <div className="w-full aspect-square">
+                      <img 
+                        src={topper.image} 
+                        alt={topper.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </CardContent>
                 </Card>
