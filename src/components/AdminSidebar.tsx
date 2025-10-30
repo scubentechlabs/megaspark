@@ -27,7 +27,6 @@ export function AdminSidebar() {
     { title: "Active Sessions", icon: Activity, path: "/admin/active-sessions" },
     { title: "User Management", icon: UserCog, path: "/admin/user-management" },
     { title: "Coupons", icon: Tag, path: "/admin/coupons" },
-    { title: "Payments", icon: CreditCard, path: "/admin/payments" },
     { title: "WhatsApp", icon: MessageSquare, path: "/admin/whatsapp" },
     { title: "Newsletter", icon: Mail, path: "/admin/newsletter" },
     { title: "Upload Poster", icon: FileText, path: "/upload-poster" },

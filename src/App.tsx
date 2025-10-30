@@ -11,7 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Coupons from "./pages/Coupons";
-import PaymentSummary from "./pages/PaymentSummary";
+
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -44,7 +44,7 @@ const App = () => (
         <Route path="/admin/newsletter" element={<NewsletterManagement />} />
         <Route path="/admin/reports" element={<Reports />} />
         <Route path="/admin/settings" element={<Settings />} />
-          <Route path="/admin/payments" element={<PaymentSummary />} />
+          
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
