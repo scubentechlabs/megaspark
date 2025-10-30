@@ -55,7 +55,7 @@ export const Toppers = () => {
                   <CardContent className="p-6">
                     <div className="flex justify-center">
                       <div className="relative">
-                        <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-accent">
+                        <div className="w-48 h-48 overflow-hidden border-4 border-accent rounded-lg">
                           <img 
                             src={topper.image} 
                             alt={topper.name}
