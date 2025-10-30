@@ -332,7 +332,9 @@ export default function Login() {
                             Class {registration.standard} | {formatMedium(registration.medium)}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Center: {registration.exam_center}
+                            Center: {registration.exam_center === "To be announced" 
+                              ? "PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150" 
+                              : registration.exam_center}
                           </p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
