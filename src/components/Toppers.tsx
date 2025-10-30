@@ -7,27 +7,28 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+import dhruvPansuriya from "@/assets/toppers/dhruv-pansuriya.webp";
+import harshVavadiya from "@/assets/toppers/harsh-vavadiya.webp";
+import monilChandgadhiya from "@/assets/toppers/monil-chandgadhiya.webp";
+import navneetAnghan from "@/assets/toppers/navneet-anghan.webp";
+import neelLathiya from "@/assets/toppers/neel-lathiya.webp";
+import dhruvanshuNakrani from "@/assets/toppers/dhruvanshu-nakrani.webp";
+import malayShah from "@/assets/toppers/malay-shah.webp";
+import vanshDhanani from "@/assets/toppers/vansh-dhanani.webp";
+import yugKhokhariya from "@/assets/toppers/yug-khokhariya.jpg";
+import dhruvPansuriyaGujarati from "@/assets/toppers/dhruv-pansuriya-gujarati.jpg";
+
 const toppersData = [
-  {
-    rank: "AIR 1",
-    name: "Sandip Thakkar",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-  },
-  {
-    rank: "AIR 2",
-    name: "Jadhav Varad",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-  },
-  {
-    rank: "AIR 30",
-    name: "Neel Lathiya",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop",
-  },
-  {
-    rank: "AIR 26",
-    name: "Harsh Vavadiya",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-  },
+  { image: dhruvPansuriya, alt: "Dhruv Pansuriya - AIR 50, IIT Guwahati" },
+  { image: harshVavadiya, alt: "Harsh Vavadiya - AIR 26, IIT Ropar" },
+  { image: monilChandgadhiya, alt: "Monil Chandgadhiya - AIR 11, IIT Dhanbad" },
+  { image: navneetAnghan, alt: "Navneet Anghan - Vardhman Delhi, NEET 695/720" },
+  { image: neelLathiya, alt: "Neel Lathiya - AIR 30, AIIMS Delhi" },
+  { image: dhruvanshuNakrani, alt: "Dhruvanshu Nakrani - 1st with 95% CBSE Board" },
+  { image: malayShah, alt: "Malay Shah - 100/100 Accountancy" },
+  { image: vanshDhanani, alt: "Vansh Dhanani - Rank 3, CBSE Board Commerce" },
+  { image: yugKhokhariya, alt: "Yug Khokhariya - AIR 8, AIIMS Delhi" },
+  { image: dhruvPansuriyaGujarati, alt: "Dhruv Pansuriya - AIR 50, IIT Guwahati" },
 ];
 
 export const Toppers = () => {
@@ -56,7 +57,7 @@ export const Toppers = () => {
                     <div className="w-full aspect-square">
                       <img 
                         src={topper.image} 
-                        alt={topper.name}
+                        alt={topper.alt}
                         className="w-full h-full object-cover"
                       />
                     </div>
