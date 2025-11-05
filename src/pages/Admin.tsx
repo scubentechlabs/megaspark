@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium } from "@/lib/formatters";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -59,6 +60,8 @@ export default function Admin() {
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editedRegNumber, setEditedRegNumber] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(50);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -161,6 +164,7 @@ export default function Admin() {
           (reg.district && reg.district.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredRegistrations(filtered);
+      setCurrentPage(1); // Reset to first page on search
     } else {
       setFilteredRegistrations(registrations);
     }
@@ -704,7 +708,9 @@ export default function Admin() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredRegistrations.map((reg) => (
+                          {filteredRegistrations
+                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                            .map((reg) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
                               <TableCell className="font-medium">{reg.registration_number}</TableCell>
                               <TableCell>{reg.student_name}</TableCell>
@@ -751,6 +757,76 @@ export default function Admin() {
                     </div>
                   )}
                 </CardContent>
+                {!isLoading && filteredRegistrations.length > 0 && (
+                  <div className="p-4 border-t flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredRegistrations.length)} of {filteredRegistrations.length} registrations
+                    </p>
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="gap-1"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                          </Button>
+                        </PaginationItem>
+                        {Array.from({ length: Math.ceil(filteredRegistrations.length / itemsPerPage) }, (_, i) => i + 1)
+                          .filter(page => {
+                            const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage);
+                            if (totalPages <= 7) return true;
+                            if (page === 1 || page === totalPages) return true;
+                            if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                            return false;
+                          })
+                          .map((page, index, array) => {
+                            if (index > 0 && array[index - 1] !== page - 1) {
+                              return [
+                                <PaginationItem key={`ellipsis-${page}`}>
+                                  <span className="px-2">...</span>
+                                </PaginationItem>,
+                                <PaginationItem key={page}>
+                                  <PaginationLink
+                                    onClick={() => setCurrentPage(page)}
+                                    isActive={currentPage === page}
+                                  >
+                                    {page}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              ];
+                            }
+                            return (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={currentPage === page}
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          })}
+                        <PaginationItem>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredRegistrations.length / itemsPerPage), p + 1))}
+                            disabled={currentPage === Math.ceil(filteredRegistrations.length / itemsPerPage)}
+                            className="gap-1"
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </Card>
             </div>
           </main>
