@@ -74,19 +74,35 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // Fetch registrations
+      // Fetch count for registrations
+      const { count: regCount, error: regCountError } = await supabase
+        .from("registrations")
+        .select("*", { count: 'exact', head: true });
+
+      if (regCountError) throw regCountError;
+
+      // Fetch all registrations - remove default 1000 limit
       const { data: registrations, error: regError } = await supabase
         .from("registrations")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(0, regCount || 100000);
 
       if (regError) throw regError;
 
-      // Fetch payments
+      // Fetch count for payments
+      const { count: payCount, error: payCountError } = await supabase
+        .from("payments")
+        .select("*", { count: 'exact', head: true });
+
+      if (payCountError) throw payCountError;
+
+      // Fetch all payments - remove default 1000 limit
       const { data: payments, error: payError } = await supabase
         .from("payments")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(0, payCount || 100000);
 
       if (payError) throw payError;
 
@@ -160,7 +176,7 @@ export default function Dashboard() {
         registrationTrendData,
       });
 
-      toast.success("Dashboard data loaded");
+      toast.success(`Dashboard refreshed - ${registrations?.length || 0} total registrations`);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to load dashboard data");
