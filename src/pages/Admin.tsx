@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium } from "@/lib/formatters";
+import { fetchAll } from "@/lib/fetchAll";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import {
   SidebarProvider,
@@ -174,33 +175,17 @@ export default function Admin() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      // Fetch count first to get exact number of records
-      const { count, error: countError } = await supabase
-        .from("registrations")
-        .select("*", { count: 'exact', head: true });
-
-      if (countError) throw countError;
-
-      console.log(`Total registrations in database: ${count}`);
-
-      // Fetch ALL records without any limit
-      // Using a high range based on actual count to ensure we get everything
-      const actualCount = count || 0;
-      const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .range(0, actualCount > 0 ? actualCount - 1 : 0);
-
-      if (error) throw error;
-
-      console.log(`Fetched ${data?.length || 0} registrations from database`);
+      const data = await fetchAll<Registration>(
+        "registrations",
+        "*",
+        { column: "created_at", ascending: false }
+      );
 
       setRegistrations(data || []);
       setFilteredRegistrations(data || []);
       toast({
         title: "Data Loaded",
-        description: `Successfully loaded all ${data?.length || 0} registrations from database`,
+        description: `Loaded ${data?.length || 0} registrations`,
       });
     } catch (error) {
       console.error("Error fetching registrations:", error);

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatMedium } from "@/lib/formatters";
+import { fetchAll } from "@/lib/fetchAll";
 
 interface Registration {
   id: string;
@@ -71,21 +72,11 @@ export default function Reports() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      // Fetch count first
-      const { count, error: countError } = await supabase
-        .from("registrations")
-        .select("*", { count: 'exact', head: true });
-
-      if (countError) throw countError;
-
-      // Fetch all records - remove default 1000 limit
-      const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .range(0, count || 100000); // Fetch all records up to the count
-
-      if (error) throw error;
+      const data = await fetchAll<Registration>(
+        "registrations",
+        "*",
+        { column: "created_at", ascending: false }
+      );
 
       setRegistrations(data || []);
       toast({

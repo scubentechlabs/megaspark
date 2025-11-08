@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { formatMedium } from "@/lib/formatters";
+import { fetchAll } from "@/lib/fetchAll";
 import {
   BarChart,
   Bar,
@@ -74,21 +75,12 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // Fetch count for registrations
-      const { count: regCount, error: regCountError } = await supabase
-        .from("registrations")
-        .select("*", { count: 'exact', head: true });
-
-      if (regCountError) throw regCountError;
-
-      // Fetch all registrations - remove default 1000 limit
-      const { data: registrations, error: regError } = await supabase
-        .from("registrations")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .range(0, regCount || 100000);
-
-      if (regError) throw regError;
+      // Fetch all registrations using batched requests (bypass 1000 limit)
+      const registrations = await fetchAll<any>(
+        "registrations",
+        "*",
+        { column: "created_at", ascending: false }
+      );
 
       // Fetch count for payments
       const { count: payCount, error: payCountError } = await supabase
