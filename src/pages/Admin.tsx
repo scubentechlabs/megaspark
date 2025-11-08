@@ -174,27 +174,33 @@ export default function Admin() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      // Fetch count first
+      // Fetch count first to get exact number of records
       const { count, error: countError } = await supabase
         .from("registrations")
         .select("*", { count: 'exact', head: true });
 
       if (countError) throw countError;
 
-      // Fetch all records - remove default 1000 limit
+      console.log(`Total registrations in database: ${count}`);
+
+      // Fetch ALL records without any limit
+      // Using a high range based on actual count to ensure we get everything
+      const actualCount = count || 0;
       const { data, error } = await supabase
         .from("registrations")
         .select("*")
         .order("created_at", { ascending: false })
-        .range(0, count || 100000); // Fetch all records up to the count
+        .range(0, actualCount > 0 ? actualCount - 1 : 0);
 
       if (error) throw error;
+
+      console.log(`Fetched ${data?.length || 0} registrations from database`);
 
       setRegistrations(data || []);
       setFilteredRegistrations(data || []);
       toast({
-        title: "Data Refreshed",
-        description: `Loaded all ${data?.length || 0} registrations`,
+        title: "Data Loaded",
+        description: `Successfully loaded all ${data?.length || 0} registrations from database`,
       });
     } catch (error) {
       console.error("Error fetching registrations:", error);
