@@ -140,14 +140,6 @@ export const RegistrationSection = () => {
 
       if (error) {
         console.error('Database error:', error);
-        // Check for duplicate mobile number error
-        if (error.code === '23505' && error.message.includes('unique_mobile_number')) {
-          toast.error("Mobile Number Already Registered", {
-            description: "This mobile number is already registered. Each mobile number can only be used once."
-          });
-          setIsSubmitting(false);
-          return;
-        }
         throw error;
       }
 
