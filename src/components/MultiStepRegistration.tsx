@@ -18,6 +18,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mobileError, setMobileError] = useState<string>("");
   const totalSteps = 2;
   const progress = (currentStep / totalSteps) * 100;
 
@@ -28,6 +29,10 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
+    // Clear mobile error when user changes the phone number
+    if (updates.phoneNumber !== undefined) {
+      setMobileError("");
+    }
   };
 
   const validateStep = () => {
@@ -95,11 +100,36 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     return true;
   };
 
-  const handleNext = () => {
-    if (validateStep()) {
-      if (currentStep < totalSteps) {
-        setCurrentStep(prev => prev + 1);
+  const handleNext = async () => {
+    if (!validateStep()) return;
+    
+    // Check for duplicate mobile number before moving to next step
+    if (currentStep === 1 && formData.phoneNumber) {
+      try {
+        const { data: existingRegistrations, error: checkError } = await supabase
+          .from('registrations')
+          .select('id, mobile_number')
+          .eq('mobile_number', formData.phoneNumber)
+          .limit(1);
+
+        if (checkError) {
+          console.error('Error checking existing registration:', checkError);
+          toast.error("Error checking mobile number");
+          return;
+        }
+
+        if (existingRegistrations && existingRegistrations.length > 0) {
+          setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking mobile number:', error);
+        return;
       }
+    }
+    
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
@@ -129,10 +159,9 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
       }
 
       if (existingRegistrations && existingRegistrations.length > 0) {
-        toast.error("Mobile Number Already Registered", {
-          description: "This mobile number is already registered. Each mobile number can only be used once."
-        });
+        setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
         setIsSubmitting(false);
+        setCurrentStep(1); // Go back to first step to show error
         return;
       }
 
@@ -234,7 +263,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         <CardContent className="px-6 pb-6 pt-8">
           <div className="min-h-[350px]">
             {currentStep === 1 && (
-              <StudentDetailsStep formData={formData} updateFormData={updateFormData} />
+              <StudentDetailsStep formData={formData} updateFormData={updateFormData} mobileError={mobileError} />
             )}
             {currentStep === 2 && (
               <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
