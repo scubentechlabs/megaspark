@@ -116,6 +116,26 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     try {
       console.log('Starting registration save with data:', formData);
       
+      // Check if mobile number already exists
+      const { data: existingRegistrations, error: checkError } = await supabase
+        .from('registrations')
+        .select('id, mobile_number')
+        .eq('mobile_number', formData.phoneNumber)
+        .limit(1);
+
+      if (checkError) {
+        console.error('Error checking existing registration:', checkError);
+        throw checkError;
+      }
+
+      if (existingRegistrations && existingRegistrations.length > 0) {
+        toast.error("Mobile Number Already Registered", {
+          description: "This mobile number is already registered. Each mobile number can only be used once."
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('registrations')
         .insert({
