@@ -367,6 +367,33 @@ export type Database = {
         }
         Relationships: []
       }
+      slot_date_settings: {
+        Row: {
+          created_at: string
+          exam_date: string
+          id: string
+          is_enabled: boolean
+          slot_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          exam_date: string
+          id?: string
+          is_enabled?: boolean
+          slot_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          exam_date?: string
+          id?: string
+          is_enabled?: boolean
+          slot_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       slot_settings: {
         Row: {
           created_at: string
