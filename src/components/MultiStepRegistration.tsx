@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, User, Users, CheckCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, User, Users, CheckCircle, Calendar } from "lucide-react";
 import { StudentDetailsStep } from "./registration/StudentDetailsStep";
 import { ParentSchoolStep } from "./registration/ParentSchoolStep";
+import { ExamPreferencesStep } from "./registration/ExamPreferencesStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,12 +20,13 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mobileError, setMobileError] = useState<string>("");
-  const totalSteps = 2;
+  const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
-    { number: 2, title: "School Info", icon: Users, description: "School and academic details" }
+    { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
+    { number: 3, title: "Exam Preferences", icon: Calendar, description: "Select exam slot and preferences" }
   ];
 
   const updateFormData = (updates: any) => {
@@ -78,10 +80,6 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Please select school medium");
         return false;
       }
-      if (!formData.standard) {
-        toast.error("Please select current standard");
-        return false;
-      }
       // Validate percentage - must be between 0-100
       if (!formData.previousYearPercentage || formData.previousYearPercentage.trim() === "") {
         toast.error("Please enter previous year percentage");
@@ -92,8 +90,17 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Percentage must be between 0 and 100");
         return false;
       }
-      if (!formData.preferredExamDate) {
-        toast.error("Please select preferred exam date");
+    } else if (currentStep === 3) {
+      if (!formData.standard) {
+        toast.error("Please select current standard");
+        return false;
+      }
+      if (!formData.medium) {
+        toast.error("Please select medium of instruction");
+        return false;
+      }
+      if (!formData.timeSlot) {
+        toast.error("Please select a time slot");
         return false;
       }
     }
@@ -178,9 +185,8 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           school_medium: formData.schoolMedium,
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
-          preferred_exam_date: formData.preferredExamDate,
-          exam_date: formData.preferredExamDate,
-          medium: formData.schoolMedium,
+          time_slot: formData.timeSlot,
+          medium: formData.medium,
           exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
           registration_number: ''
         } as any)
@@ -267,6 +273,9 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
             )}
             {currentStep === 2 && (
               <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
+            )}
+            {currentStep === 3 && (
+              <ExamPreferencesStep formData={formData} updateFormData={updateFormData} />
             )}
           </div>
 
