@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
+import { AdminSidebar } from "@/components/AdminSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 interface SlotSetting {
   id: string;
@@ -33,6 +36,7 @@ const examDates = [
 ];
 
 export default function SlotManagement() {
+  const navigate = useNavigate();
   const [slots, setSlots] = useState<SlotSetting[]>([]);
   const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,9 +45,18 @@ export default function SlotManagement() {
   const [selectedSlot, setSelectedSlot] = useState<string>("");
 
   useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/admin/login");
+      return;
+    }
     fetchSlots();
     fetchDateSlots();
-  }, []);
+  };
 
   const fetchSlots = async () => {
     try {
@@ -149,18 +162,29 @@ export default function SlotManagement() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full">
+          <AdminSidebar />
+          <SidebarInset>
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Time Slot Management</h1>
-        <p className="text-muted-foreground">Manage exam time slots and their availability</p>
-      </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AdminSidebar />
+        <SidebarInset>
+          <div className="container mx-auto p-6">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold">Time Slot Management</h1>
+              <p className="text-muted-foreground">Manage exam time slots and their availability</p>
+            </div>
 
       <Card className="mb-6">
         <CardHeader>
@@ -343,6 +367,9 @@ export default function SlotManagement() {
           </Card>
         ))}
       </div>
-    </div>
+          </div>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
