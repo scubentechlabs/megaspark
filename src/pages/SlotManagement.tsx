@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 
 interface SlotSetting {
   id: string;
@@ -17,13 +18,31 @@ interface SlotSetting {
   reporting_time: string;
 }
 
+interface SlotDateSetting {
+  id: string;
+  exam_date: string;
+  slot_name: string;
+  is_enabled: boolean;
+}
+
+const examDates = [
+  { value: "2025-11-30", label: "30th November 2025" },
+  { value: "2025-12-07", label: "7th December 2025" },
+  { value: "2025-12-14", label: "14th December 2025" },
+  { value: "2025-12-28", label: "28th December 2025" }
+];
+
 export default function SlotManagement() {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
+  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedSlot, setSelectedSlot] = useState<string>("");
 
   useEffect(() => {
     fetchSlots();
+    fetchDateSlots();
   }, []);
 
   const fetchSlots = async () => {
@@ -40,6 +59,21 @@ export default function SlotManagement() {
       toast.error("Failed to load slot settings");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDateSlots = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('slot_date_settings')
+        .select('*')
+        .order('exam_date', { ascending: false });
+
+      if (error) throw error;
+      setDateSlots(data || []);
+    } catch (error) {
+      console.error('Error fetching date slots:', error);
+      toast.error("Failed to load date-specific slot settings");
     }
   };
 
@@ -63,6 +97,52 @@ export default function SlotManagement() {
     }
   };
 
+  const addDateSlotOverride = async () => {
+    if (!selectedDate || !selectedSlot) {
+      toast.error("Please select both date and slot");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('slot_date_settings')
+        .upsert({
+          exam_date: selectedDate,
+          slot_name: selectedSlot,
+          is_enabled: false
+        }, {
+          onConflict: 'exam_date,slot_name'
+        });
+
+      if (error) throw error;
+
+      toast.success("Date-specific slot setting added");
+      fetchDateSlots();
+      setSelectedDate("");
+      setSelectedSlot("");
+    } catch (error) {
+      console.error('Error adding date slot:', error);
+      toast.error("Failed to add date-specific slot setting");
+    }
+  };
+
+  const toggleDateSlot = async (id: string, currentEnabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('slot_date_settings')
+        .update({ is_enabled: !currentEnabled })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Slot status updated");
+      fetchDateSlots();
+    } catch (error) {
+      console.error('Error updating date slot:', error);
+      toast.error("Failed to update slot status");
+    }
+  };
+
   const getSlotLabel = (slotName: string) => {
     return slotName.charAt(0).toUpperCase() + slotName.slice(1) + " Slot";
   };
@@ -81,6 +161,81 @@ export default function SlotManagement() {
         <h1 className="text-3xl font-bold">Time Slot Management</h1>
         <p className="text-muted-foreground">Manage exam time slots and their availability</p>
       </div>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Disable Slot for Specific Date</CardTitle>
+          <CardDescription>Add date-specific slot overrides to disable slots for particular exam dates</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label>Exam Date</Label>
+              <Select value={selectedDate} onValueChange={setSelectedDate}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select date" />
+                </SelectTrigger>
+                <SelectContent>
+                  {examDates.map((date) => (
+                    <SelectItem key={date.value} value={date.value}>
+                      {date.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Time Slot</Label>
+              <Select value={selectedSlot} onValueChange={setSelectedSlot}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select slot" />
+                </SelectTrigger>
+                <SelectContent>
+                  {slots.map((slot) => (
+                    <SelectItem key={slot.slot_name} value={slot.slot_name}>
+                      {getSlotLabel(slot.slot_name)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button onClick={addDateSlotOverride} className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Disable Slot
+              </Button>
+            </div>
+          </div>
+
+          {dateSlots.length > 0 && (
+            <div className="mt-6">
+              <h3 className="font-semibold mb-3">Active Date-Specific Overrides</h3>
+              <div className="space-y-2">
+                {dateSlots.map((dateSlot) => (
+                  <div key={dateSlot.id} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
+                    <div>
+                      <span className="font-medium">
+                        {examDates.find(d => d.value === dateSlot.exam_date)?.label || dateSlot.exam_date}
+                      </span>
+                      <span className="mx-2">-</span>
+                      <span>{getSlotLabel(dateSlot.slot_name)}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-sm ${dateSlot.is_enabled ? 'text-green-600' : 'text-red-600'}`}>
+                        {dateSlot.is_enabled ? 'Enabled' : 'Disabled (Full)'}
+                      </span>
+                      <Switch
+                        checked={dateSlot.is_enabled}
+                        onCheckedChange={() => toggleDateSlot(dateSlot.id, dateSlot.is_enabled)}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6">
         {slots.map((slot) => (

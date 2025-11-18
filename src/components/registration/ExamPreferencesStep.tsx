@@ -18,6 +18,12 @@ interface SlotSetting {
   reporting_time: string;
 }
 
+interface SlotDateSetting {
+  exam_date: string;
+  slot_name: string;
+  is_enabled: boolean;
+}
+
 const examDates = [
   { value: "2025-11-30", label: "30th November 2025 - Sunday" },
   { value: "2025-12-07", label: "7th December 2025 - Sunday" },
@@ -27,10 +33,12 @@ const examDates = [
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
+  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchSlotSettings();
+    fetchDateSlotSettings();
   }, []);
 
   const fetchSlotSettings = async () => {
@@ -50,6 +58,19 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     }
   };
 
+  const fetchDateSlotSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('slot_date_settings')
+        .select('*');
+
+      if (error) throw error;
+      setDateSlots(data || []);
+    } catch (error) {
+      console.error('Error fetching date slot settings:', error);
+    }
+  };
+
   const getSlotLabel = (slotName: string) => {
     return slotName.charAt(0).toUpperCase() + slotName.slice(1) + " Slot";
   };
@@ -62,16 +83,27 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   const isSlotAvailable = (slot: SlotSetting) => {
-    // Disable morning slot for November 30th, 2025
-    if (formData.examDate === "2025-11-30" && slot.slot_name.toLowerCase() === "morning") {
-      return false;
+    // Check date-specific overrides
+    if (formData.examDate) {
+      const dateOverride = dateSlots.find(
+        ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
+      );
+      if (dateOverride && !dateOverride.is_enabled) {
+        return false;
+      }
     }
     return slot.is_enabled && slot.current_count < slot.max_capacity;
   };
 
   const getSlotStatusMessage = (slot: SlotSetting) => {
-    if (formData.examDate === "2025-11-30" && slot.slot_name.toLowerCase() === "morning") {
-      return "Morning Slot Is Full";
+    // Check date-specific overrides
+    if (formData.examDate) {
+      const dateOverride = dateSlots.find(
+        ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
+      );
+      if (dateOverride && !dateOverride.is_enabled) {
+        return "Slot Is Full";
+      }
     }
     if (!slot.is_enabled) return "Disabled";
     if (slot.current_count >= slot.max_capacity) return "Full";
