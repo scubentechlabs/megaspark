@@ -175,6 +175,7 @@ export default function Reports() {
       "School Medium",
       "Standard",
       "Previous Year %",
+      "Exam Date",
       "Time Slot",
       "Reporting Time",
       "Medium",
@@ -195,6 +196,7 @@ export default function Reports() {
       reg.school_medium || 'N/A',
       reg.standard,
       reg.previous_year_percentage || 'N/A',
+      reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA',
       formatTimeSlot(reg.time_slot),
       getReportingTime(reg.time_slot),
       formatMedium(reg.medium),
@@ -275,10 +277,27 @@ export default function Reports() {
               <th>District</th>
               <th>School</th>
               <th>Exam Date</th>
+              <th>Time Slot</th>
+              <th>Reporting Time</th>
             </tr>
           </thead>
           <tbody>
-            ${data.map(reg => `
+            ${data.map(reg => {
+              const formatTimeSlot = (slot: string | null) => {
+                if (!slot) return 'TBA';
+                if (slot.toLowerCase() === 'morning') return 'Morning';
+                if (slot.toLowerCase() === 'afternoon') return 'Afternoon';
+                return slot;
+              };
+              
+              const getReportingTime = (slot: string | null) => {
+                if (!slot) return 'TBA';
+                if (slot.toLowerCase() === 'morning') return '8:00 AM';
+                if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
+                return 'TBA';
+              };
+              
+              return `
               <tr>
                 <td>${reg.registration_number}</td>
                 <td>${reg.student_name}</td>
@@ -289,8 +308,11 @@ export default function Reports() {
                 <td>${reg.district || 'N/A'}</td>
                 <td>${reg.school_name || 'N/A'}</td>
                 <td>${reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}</td>
+                <td>${formatTimeSlot(reg.time_slot)}</td>
+                <td>${getReportingTime(reg.time_slot)}</td>
               </tr>
-            `).join('')}
+              `;
+            }).join('')}
           </tbody>
         </table>
         
