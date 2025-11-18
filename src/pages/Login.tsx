@@ -27,6 +27,7 @@ interface Registration {
   floor: string | null;
   building_name: string | null;
   exam_pattern: string | null;
+  time_slot: string | null;
 }
 
 export default function Login() {
@@ -118,24 +119,21 @@ export default function Login() {
     }
   };
 
-  const handleDownloadHallTicket = (registration: Registration) => {
-    // Format exam date from YYYY-MM-DD to readable format
-    const formatExamDate = (dateString: string) => {
-      const date = new Date(dateString);
-      const day = date.getDate();
-      const month = date.toLocaleString('en-US', { month: 'long' });
-      const year = date.getFullYear();
-      
-      // Add ordinal suffix (st, nd, rd, th)
-      const ordinal = (n: number) => {
-        const s = ["th", "st", "nd", "rd"];
-        const v = n % 100;
-        return n + (s[(v - 20) % 10] || s[v] || s[0]);
-      };
-      
-      return `${ordinal(day)} ${month} ${year}`;
-    };
+  const formatTimeSlot = (slot: string | null) => {
+    if (!slot) return 'TBA';
+    if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+    if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
+    return slot;
+  };
 
+  const getReportingTime = (slot: string | null) => {
+    if (!slot) return 'TBA';
+    if (slot.toLowerCase() === 'morning') return '8:00 AM';
+    if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
+    return 'TBA';
+  };
+
+  const handleDownloadHallTicket = (registration: Registration) => {
     // Generate hall ticket HTML
     const hallTicketHTML = `
 <!DOCTYPE html>
@@ -196,8 +194,12 @@ export default function Login() {
       <td><strong>${formatMedium(registration.medium)}</strong></td>
     </tr>
     <tr>
-      <td>Exam Date :</td>
-      <td><strong>${formatExamDate(registration.exam_date)}</strong></td>
+      <td>Time Slot :</td>
+      <td><strong>${formatTimeSlot(registration.time_slot)}</strong></td>
+    </tr>
+    <tr>
+      <td>Reporting Time :</td>
+      <td><strong>${getReportingTime(registration.time_slot)}</strong></td>
     </tr>
     <tr>
       <td>Exam Pattern :</td>
@@ -219,7 +221,8 @@ export default function Login() {
   <div class="notes">
     <h4>નોંધ (Notes):</h4>
     <ol>
-      <li>પરીક્ષાનો રિપોર્ટિંગ સમય સવારે 8:00 કલાકે રહેશે</li>
+      <li>પરીક્ષાનો રિપોર્ટિંગ સમય ${getReportingTime(registration.time_slot)} છે</li>
+      <li>The reporting time for the exam is ${getReportingTime(registration.time_slot)}</li>
       <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
     </ol>
   </div>

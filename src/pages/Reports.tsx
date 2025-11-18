@@ -41,6 +41,7 @@ interface Registration {
   floor: string | null;
   building_name: string | null;
   exam_pattern: string | null;
+  time_slot: string | null;
 }
 
 export default function Reports() {
@@ -147,6 +148,20 @@ export default function Reports() {
   const downloadReport = () => {
     const data = getFilteredReportData();
     
+    const formatTimeSlot = (slot: string | null) => {
+      if (!slot) return 'TBA';
+      if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+      if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
+      return slot;
+    };
+
+    const getReportingTime = (slot: string | null) => {
+      if (!slot) return 'TBA';
+      if (slot.toLowerCase() === 'morning') return '8:00 AM';
+      if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
+      return 'TBA';
+    };
+
     const headers = [
       "Registration Number",
       "Student Name",
@@ -154,14 +169,14 @@ export default function Reports() {
       "Mobile Number",
       "WhatsApp Number",
       "Email",
+      "State",
       "District",
-      "City/Village",
       "School Name",
       "School Medium",
       "Standard",
       "Previous Year %",
-      "Preferred Exam Date",
-      "Exam Date",
+      "Time Slot",
+      "Reporting Time",
       "Medium",
       "Exam Center",
       "Registration Date",
@@ -180,8 +195,8 @@ export default function Reports() {
       reg.school_medium || 'N/A',
       reg.standard,
       reg.previous_year_percentage || 'N/A',
-      reg.preferred_exam_date ? new Date(reg.preferred_exam_date).toLocaleDateString() : 'N/A',
-      reg.exam_date ? new Date(reg.exam_date).toLocaleDateString() : 'N/A',
+      formatTimeSlot(reg.time_slot),
+      getReportingTime(reg.time_slot),
       formatMedium(reg.medium),
       reg.exam_center,
       new Date(reg.created_at).toLocaleDateString(),

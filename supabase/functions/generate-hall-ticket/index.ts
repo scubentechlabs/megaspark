@@ -33,16 +33,19 @@ serve(async (req) => {
       throw new Error('Registration not found');
     }
 
-    // Format exam date
-    const formatExamDate = (dateStr: string | null) => {
-      if (!dateStr) return 'TBA';
-      const date = new Date(dateStr);
-      const options: Intl.DateTimeFormatOptions = { 
-        day: '2-digit', 
-        month: 'long', 
-        year: 'numeric' 
-      };
-      return date.toLocaleDateString('en-IN', options);
+    // Format time slot
+    const formatTimeSlot = (slot: string | null) => {
+      if (!slot) return 'TBA';
+      if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+      if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
+      return slot;
+    };
+    
+    const getReportingTime = (slot: string | null) => {
+      if (!slot) return 'TBA';
+      if (slot.toLowerCase() === 'morning') return '8:00 AM';
+      if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
+      return 'TBA';
     };
 
     console.log('Creating PDF document...');
@@ -162,7 +165,10 @@ serve(async (req) => {
     drawInfoRow('Medium', formatMedium(registration.medium), yPosition);
     yPosition -= 25;
     
-    drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
+    drawInfoRow('Time Slot', formatTimeSlot(registration.time_slot), yPosition);
+    yPosition -= 25;
+    
+    drawInfoRow('Reporting Time', getReportingTime(registration.time_slot), yPosition);
     yPosition -= 25;
     
     drawInfoRow('Exam Center', 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150', yPosition);
