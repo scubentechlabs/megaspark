@@ -1,6 +1,5 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,8 +50,8 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     }
   };
 
-  const getSlotLabel = (slot: SlotSetting) => {
-    return slot.slot_name.charAt(0).toUpperCase() + slot.slot_name.slice(1) + " Slot";
+  const getSlotLabel = (slotName: string) => {
+    return slotName.charAt(0).toUpperCase() + slotName.slice(1) + " Slot";
   };
 
   const getSlotAvailability = (slot: SlotSetting) => {
@@ -66,15 +65,24 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     return slot.is_enabled && slot.current_count < slot.max_capacity;
   };
 
+  const getReportingTime = (slotName: string | null) => {
+    if (!slotName) return 'TBA';
+    const slotData = slots.find(s => s.slot_name === slotName);
+    if (slotData) return slotData.reporting_time;
+    if (slotName.toLowerCase() === 'morning') return '8:00 AM';
+    if (slotName.toLowerCase() === 'afternoon') return '2:30 PM';
+    return 'TBA';
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <Label htmlFor="standard">Current Standard *</Label>
         <Select value={formData.standard} onValueChange={(value) => updateFormData({ standard: value })}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-background">
             <SelectValue placeholder="Select your standard" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-background z-50">
             <SelectItem value="5">Standard 5</SelectItem>
             <SelectItem value="6">Standard 6</SelectItem>
             <SelectItem value="7">Standard 7</SelectItem>
@@ -85,102 +93,95 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
         </Select>
       </div>
 
-      <div className="space-y-3">
-        <Label>Medium of Instruction *</Label>
-        <RadioGroup
-          value={formData.medium}
-          onValueChange={(value) => updateFormData({ medium: value })}
-          className="grid grid-cols-2 gap-4"
-        >
-          <Card className="relative cursor-pointer hover:shadow-card transition-all">
-            <label className="flex items-center space-x-3 p-4 cursor-pointer">
-              <RadioGroupItem value="gujarati" id="gujarati" />
-              <div className="flex-1">
-                <div className="font-semibold text-primary">Gujarati Medium</div>
-                <div className="text-xs text-muted-foreground">ગુજરાતી માધ્યમ</div>
+      <div className="space-y-2">
+        <Label htmlFor="medium">Medium of Instruction *</Label>
+        <Select value={formData.medium} onValueChange={(value) => updateFormData({ medium: value })}>
+          <SelectTrigger className="bg-background">
+            <SelectValue placeholder="Select medium" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            <SelectItem value="gujarati">
+              <div className="flex flex-col">
+                <span className="font-semibold">Gujarati Medium</span>
+                <span className="text-xs text-muted-foreground">ગુજરાતી માધ્યમ</span>
               </div>
-            </label>
-          </Card>
-
-          <Card className="relative cursor-pointer hover:shadow-card transition-all">
-            <label className="flex items-center space-x-3 p-4 cursor-pointer">
-              <RadioGroupItem value="english" id="english" />
-              <div className="flex-1">
-                <div className="font-semibold text-accent">English Medium</div>
-                <div className="text-xs text-muted-foreground">આંગ્લ માધ્યમ</div>
+            </SelectItem>
+            <SelectItem value="english">
+              <div className="flex flex-col">
+                <span className="font-semibold">English Medium</span>
+                <span className="text-xs text-muted-foreground">આંગ્લ માધ્યમ</span>
               </div>
-            </label>
-          </Card>
-        </RadioGroup>
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="space-y-3">
-        <Label>Preferred Exam Date *</Label>
-        <RadioGroup
-          value={formData.examDate}
-          onValueChange={(value) => updateFormData({ examDate: value })}
-          className="space-y-3"
-        >
-          {examDates.map((date) => (
-            <Card
-              key={date.value}
-              className="relative cursor-pointer hover:shadow-card transition-all"
-            >
-              <label className="flex items-center space-x-3 p-4 cursor-pointer">
-                <RadioGroupItem value={date.value} id={`date-${date.value}`} />
-                <div className="flex-1">
-                  <div className="font-semibold text-foreground">{date.label}</div>
-                </div>
-              </label>
-            </Card>
-          ))}
-        </RadioGroup>
+      <div className="space-y-2">
+        <Label htmlFor="examDate">Preferred Exam Date *</Label>
+        <Select value={formData.examDate} onValueChange={(value) => updateFormData({ examDate: value })}>
+          <SelectTrigger className="bg-background">
+            <SelectValue placeholder="Select exam date" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            {examDates.map((date) => (
+              <SelectItem key={date.value} value={date.value}>
+                {date.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="space-y-3">
-        <Label>Preferred Time Slot *</Label>
+      <div className="space-y-2">
+        <Label htmlFor="timeSlot">Preferred Time Slot *</Label>
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading available slots...</p>
         ) : (
-          <RadioGroup
-            value={formData.timeSlot}
+          <Select 
+            value={formData.timeSlot} 
             onValueChange={(value) => updateFormData({ timeSlot: value })}
-            className="space-y-3"
           >
-            {slots.map((slot) => {
-              const available = isSlotAvailable(slot);
-              return (
-                <Card
-                  key={slot.slot_name}
-                  className={`relative cursor-pointer transition-all ${
-                    available ? 'hover:shadow-card' : 'opacity-50 cursor-not-allowed'
-                  }`}
-                >
-                  <label className={`flex items-center space-x-3 p-4 ${available ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-                    <RadioGroupItem 
-                      value={slot.slot_name} 
-                      id={slot.slot_name}
-                      disabled={!available}
-                    />
-                    <div className="flex-1">
-                      <div className="font-semibold text-foreground">{getSlotLabel(slot)}</div>
-                      <div className="text-sm text-muted-foreground">Reporting Time: {slot.reporting_time}</div>
-                      <div className={`text-xs mt-1 ${available ? 'text-green-600' : 'text-red-600'}`}>
-                        {getSlotAvailability(slot)}
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Select time slot" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              {slots.map((slot) => {
+                const available = isSlotAvailable(slot);
+                return (
+                  <SelectItem 
+                    key={slot.slot_name} 
+                    value={slot.slot_name}
+                    disabled={!available}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
+                        <span className="text-xs text-muted-foreground">
+                          Reporting: {slot.reporting_time}
+                        </span>
                       </div>
+                      <span className={`text-xs ml-4 ${available ? 'text-green-600' : 'text-red-600'}`}>
+                        {getSlotAvailability(slot)}
+                      </span>
                     </div>
-                  </label>
-                </Card>
-              );
-            })}
-          </RadioGroup>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        )}
+        {formData.timeSlot && (
+          <Card className="bg-primary/5 border-primary/20 p-3 mt-2">
+            <p className="text-sm text-foreground">
+              <strong className="text-primary">Selected:</strong> {getSlotLabel(formData.timeSlot)} - Reporting Time: {getReportingTime(formData.timeSlot)}
+            </p>
+          </Card>
         )}
       </div>
 
       <Card className="bg-primary/5 border-primary/20 p-4">
         <p className="text-sm text-foreground">
-          <strong className="text-primary">Note:</strong> Please select your preferred exam date and arrive at the exam center by your selected time slot's reporting time. 
-          Late arrivals will not be permitted.
+          <strong className="text-primary">Important:</strong> Please select your preferred exam date and arrive at the exam center by your selected time slot's reporting time. Late arrivals will not be permitted.
         </p>
       </Card>
     </div>
