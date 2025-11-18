@@ -91,10 +91,6 @@ export const RegistrationSection = () => {
         toast.error("Please select current standard");
         return false;
       }
-      if (!formData.medium) {
-        toast.error("Please select medium of instruction");
-        return false;
-      }
       if (!formData.examDate) {
         toast.error("Please select an exam date");
         return false;
