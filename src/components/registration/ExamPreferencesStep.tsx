@@ -62,7 +62,20 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   const isSlotAvailable = (slot: SlotSetting) => {
+    // Disable morning slot for November 30th, 2025
+    if (formData.examDate === "2025-11-30" && slot.slot_name.toLowerCase() === "morning") {
+      return false;
+    }
     return slot.is_enabled && slot.current_count < slot.max_capacity;
+  };
+
+  const getSlotStatusMessage = (slot: SlotSetting) => {
+    if (formData.examDate === "2025-11-30" && slot.slot_name.toLowerCase() === "morning") {
+      return "Morning Slot Is Full";
+    }
+    if (!slot.is_enabled) return "Disabled";
+    if (slot.current_count >= slot.max_capacity) return "Full";
+    return "";
   };
 
   const getReportingTime = (slotName: string | null) => {
@@ -120,17 +133,25 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
             <SelectContent className="bg-background z-50">
               {slots.map((slot) => {
                 const available = isSlotAvailable(slot);
+                const statusMessage = getSlotStatusMessage(slot);
                 return (
                   <SelectItem 
                     key={slot.slot_name} 
                     value={slot.slot_name}
                     disabled={!available}
                   >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
-                      <span className="text-xs text-muted-foreground">
-                        Reporting: {slot.reporting_time}
-                      </span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
+                        <span className="text-xs text-muted-foreground">
+                          Reporting: {slot.reporting_time}
+                        </span>
+                      </div>
+                      {statusMessage && (
+                        <span className="text-xs ml-4 text-red-600 font-medium">
+                          {statusMessage}
+                        </span>
+                      )}
                     </div>
                   </SelectItem>
                 );
