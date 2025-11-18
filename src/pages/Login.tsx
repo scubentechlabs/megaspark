@@ -198,8 +198,12 @@ export default function Login() {
       <td><strong>${formatTimeSlot(registration.time_slot)}</strong></td>
     </tr>
     <tr>
-      <td>Reporting Time :</td>
-      <td><strong>${getReportingTime(registration.time_slot)}</strong></td>
+      <td>Exam Date :</td>
+      <td><strong>${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'}</strong></td>
+    </tr>
+    <tr>
+      <td>Reporting Date & Time :</td>
+      <td><strong>${registration.exam_date ? `${new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at ${getReportingTime(registration.time_slot)}` : getReportingTime(registration.time_slot)}</strong></td>
     </tr>
     <tr>
       <td>Exam Pattern :</td>
@@ -221,8 +225,8 @@ export default function Login() {
   <div class="notes">
     <h4>નોંધ (Notes):</h4>
     <ol>
-      <li>પરીક્ષાનો રિપોર્ટિંગ સમય ${getReportingTime(registration.time_slot)} છે</li>
-      <li>The reporting time for the exam is ${getReportingTime(registration.time_slot)}</li>
+      <li>પરીક્ષા તારીખ: ${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'} | રિપોર્ટિંગ સમય: ${getReportingTime(registration.time_slot)}</li>
+      <li>Exam Date: ${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'} | Reporting Time: ${getReportingTime(registration.time_slot)}</li>
       <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
     </ol>
   </div>

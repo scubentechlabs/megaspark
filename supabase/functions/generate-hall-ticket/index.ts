@@ -168,7 +168,21 @@ serve(async (req) => {
     drawInfoRow('Time Slot', formatTimeSlot(registration.time_slot), yPosition);
     yPosition -= 25;
     
-    drawInfoRow('Reporting Time', getReportingTime(registration.time_slot), yPosition);
+    // Format exam date
+    const formatExamDate = (dateStr: string | null) => {
+      if (!dateStr) return 'TBA';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    };
+    
+    drawInfoRow('Exam Date', formatExamDate(registration.exam_date), yPosition);
+    yPosition -= 25;
+    
+    const reportingDateTime = registration.exam_date 
+      ? `${formatExamDate(registration.exam_date)} at ${getReportingTime(registration.time_slot)}`
+      : getReportingTime(registration.time_slot);
+    
+    drawInfoRow('Reporting Date & Time', reportingDateTime, yPosition);
     yPosition -= 25;
     
     drawInfoRow('Exam Center', 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150', yPosition);
