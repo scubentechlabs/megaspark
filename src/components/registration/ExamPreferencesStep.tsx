@@ -83,18 +83,8 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
             <SelectValue placeholder="Select medium" />
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="gujarati">
-              <div className="flex flex-col">
-                <span className="font-semibold">Gujarati Medium</span>
-                <span className="text-xs text-muted-foreground">ગુજરાતી માધ્યમ</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="english">
-              <div className="flex flex-col">
-                <span className="font-semibold">English Medium</span>
-                <span className="text-xs text-muted-foreground">અંગ્રેજી માધ્યમ</span>
-              </div>
-            </SelectItem>
+            <SelectItem value="gujarati">Gujarati Medium</SelectItem>
+            <SelectItem value="english">English Medium</SelectItem>
           </SelectContent>
         </Select>
       </div>
