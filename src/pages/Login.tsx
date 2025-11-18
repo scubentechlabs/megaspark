@@ -142,30 +142,42 @@ export default function Login() {
   <meta charset="UTF-8">
   <title>MEGA SPARK EXAM Hall Ticket - ${registration.registration_number}</title>
   <style>
-    @page { margin: 0; }
+    @page { 
+      size: A4;
+      margin: 0; 
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; padding: 30px; background: white; }
-    .header { text-align: center; margin-bottom: 20px; }
-    .header-image { width: 100%; max-width: 600px; margin-bottom: 15px; }
-    .header h1 { font-size: 24px; color: #1a1a1a; margin: 5px 0; }
-    .header h2 { font-size: 32px; color: #2563eb; margin: 10px 0; font-weight: bold; }
-    .header h3 { font-size: 20px; color: #1a1a1a; margin: 5px 0; }
-    .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    .info-table td { padding: 12px; border: 1px solid #ddd; font-size: 14px; }
-    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 40%; }
-    .exam-pattern-box { padding: 10px; background: #f0f0f0; margin-top: 5px; }
-    .exam-pattern-box strong { display: block; margin-bottom: 5px; }
-    .notes { margin: 25px 0; }
-    .notes h4 { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-    .notes ol { padding-left: 20px; }
-    .notes li { margin: 8px 0; line-height: 1.6; font-size: 13px; }
-    .exam-center { margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #2563eb; }
-    .exam-center h4 { font-size: 16px; font-weight: bold; margin-bottom: 8px; }
-    .footer { margin-top: 30px; text-align: center; padding: 15px; background: #f0f0f0; }
-    .footer p { margin: 5px 0; font-size: 14px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 15px 25px; 
+      background: white; 
+      width: 210mm;
+      height: 297mm;
+      margin: 0 auto;
+    }
+    .header { text-align: center; margin-bottom: 12px; }
+    .header h1 { font-size: 20px; color: #1a1a1a; margin: 3px 0; }
+    .header h2 { font-size: 26px; color: #2563eb; margin: 5px 0; font-weight: bold; }
+    .header h3 { font-size: 16px; color: #1a1a1a; margin: 3px 0; }
+    .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    .info-table td { padding: 8px 10px; border: 1px solid #ddd; font-size: 12px; }
+    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 38%; }
+    .exam-pattern-box { padding: 6px; background: #f0f0f0; margin-top: 3px; font-size: 11px; }
+    .exam-pattern-box strong { display: block; margin-bottom: 3px; }
+    .notes { margin: 12px 0; }
+    .notes h4 { font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+    .notes ol { padding-left: 18px; }
+    .notes li { margin: 5px 0; line-height: 1.4; font-size: 11px; }
+    .exam-center { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #2563eb; }
+    .exam-center h4 { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+    .exam-center p { font-size: 12px; }
+    .footer { margin-top: 15px; text-align: center; padding: 10px; background: #f0f0f0; }
+    .footer p { margin: 3px 0; font-size: 12px; }
+    .footer-image { max-width: 60%; height: auto; margin: 10px 0; }
     @media print {
-      body { padding: 20px; }
+      body { padding: 15px 25px; }
       .no-print { display: none; }
+      @page { size: A4; margin: 0; }
     }
   </style>
 </head>
@@ -232,8 +244,8 @@ export default function Login() {
   </div>
 
 
-  <div style="text-align: center; margin: 20px 0;">
-    <img src="${hallTicketFooterImage}" style="max-width: 70%; height: auto;" alt="PP Savani Banner" />
+  <div style="text-align: center; margin: 10px 0;">
+    <img src="${hallTicketFooterImage}" class="footer-image" alt="PP Savani Banner" />
   </div>
 
   <div class="footer">
