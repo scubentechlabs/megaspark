@@ -8,13 +8,13 @@ const downloadItems = [
     icon: BookOpen,
     title: "Exam Syllabus",
     subtitle: "Complete syllabus for all standards",
-    description: "Comprehensive syllabus covering all topics for Standards 5-10 in both Gujarati and English mediums.",
+    description: "Comprehensive syllabus covering all topics for Standards 5-10 in English medium.",
     color: "from-primary to-primary/80",
     driveLink: "https://drive.google.com/drive/folders/1GUQk1vQbBLpGWPB55S0GKs0CcQhdVJcn?usp=sharing",
     previewContent: [
       "Mathematics: Algebra, Geometry, Arithmetic",
       "Science: Physics, Chemistry, Biology",
-      "English/Gujarati: Grammar, Comprehension",
+      "English: Grammar, Comprehension",
       "Social Studies: History, Geography, Civics",
       "General Knowledge & Current Affairs"
     ]
