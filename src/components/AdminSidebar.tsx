@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog } from "lucide-react";
+import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ export function AdminSidebar() {
     { title: "Registrations", icon: Users, path: "/admin" },
     { title: "Active Sessions", icon: Activity, path: "/admin/active-sessions" },
     { title: "User Management", icon: UserCog, path: "/admin/user-management" },
+    { title: "Slot Management", icon: Clock, path: "/admin/slots" },
     { title: "Coupons", icon: Tag, path: "/admin/coupons" },
     { title: "WhatsApp", icon: MessageSquare, path: "/admin/whatsapp" },
     { title: "Newsletter", icon: Mail, path: "/admin/newsletter" },

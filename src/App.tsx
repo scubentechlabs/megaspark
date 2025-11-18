@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import UploadPoster from "./pages/UploadPoster";
 import ActiveSessions from "./pages/ActiveSessions";
 import UserManagement from "./pages/UserManagement";
+import SlotManagement from "./pages/SlotManagement";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const App = () => {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/active-sessions" element={<ActiveSessions />} />
         <Route path="/admin/user-management" element={<UserManagement />} />
+        <Route path="/admin/slots" element={<SlotManagement />} />
         <Route path="/admin/coupons" element={<Coupons />} />
         <Route path="/admin/whatsapp" element={<WhatsAppManagement />} />
         <Route path="/admin/newsletter" element={<NewsletterManagement />} />
