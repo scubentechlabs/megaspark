@@ -70,6 +70,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
               <SelectValue placeholder="Select medium" />
             </SelectTrigger>
             <SelectContent className="bg-background z-50">
+              <SelectItem value="gujarati">Gujarati</SelectItem>
               <SelectItem value="english">English</SelectItem>
             </SelectContent>
           </Select>
