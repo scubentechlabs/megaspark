@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { CheckCircle, XCircle, Search, Download, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { formatRegistrationNumber } from "@/lib/formatters";
 
 interface Payment {
   id: string;
@@ -222,7 +223,7 @@ export default function PaymentSummary() {
                         filteredPayments.map((payment) => (
                           <TableRow key={payment.id}>
                             <TableCell className="font-medium">{payment.student_name}</TableCell>
-                            <TableCell>{payment.registration_number || "N/A"}</TableCell>
+                            <TableCell>{formatRegistrationNumber(payment.registration_number)}</TableCell>
                             <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
                             <TableCell className="capitalize">{payment.payment_type}</TableCell>
                             <TableCell>

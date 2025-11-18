@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatMedium } from "@/lib/formatters";
+import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
 
 interface Registration {
@@ -534,7 +534,7 @@ export default function Reports() {
                       .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                       .map((reg) => (
                       <TableRow key={reg.id}>
-                        <TableCell className="font-medium">{reg.registration_number}</TableCell>
+                        <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
                         <TableCell>{reg.student_name}</TableCell>
                         <TableCell>{reg.mobile_number}</TableCell>
                         <TableCell>{reg.standard}</TableCell>

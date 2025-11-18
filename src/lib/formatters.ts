@@ -14,3 +14,8 @@ export const formatMedium = (medium: string | null | undefined): string => {
   // Return original value if it doesn't match known values
   return medium;
 };
+
+export const formatRegistrationNumber = (regNumber: string | null | undefined): string => {
+  if (!regNumber || regNumber === '') return 'Pending';
+  return regNumber;
+};

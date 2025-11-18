@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { formatMedium } from "@/lib/formatters";
+import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
 import {
   BarChart,
@@ -371,7 +371,7 @@ export default function Dashboard() {
                           <div>
                             <p className="font-medium">{reg.student_name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {reg.registration_number} • Standard {reg.standard}
+                              {formatRegistrationNumber(reg.registration_number)} • Standard {reg.standard}
                             </p>
                           </div>
                           <div className="text-right">

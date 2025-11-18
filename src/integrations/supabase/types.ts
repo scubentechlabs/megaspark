@@ -244,7 +244,7 @@ export type Database = {
           gender: string | null
           hall_ticket_url: string | null
           id: string
-          medium: string
+          medium: string | null
           mobile_number: string
           parent_email: string | null
           parent_first_name: string | null
@@ -279,7 +279,7 @@ export type Database = {
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
-          medium: string
+          medium?: string | null
           mobile_number: string
           parent_email?: string | null
           parent_first_name?: string | null
@@ -314,7 +314,7 @@ export type Database = {
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
-          medium?: string
+          medium?: string | null
           mobile_number?: string
           parent_email?: string | null
           parent_first_name?: string | null
