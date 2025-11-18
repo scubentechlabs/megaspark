@@ -9,7 +9,7 @@ import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
-import { formatMedium } from "@/lib/formatters";
+import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 
 interface Registration {
   id: string;
@@ -183,7 +183,7 @@ export default function Login() {
     </tr>
     <tr>
       <td>Seat No :</td>
-      <td><strong>${registration.registration_number}</strong></td>
+      <td><strong>${formatRegistrationNumber(registration.registration_number)}</strong></td>
     </tr>
     <tr>
       <td>Std :</td>
@@ -329,7 +329,7 @@ export default function Login() {
                             {registration.student_name}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Reg. No: <span className="font-semibold text-primary">{registration.registration_number}</span>
+                            Reg. No: <span className="font-semibold text-primary">{formatRegistrationNumber(registration.registration_number)}</span>
                           </p>
                           <p className="text-sm text-muted-foreground">
                             Class {registration.standard} | {formatMedium(registration.medium)}

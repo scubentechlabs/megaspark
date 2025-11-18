@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
-import { formatMedium } from "@/lib/formatters";
+import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import {
@@ -253,7 +253,7 @@ export default function Admin() {
           <table class="info-table">
             <tr>
               <td>Registration Number<br>નોંધણી નંબર</td>
-              <td><strong style="font-size: 18px;">${reg.registration_number}</strong></td>
+              <td><strong style="font-size: 18px;">${formatRegistrationNumber(reg.registration_number)}</strong></td>
             </tr>
             <tr>
               <td>Student Name<br>વિદ્યાર્થીનું નામ</td>
@@ -727,7 +727,7 @@ export default function Admin() {
                             .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                             .map((reg) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
-                              <TableCell className="font-medium">{reg.registration_number}</TableCell>
+                              <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
