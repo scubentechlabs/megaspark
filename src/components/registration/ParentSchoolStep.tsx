@@ -94,24 +94,6 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <p className="text-xs text-destructive">Percentage must be between 0 and 100</p>
           )}
         </div>
-
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="preferredExamDate">Preferred Exam Date *</Label>
-          <Select 
-            value={formData.preferredExamDate} 
-            onValueChange={(value) => updateFormData({ preferredExamDate: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select preferred exam date" />
-            </SelectTrigger>
-            <SelectContent className="bg-background z-50">
-              <SelectItem value="2025-11-30">30th November 2025 - Sunday</SelectItem>
-              <SelectItem value="2025-12-07">7th December 2025 - Sunday</SelectItem>
-              <SelectItem value="2025-12-14">14th December 2025 - Sunday</SelectItem>
-              <SelectItem value="2025-12-28">28th December 2025 - Sunday</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
     </div>
   );

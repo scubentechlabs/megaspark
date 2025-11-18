@@ -261,6 +261,7 @@ export type Database = {
           standard: string
           state: string | null
           student_name: string
+          time_slot: string | null
           updated_at: string
           whatsapp_number: string | null
         }
@@ -295,6 +296,7 @@ export type Database = {
           standard: string
           state?: string | null
           student_name: string
+          time_slot?: string | null
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -329,6 +331,7 @@ export type Database = {
           standard?: string
           state?: string | null
           student_name?: string
+          time_slot?: string | null
           updated_at?: string
           whatsapp_number?: string | null
         }
@@ -360,6 +363,39 @@ export type Database = {
           exam_name?: string
           id?: string
           organization_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      slot_settings: {
+        Row: {
+          created_at: string
+          current_count: number
+          id: string
+          is_enabled: boolean
+          max_capacity: number
+          reporting_time: string
+          slot_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_count?: number
+          id?: string
+          is_enabled?: boolean
+          max_capacity?: number
+          reporting_time: string
+          slot_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_count?: number
+          id?: string
+          is_enabled?: boolean
+          max_capacity?: number
+          reporting_time?: string
+          slot_name?: string
           updated_at?: string
         }
         Relationships: []
