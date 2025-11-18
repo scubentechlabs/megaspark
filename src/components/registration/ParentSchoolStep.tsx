@@ -59,27 +59,7 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="standard">Current Standard *</Label>
-          <Select 
-            value={formData.standard} 
-            onValueChange={(value) => updateFormData({ standard: value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select standard" />
-            </SelectTrigger>
-            <SelectContent className="bg-background z-50">
-              <SelectItem value="5th">5th Standard</SelectItem>
-              <SelectItem value="6th">6th Standard</SelectItem>
-              <SelectItem value="7th">7th Standard</SelectItem>
-              <SelectItem value="8th">8th Standard</SelectItem>
-              <SelectItem value="9th">9th Standard</SelectItem>
-              <SelectItem value="10th">10th Standard</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="previousYearPercentage">Your Previous Year Percentage *</Label>
           <Input
             id="previousYearPercentage"

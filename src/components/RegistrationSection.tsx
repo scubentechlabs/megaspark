@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronRight, ChevronLeft, User, Users, CheckCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, User, Users, CheckCircle, Calendar } from "lucide-react";
 import { StudentDetailsStep } from "./registration/StudentDetailsStep";
 import { ParentSchoolStep } from "./registration/ParentSchoolStep";
+import { ExamPreferencesStep } from "./registration/ExamPreferencesStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,16 +15,22 @@ export const RegistrationSection = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const totalSteps = 2;
+  const [mobileError, setMobileError] = useState<string>("");
+  const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: "Student Details", icon: User, description: "Basic information" },
-    { number: 2, title: "School Info", icon: Users, description: "School and academic details" }
+    { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
+    { number: 3, title: "Exam Preferences", icon: Calendar, description: "Select exam slot and preferences" }
   ];
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
+    // Clear mobile error when user changes the phone number
+    if (updates.phoneNumber !== undefined) {
+      setMobileError("");
+    }
   };
 
   const validateStep = () => {
@@ -69,10 +76,6 @@ export const RegistrationSection = () => {
         toast.error("Please select school medium");
         return false;
       }
-      if (!formData.standard) {
-        toast.error("Please select current standard");
-        return false;
-      }
       // Validate percentage - must be between 0-100
       if (!formData.previousYearPercentage || formData.previousYearPercentage.trim() === "") {
         toast.error("Please enter previous year percentage");
@@ -83,21 +86,55 @@ export const RegistrationSection = () => {
         toast.error("Percentage must be between 0 and 100");
         return false;
       }
-      if (!formData.preferredExamDate) {
-        toast.error("Please select preferred exam date");
+    } else if (currentStep === 3) {
+      if (!formData.standard) {
+        toast.error("Please select current standard");
+        return false;
+      }
+      if (!formData.medium) {
+        toast.error("Please select medium of instruction");
+        return false;
+      }
+      if (!formData.timeSlot) {
+        toast.error("Please select a time slot");
         return false;
       }
     }
     return true;
   };
 
-  const handleNext = () => {
-    if (validateStep()) {
-      if (currentStep < totalSteps) {
-        setCurrentStep(prev => prev + 1);
-        // Scroll to top of form
-        document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
+  const handleNext = async () => {
+    if (!validateStep()) return;
+    
+    // Check for duplicate mobile number before moving to next step
+    if (currentStep === 1 && formData.phoneNumber) {
+      try {
+        const { data: existingRegistrations, error: checkError } = await supabase
+          .from('registrations')
+          .select('id, mobile_number')
+          .eq('mobile_number', formData.phoneNumber)
+          .limit(1);
+
+        if (checkError) {
+          console.error('Error checking existing registration:', checkError);
+          toast.error("Error checking mobile number");
+          return;
+        }
+
+        if (existingRegistrations && existingRegistrations.length > 0) {
+          setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking mobile number:', error);
+        return;
       }
+    }
+    
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
+      // Scroll to top of form
+      document.getElementById('registration-section')?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -129,10 +166,9 @@ export const RegistrationSection = () => {
       }
 
       if (existingRegistrations && existingRegistrations.length > 0) {
-        toast.error("Mobile Number Already Registered", {
-          description: "This mobile number is already registered. Each mobile number can only be used once."
-        });
+        setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
         setIsSubmitting(false);
+        setCurrentStep(1); // Go back to first step to show error
         return;
       }
 
@@ -149,9 +185,8 @@ export const RegistrationSection = () => {
           school_medium: formData.schoolMedium,
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
-          preferred_exam_date: formData.preferredExamDate,
-          exam_date: formData.preferredExamDate,
-          medium: formData.schoolMedium,
+          time_slot: formData.timeSlot,
+          medium: formData.medium,
           exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
           registration_number: ''
         } as any)
@@ -244,10 +279,13 @@ export const RegistrationSection = () => {
           <CardContent className="p-8">
             <div className="min-h-[350px]">
               {currentStep === 1 && (
-                <StudentDetailsStep formData={formData} updateFormData={updateFormData} />
+                <StudentDetailsStep formData={formData} updateFormData={updateFormData} mobileError={mobileError} />
               )}
               {currentStep === 2 && (
                 <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
+              )}
+              {currentStep === 3 && (
+                <ExamPreferencesStep formData={formData} updateFormData={updateFormData} />
               )}
             </div>
 
