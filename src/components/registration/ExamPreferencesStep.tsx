@@ -19,6 +19,13 @@ interface SlotSetting {
   reporting_time: string;
 }
 
+const examDates = [
+  { value: "2025-11-30", label: "30th November 2025 - Sunday" },
+  { value: "2025-12-07", label: "7th December 2025 - Sunday" },
+  { value: "2025-12-14", label: "14th December 2025 - Sunday" },
+  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
+];
+
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,6 +115,29 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
       </div>
 
       <div className="space-y-3">
+        <Label>Preferred Exam Date *</Label>
+        <RadioGroup
+          value={formData.examDate}
+          onValueChange={(value) => updateFormData({ examDate: value })}
+          className="space-y-3"
+        >
+          {examDates.map((date) => (
+            <Card
+              key={date.value}
+              className="relative cursor-pointer hover:shadow-card transition-all"
+            >
+              <label className="flex items-center space-x-3 p-4 cursor-pointer">
+                <RadioGroupItem value={date.value} id={`date-${date.value}`} />
+                <div className="flex-1">
+                  <div className="font-semibold text-foreground">{date.label}</div>
+                </div>
+              </label>
+            </Card>
+          ))}
+        </RadioGroup>
+      </div>
+
+      <div className="space-y-3">
         <Label>Preferred Time Slot *</Label>
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading available slots...</p>
@@ -149,7 +179,7 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
 
       <Card className="bg-primary/5 border-primary/20 p-4">
         <p className="text-sm text-foreground">
-          <strong className="text-primary">Note:</strong> Please arrive at the exam center by your selected slot's reporting time. 
+          <strong className="text-primary">Note:</strong> Please select your preferred exam date and arrive at the exam center by your selected time slot's reporting time. 
           Late arrivals will not be permitted.
         </p>
       </Card>
