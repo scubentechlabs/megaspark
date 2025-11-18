@@ -27,19 +27,19 @@ export const EligibilityCriteria = () => {
             Eligibility
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Open to students from Standard 5th to 10th in English medium
+            Open to students from Standard 5th to 10th in both Gujarati and English mediums
           </p>
         </div>
 
-        <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
-          {/* English Medium Column */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {/* Gujarati Medium Column */}
           <Card className="border-2 border-primary/20">
             <CardHeader className="bg-gradient-to-br from-primary/10 to-primary/5 pb-4">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
-                <div className="text-primary">English Medium</div>
+                <div className="text-primary">Gujarati Medium</div>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
@@ -56,6 +56,30 @@ export const EligibilityCriteria = () => {
             </CardContent>
           </Card>
 
+
+          {/* English Medium Column */}
+          <Card className="border-2 border-accent/20">
+            <CardHeader className="bg-gradient-to-br from-accent/10 to-accent/5 pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
+                  <BookOpen className="h-4 w-4 text-white" />
+                </div>
+                <div className="text-accent">English Medium</div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="grid grid-cols-3 gap-2">
+                {standards.map((standard, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-center p-3 rounded-lg bg-secondary/50 border border-border"
+                  >
+                    <span className="font-semibold text-sm text-foreground">{standard.name}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
