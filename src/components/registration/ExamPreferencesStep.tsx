@@ -126,15 +126,10 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
                     value={slot.slot_name}
                     disabled={!available}
                   >
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
-                        <span className="text-xs text-muted-foreground">
-                          Reporting: {slot.reporting_time}
-                        </span>
-                      </div>
-                      <span className={`text-xs ml-4 ${available ? 'text-green-600' : 'text-red-600'}`}>
-                        {getSlotAvailability(slot)}
+                    <div className="flex flex-col">
+                      <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Reporting: {slot.reporting_time}
                       </span>
                     </div>
                   </SelectItem>
