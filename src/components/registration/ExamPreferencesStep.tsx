@@ -77,23 +77,6 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <Label htmlFor="standard">Current Standard *</Label>
-        <Select value={formData.standard} onValueChange={(value) => updateFormData({ standard: value })}>
-          <SelectTrigger className="bg-background">
-            <SelectValue placeholder="Select your standard" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            <SelectItem value="5">Standard 5</SelectItem>
-            <SelectItem value="6">Standard 6</SelectItem>
-            <SelectItem value="7">Standard 7</SelectItem>
-            <SelectItem value="8">Standard 8</SelectItem>
-            <SelectItem value="9">Standard 9</SelectItem>
-            <SelectItem value="10">Standard 10</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="medium">Medium of Instruction *</Label>
         <Select value={formData.medium} onValueChange={(value) => updateFormData({ medium: value })}>
           <SelectTrigger className="bg-background">
