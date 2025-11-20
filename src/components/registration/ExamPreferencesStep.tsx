@@ -122,19 +122,6 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
-        <Label htmlFor="medium">Medium of Instruction *</Label>
-        <Select value={formData.medium} onValueChange={(value) => updateFormData({ medium: value })}>
-          <SelectTrigger className="bg-background">
-            <SelectValue placeholder="Select medium" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            <SelectItem value="gujarati">Gujarati Medium</SelectItem>
-            <SelectItem value="english">English Medium</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="examDate">Preferred Exam Date *</Label>
         <Select value={formData.examDate} onValueChange={(value) => updateFormData({ examDate: value })}>
           <SelectTrigger className="bg-background">

@@ -91,10 +91,6 @@ export const RegistrationSection = () => {
         toast.error("Please select current standard");
         return false;
       }
-      if (!formData.medium) {
-        toast.error("Please select medium of instruction");
-        return false;
-      }
       if (!formData.examDate) {
         toast.error("Please select an exam date");
         return false;
@@ -190,7 +186,6 @@ export const RegistrationSection = () => {
           standard: formData.standard,
           previous_year_percentage: formData.previousYearPercentage,
           time_slot: formData.timeSlot,
-          medium: formData.medium,
           exam_date: formData.examDate,
           preferred_exam_date: formData.examDate,
           exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
