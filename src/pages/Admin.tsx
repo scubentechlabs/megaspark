@@ -736,7 +736,7 @@ export default function Admin() {
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
-                              <TableCell>{formatMedium(reg.medium)}</TableCell>
+                              <TableCell>{formatMedium(reg.school_medium)}</TableCell>
                               <TableCell>
                                 {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
                               </TableCell>
