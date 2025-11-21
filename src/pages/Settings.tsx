@@ -11,6 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
 import { Settings as SettingsIcon, Save, Download, Database, FileText } from "lucide-react";
 
 export default function Settings() {
@@ -23,6 +24,7 @@ export default function Settings() {
     organizationName: "P.R. SAVANI",
     contactEmail: "info@megaspark.com",
     contactPhone: "+91 1234567890",
+    maintenanceMode: false,
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -69,6 +71,7 @@ export default function Settings() {
               organizationName: newSettings.organization_name,
               contactEmail: newSettings.contact_email,
               contactPhone: newSettings.contact_phone,
+              maintenanceMode: newSettings.maintenance_mode || false,
             });
           }
         } else {
@@ -81,6 +84,7 @@ export default function Settings() {
           organizationName: data.organization_name,
           contactEmail: data.contact_email,
           contactPhone: data.contact_phone,
+          maintenanceMode: data.maintenance_mode || false,
         });
       }
     } catch (error: any) {
@@ -114,6 +118,7 @@ export default function Settings() {
           organization_name: examSettings.organizationName,
           contact_email: examSettings.contactEmail,
           contact_phone: examSettings.contactPhone,
+          maintenance_mode: examSettings.maintenanceMode,
         })
         .eq("id", settingsId);
 
@@ -269,6 +274,38 @@ export default function Settings() {
           </header>
           <div className="p-6 space-y-6">
             
+            {/* Maintenance Mode */}
+            <Card>
+              <CardHeader className="border-b">
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <SettingsIcon className="h-5 w-5" />
+                  Maintenance Mode
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="maintenance-mode" className="text-base font-medium">
+                      Enable Maintenance Mode
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      When enabled, visitors on the production domain will see a maintenance message. 
+                      This does not affect Lovable preview domains.
+                    </p>
+                  </div>
+                  <Switch
+                    id="maintenance-mode"
+                    checked={examSettings.maintenanceMode}
+                    onCheckedChange={(checked) => {
+                      setExamSettings({ ...examSettings, maintenanceMode: checked });
+                      // Auto-save maintenance mode changes
+                      handleSave();
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Exam Settings */}
             <Card>
               <CardHeader className="border-b">

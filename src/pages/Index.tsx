@@ -12,6 +12,7 @@ import { HelpBox } from "@/components/HelpBox";
 import { FinalCTA } from "@/components/FinalCTA";
 import { NewFooter } from "@/components/NewFooter";
 import { MultiStepRegistration } from "@/components/MultiStepRegistration";
+import { MaintenancePage } from "@/components/MaintenancePage";
 import {
   Dialog,
   DialogContent,
@@ -19,11 +20,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    checkMaintenanceMode();
+    
     // Open popup after 10 seconds
     const timer = setTimeout(() => {
       setIsPopupOpen(true);
@@ -31,6 +37,45 @@ const Index = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const checkMaintenanceMode = async () => {
+    try {
+      // Check if we're on a production domain (not lovable.app subdomain)
+      const hostname = window.location.hostname;
+      const isProductionDomain = !hostname.includes('lovable.app');
+      
+      if (!isProductionDomain) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch maintenance mode setting
+      const { data, error } = await supabase
+        .from('settings')
+        .select('maintenance_mode')
+        .single();
+
+      if (!error && data?.maintenance_mode) {
+        setIsMaintenanceMode(true);
+      }
+    } catch (error) {
+      console.error('Error checking maintenance mode:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (isMaintenanceMode) {
+    return <MaintenancePage />;
+  }
 
   return (
     <main className="min-h-screen">
