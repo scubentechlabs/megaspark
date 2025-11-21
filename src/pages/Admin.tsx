@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { fetchAll } from "@/lib/fetchAll";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -56,24 +56,17 @@ interface Registration {
 export default function Admin() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [filteredRegistrations, setFilteredRegistrations] = useState<Registration[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editedRegNumber, setEditedRegNumber] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(50);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
   }, []);
-
-  useEffect(() => {
-    fetchRegistrations();
-  }, [currentPage]);
 
   useEffect(() => {
     // Set up realtime subscription for registrations
@@ -171,15 +164,22 @@ export default function Admin() {
     if (!searchTerm) return;
     
     try {
-      const { data, error } = await supabase
-        .from('registrations')
-        .select('*')
-        .or(`student_name.ilike.%${searchTerm}%,mobile_number.ilike.%${searchTerm}%,registration_number.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,parent_name.ilike.%${searchTerm}%,district.ilike.%${searchTerm}%`)
-        .order('created_at', { ascending: false });
+      const data = await fetchAll<Registration>(
+        'registrations',
+        '*',
+        { column: 'created_at', ascending: false }
+      );
       
-      if (error) throw error;
-      setFilteredRegistrations(data || []);
-      setCurrentPage(1);
+      const filtered = data.filter(reg => 
+        reg.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.mobile_number?.includes(searchTerm) ||
+        reg.registration_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.parent_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reg.district?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      
+      setFilteredRegistrations(filtered);
     } catch (error) {
       console.error("Error filtering:", error);
     }
@@ -189,29 +189,15 @@ export default function Admin() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      console.log("Fetching registrations with pagination...");
+      console.log("Fetching all registrations...");
       
-      // Get total count for stats
-      const { count, error: countError } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true });
+      const data = await fetchAll<Registration>(
+        'registrations',
+        '*',
+        { column: 'created_at', ascending: false }
+      );
       
-      if (countError) throw countError;
-      setTotalCount(count || 0);
-      
-      // Fetch only current page
-      const from = (currentPage - 1) * itemsPerPage;
-      const to = from + itemsPerPage - 1;
-      
-      const { data, error } = await supabase
-        .from('registrations')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(from, to);
-
-      if (error) throw error;
-      
-      console.log(`Fetched ${data?.length} registrations for page ${currentPage}`);
+      console.log(`Fetched ${data?.length} total registrations`);
       
       setRegistrations(data || []);
       if (!searchTerm) {
@@ -564,7 +550,7 @@ export default function Admin() {
   };
 
   const getStats = () => {
-    const total = totalCount;
+    const total = registrations.length;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -752,9 +738,7 @@ export default function Admin() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredRegistrations
-                            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                            .map((reg) => (
+                          {filteredRegistrations.map((reg) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
                               <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
                               <TableCell>{reg.student_name}</TableCell>
@@ -801,76 +785,6 @@ export default function Admin() {
                     </div>
                   )}
                 </CardContent>
-                {!isLoading && filteredRegistrations.length > 0 && (
-                  <div className="p-4 border-t flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredRegistrations.length)} of {filteredRegistrations.length} registrations
-                    </p>
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            disabled={currentPage === 1}
-                            className="gap-1"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                            Previous
-                          </Button>
-                        </PaginationItem>
-                        {Array.from({ length: Math.ceil(filteredRegistrations.length / itemsPerPage) }, (_, i) => i + 1)
-                          .filter(page => {
-                            const totalPages = Math.ceil(filteredRegistrations.length / itemsPerPage);
-                            if (totalPages <= 7) return true;
-                            if (page === 1 || page === totalPages) return true;
-                            if (page >= currentPage - 1 && page <= currentPage + 1) return true;
-                            return false;
-                          })
-                          .map((page, index, array) => {
-                            if (index > 0 && array[index - 1] !== page - 1) {
-                              return [
-                                <PaginationItem key={`ellipsis-${page}`}>
-                                  <span className="px-2">...</span>
-                                </PaginationItem>,
-                                <PaginationItem key={page}>
-                                  <PaginationLink
-                                    onClick={() => setCurrentPage(page)}
-                                    isActive={currentPage === page}
-                                  >
-                                    {page}
-                                  </PaginationLink>
-                                </PaginationItem>
-                              ];
-                            }
-                            return (
-                              <PaginationItem key={page}>
-                                <PaginationLink
-                                  onClick={() => setCurrentPage(page)}
-                                  isActive={currentPage === page}
-                                >
-                                  {page}
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                          })}
-                        <PaginationItem>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredRegistrations.length / itemsPerPage), p + 1))}
-                            disabled={currentPage === Math.ceil(filteredRegistrations.length / itemsPerPage)}
-                            className="gap-1"
-                          >
-                            Next
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
               </Card>
             </div>
           </main>
