@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
-import { fetchAll } from "@/lib/fetchAll";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import {
   SidebarProvider,
@@ -57,6 +56,7 @@ interface Registration {
 export default function Admin() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [filteredRegistrations, setFilteredRegistrations] = useState<Registration[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
@@ -70,6 +70,10 @@ export default function Admin() {
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    fetchRegistrations();
+  }, [currentPage]);
 
   useEffect(() => {
     // Set up realtime subscription for registrations
@@ -155,46 +159,66 @@ export default function Admin() {
   };
 
   useEffect(() => {
+    // When search term changes, fetch matching results
     if (searchTerm) {
-      const filtered = registrations.filter(
-        (reg) =>
-          reg.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          reg.mobile_number.includes(searchTerm) ||
-          (reg.registration_number && reg.registration_number.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (reg.email && reg.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (reg.parent_name && reg.parent_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (reg.district && reg.district.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-      setFilteredRegistrations(filtered);
-      setCurrentPage(1); // Reset to first page on search
+      fetchFilteredRegistrations();
     } else {
       setFilteredRegistrations(registrations);
     }
-  }, [searchTerm, registrations]);
+  }, [searchTerm]);
+
+  const fetchFilteredRegistrations = async () => {
+    if (!searchTerm) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .or(`student_name.ilike.%${searchTerm}%,mobile_number.ilike.%${searchTerm}%,registration_number.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,parent_name.ilike.%${searchTerm}%,district.ilike.%${searchTerm}%`)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setFilteredRegistrations(data || []);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error filtering:", error);
+    }
+  };
 
 
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      console.log("Starting to fetch registrations...");
+      console.log("Fetching registrations with pagination...");
       
-      const data = await fetchAll<Registration>(
-        "registrations",
-        "*",
-        { column: "created_at", ascending: false }
-      );
+      // Get total count for stats
+      const { count, error: countError } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true });
+      
+      if (countError) throw countError;
+      setTotalCount(count || 0);
+      
+      // Fetch only current page
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+      
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
-      console.log("Fetched registrations:", data?.length);
+      if (error) throw error;
+      
+      console.log(`Fetched ${data?.length} registrations for page ${currentPage}`);
       
       setRegistrations(data || []);
-      setFilteredRegistrations(data || []);
-      toast({
-        title: "Data Loaded",
-        description: `Loaded ${data?.length || 0} registrations`,
-      });
+      if (!searchTerm) {
+        setFilteredRegistrations(data || []);
+      }
     } catch (error: any) {
       console.error("Error fetching registrations:", error);
-      console.error("Error details:", error.message, error.code);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch registrations",
@@ -540,7 +564,7 @@ export default function Admin() {
   };
 
   const getStats = () => {
-    const total = registrations.length;
+    const total = totalCount;
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
