@@ -40,22 +40,26 @@ const Index = () => {
 
   const checkMaintenanceMode = async () => {
     try {
-      // Check if we're on a production domain (not lovable.app subdomain)
-      const hostname = window.location.hostname;
-      const isProductionDomain = !hostname.includes('lovable.app');
-      
-      if (!isProductionDomain) {
-        setIsLoading(false);
-        return;
-      }
-
       // Fetch maintenance mode setting
       const { data, error } = await supabase
         .from('settings')
         .select('maintenance_mode')
         .single();
 
-      if (!error && data?.maintenance_mode) {
+      if (error) {
+        console.error('Error fetching maintenance mode:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if we're on a Lovable preview domain
+      const hostname = window.location.hostname;
+      const isLovableDomain = hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
+      
+      // Show maintenance mode only if:
+      // 1. Maintenance mode is enabled in settings
+      // 2. NOT on a Lovable preview domain
+      if (data?.maintenance_mode && !isLovableDomain) {
         setIsMaintenanceMode(true);
       }
     } catch (error) {
