@@ -155,8 +155,9 @@ serve(async (req) => {
     drawInfoRow('Standard', registration.standard, yPosition);
     yPosition -= 20;
     
-    const formatMedium = (medium: string): string => {
-      const mediumLower = medium?.toLowerCase() || '';
+    const formatMedium = (medium: string | null): string => {
+      if (!medium) return 'N/A';
+      const mediumLower = medium.toLowerCase();
       if (mediumLower === 'gujarati') return 'Gujarati';
       if (mediumLower === 'english') return 'English Medium';
       return medium;
