@@ -344,6 +344,7 @@ export type Database = {
           created_at: string
           exam_name: string
           id: string
+          maintenance_mode: boolean | null
           organization_name: string
           updated_at: string
         }
@@ -353,6 +354,7 @@ export type Database = {
           created_at?: string
           exam_name?: string
           id?: string
+          maintenance_mode?: boolean | null
           organization_name?: string
           updated_at?: string
         }
@@ -362,6 +364,7 @@ export type Database = {
           created_at?: string
           exam_name?: string
           id?: string
+          maintenance_mode?: boolean | null
           organization_name?: string
           updated_at?: string
         }
