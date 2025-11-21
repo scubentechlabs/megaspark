@@ -289,8 +289,7 @@ export default function Settings() {
                       Enable Maintenance Mode
                     </Label>
                     <p className="text-sm text-muted-foreground">
-                      When enabled, visitors on the production domain will see a maintenance message. 
-                      This does not affect Lovable preview domains.
+                      When enabled, visitors will see a maintenance message.
                     </p>
                   </div>
                   <Switch
