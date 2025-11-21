@@ -21,7 +21,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
-import { fetchAll } from "@/lib/fetchAll";
+// Removed fetchAll - using server-side aggregations instead
 import {
   BarChart,
   Bar,
@@ -75,30 +75,7 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // Fetch all registrations using batched requests (bypass 1000 limit)
-      const registrations = await fetchAll<any>(
-        "registrations",
-        "*",
-        { column: "created_at", ascending: false }
-      );
-
-      // Fetch count for payments
-      const { count: payCount, error: payCountError } = await supabase
-        .from("payments")
-        .select("*", { count: 'exact', head: true });
-
-      if (payCountError) throw payCountError;
-
-      // Fetch all payments - remove default 1000 limit
-      const { data: payments, error: payError } = await supabase
-        .from("payments")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .range(0, payCount || 100000);
-
-      if (payError) throw payError;
-
-      // Get today and yesterday dates
+      // Get date boundaries
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const yesterday = new Date(today);
@@ -106,31 +83,81 @@ export default function Dashboard() {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // Calculate today's and yesterday's registrations
-      const todayRegistrations = registrations?.filter((reg) => {
-        const regDate = new Date(reg.created_at);
-        return regDate >= today && regDate < tomorrow;
-      }) || [];
+      // Fetch total counts efficiently
+      const { count: totalRegistrations } = await supabase
+        .from("registrations")
+        .select("*", { count: 'exact', head: true });
 
-      const yesterdayRegistrations = registrations?.filter((reg) => {
-        const regDate = new Date(reg.created_at);
-        return regDate >= yesterday && regDate < today;
-      }) || [];
+      const { count: todayCount } = await supabase
+        .from("registrations")
+        .select("*", { count: 'exact', head: true })
+        .gte("created_at", today.toISOString())
+        .lt("created_at", tomorrow.toISOString());
 
-      // Calculate statistics
-      const registrationsByStandard = registrations?.reduce((acc: any, reg) => {
+      const { count: yesterdayCount } = await supabase
+        .from("registrations")
+        .select("*", { count: 'exact', head: true })
+        .gte("created_at", yesterday.toISOString())
+        .lt("created_at", today.toISOString());
+
+      // Fetch recent registrations only (last 5)
+      const { data: recentRegistrations } = await supabase
+        .from("registrations")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      // Fetch payment stats
+      const { count: totalPayments } = await supabase
+        .from("payments")
+        .select("*", { count: 'exact', head: true });
+
+      const { count: successfulPayments } = await supabase
+        .from("payments")
+        .select("*", { count: 'exact', head: true })
+        .eq("status", "success");
+
+      const { count: failedPayments } = await supabase
+        .from("payments")
+        .select("*", { count: 'exact', head: true })
+        .eq("status", "failed");
+
+      // Fetch recent payments only (last 5)
+      const { data: recentPayments } = await supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      // Calculate total revenue from successful payments only
+      const { data: successPaymentData } = await supabase
+        .from("payments")
+        .select("amount")
+        .eq("status", "success");
+      
+      const totalRevenue = successPaymentData?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+
+      // Fetch registrations by standard (aggregated)
+      const { data: standardData } = await supabase
+        .from("registrations")
+        .select("standard");
+      
+      const registrationsByStandard = standardData?.reduce((acc: any, reg) => {
         acc[reg.standard] = (acc[reg.standard] || 0) + 1;
         return acc;
       }, {}) || {};
 
-      const registrationsByMedium = registrations?.reduce((acc: any, reg) => {
-        acc[reg.medium] = (acc[reg.medium] || 0) + 1;
+      // Fetch registrations by medium (aggregated)
+      const { data: mediumData } = await supabase
+        .from("registrations")
+        .select("medium");
+      
+      const registrationsByMedium = mediumData?.reduce((acc: any, reg) => {
+        if (reg.medium) {
+          acc[reg.medium] = (acc[reg.medium] || 0) + 1;
+        }
         return acc;
       }, {}) || {};
-
-      const successfulPayments = payments?.filter((p) => p.status === "success") || [];
-      const failedPayments = payments?.filter((p) => p.status === "failed") || [];
-      const totalRevenue = successfulPayments.reduce((sum, p) => sum + Number(p.amount), 0);
 
       // Generate registration trend data for last 7 days
       const registrationTrendData = [];
@@ -142,33 +169,34 @@ export default function Dashboard() {
         const nextDate = new Date(date);
         nextDate.setDate(nextDate.getDate() + 1);
         
-        const count = registrations?.filter((reg) => {
-          const regDate = new Date(reg.created_at);
-          return regDate >= date && regDate < nextDate;
-        }).length || 0;
+        const { count } = await supabase
+          .from("registrations")
+          .select("*", { count: 'exact', head: true })
+          .gte("created_at", date.toISOString())
+          .lt("created_at", nextDate.toISOString());
         
         registrationTrendData.push({
           date: format(date, 'MMM dd'),
-          registrations: count,
+          registrations: count || 0,
         });
       }
 
       setStats({
-        totalRegistrations: registrations?.length || 0,
-        todayRegistrations: todayRegistrations.length,
-        yesterdayRegistrations: yesterdayRegistrations.length,
-        totalPayments: payments?.length || 0,
-        successfulPayments: successfulPayments.length,
-        failedPayments: failedPayments.length,
+        totalRegistrations: totalRegistrations || 0,
+        todayRegistrations: todayCount || 0,
+        yesterdayRegistrations: yesterdayCount || 0,
+        totalPayments: totalPayments || 0,
+        successfulPayments: successfulPayments || 0,
+        failedPayments: failedPayments || 0,
         totalRevenue,
         registrationsByStandard,
         registrationsByMedium,
-        recentRegistrations: registrations?.slice(0, 5) || [],
-        recentPayments: payments?.slice(0, 5) || [],
+        recentRegistrations: recentRegistrations || [],
+        recentPayments: recentPayments || [],
         registrationTrendData,
       });
 
-      toast.success(`Dashboard refreshed - ${registrations?.length || 0} total registrations`);
+      toast.success(`Dashboard refreshed - ${totalRegistrations || 0} total registrations`);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error("Failed to load dashboard data");
