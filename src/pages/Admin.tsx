@@ -176,23 +176,28 @@ export default function Admin() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
+      console.log("Starting to fetch registrations...");
+      
       const data = await fetchAll<Registration>(
         "registrations",
         "*",
         { column: "created_at", ascending: false }
       );
 
+      console.log("Fetched registrations:", data?.length);
+      
       setRegistrations(data || []);
       setFilteredRegistrations(data || []);
       toast({
         title: "Data Loaded",
         description: `Loaded ${data?.length || 0} registrations`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching registrations:", error);
+      console.error("Error details:", error.message, error.code);
       toast({
         title: "Error",
-        description: "Failed to fetch registrations",
+        description: error.message || "Failed to fetch registrations",
         variant: "destructive",
       });
     } finally {
