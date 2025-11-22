@@ -157,7 +157,7 @@ export default function Settings() {
 
         const backup = {
           backup_date: new Date().toISOString(),
-          version: '2.5.1',
+          version: '3.1.1',
           data: {
             registrations: regData.data || [],
             payments: payData.data || [],
@@ -439,7 +439,7 @@ export default function Settings() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Version:</span>
-                    <span className="font-medium">2.5.1 (Beta)</span>
+                    <span className="font-medium">3.1.1 (Beta)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Last Updated:</span>
