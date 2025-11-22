@@ -200,7 +200,7 @@ serve(async (req) => {
     }
     
     if (registration.room_no) {
-      drawInfoRow('Room Number', registration.room_no, yPosition);
+      drawInfoRow('Registration No', registration.registration_number || 'Pending', yPosition);
       yPosition -= 20;
     }
     
