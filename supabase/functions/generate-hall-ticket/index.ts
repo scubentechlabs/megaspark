@@ -189,6 +189,9 @@ serve(async (req) => {
     drawInfoRow('Exam Center', 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150', yPosition);
     yPosition -= 20;
     
+    drawInfoRow('Registration No', registration.registration_number || 'Pending', yPosition);
+    yPosition -= 20;
+    
     if (registration.building_name) {
       drawInfoRow('Building', registration.building_name, yPosition);
       yPosition -= 20;
@@ -200,7 +203,7 @@ serve(async (req) => {
     }
     
     if (registration.room_no) {
-      drawInfoRow('Registration No', registration.registration_number || 'Pending', yPosition);
+      drawInfoRow('Room Number', registration.room_no, yPosition);
       yPosition -= 20;
     }
     
