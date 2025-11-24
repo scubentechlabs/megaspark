@@ -119,11 +119,34 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     return 'TBA';
   };
 
+  const handleDateChange = (newDate: string) => {
+    // Check if current time slot is available for the new date
+    if (formData.timeSlot) {
+      const currentSlot = slots.find(s => s.slot_name === formData.timeSlot);
+      if (currentSlot) {
+        const dateOverride = dateSlots.find(
+          ds => ds.exam_date === newDate && ds.slot_name === currentSlot.slot_name
+        );
+        // If slot is disabled for new date or full, clear the selection
+        if ((dateOverride && !dateOverride.is_enabled) || 
+            !currentSlot.is_enabled || 
+            currentSlot.current_count >= currentSlot.max_capacity) {
+          updateFormData({ examDate: newDate, timeSlot: '' });
+          toast.warning("Time slot cleared", {
+            description: "Your previously selected slot is not available for this date. Please select a new slot."
+          });
+          return;
+        }
+      }
+    }
+    updateFormData({ examDate: newDate });
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <Label htmlFor="examDate">Preferred Exam Date *</Label>
-        <Select value={formData.examDate} onValueChange={(value) => updateFormData({ examDate: value })}>
+        <Select value={formData.examDate} onValueChange={handleDateChange}>
           <SelectTrigger className="bg-background">
             <SelectValue placeholder="Select exam date" />
           </SelectTrigger>
