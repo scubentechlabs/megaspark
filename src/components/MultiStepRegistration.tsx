@@ -172,6 +172,46 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         return;
       }
 
+      // Verify slot availability before registration
+      const { data: slotData, error: slotError } = await supabase
+        .from('slot_settings')
+        .select('*')
+        .eq('slot_name', formData.timeSlot)
+        .single();
+
+      if (slotError || !slotData) {
+        toast.error("Error verifying slot availability");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Check if slot is enabled and has capacity
+      if (!slotData.is_enabled || slotData.current_count >= slotData.max_capacity) {
+        toast.error("Selected time slot is now full", {
+          description: "Please go back and select a different time slot."
+        });
+        setIsSubmitting(false);
+        setCurrentStep(3); // Go back to slot selection step
+        return;
+      }
+
+      // Check date-specific overrides
+      const { data: dateSlotData } = await supabase
+        .from('slot_date_settings')
+        .select('*')
+        .eq('exam_date', formData.examDate)
+        .eq('slot_name', formData.timeSlot)
+        .maybeSingle();
+
+      if (dateSlotData && !dateSlotData.is_enabled) {
+        toast.error("Selected time slot is not available for this date", {
+          description: "Please go back and select a different time slot or date."
+        });
+        setIsSubmitting(false);
+        setCurrentStep(3);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('registrations')
         .insert({
