@@ -137,27 +137,33 @@ export default function Dashboard() {
       
       const totalRevenue = successPaymentData?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
 
-      // Fetch registrations by standard (aggregated)
-      const { data: standardData } = await supabase
-        .from("registrations")
-        .select("standard");
+      // Fetch registrations by standard (use limit and pagination for large datasets)
+      const registrationsByStandard: Record<string, number> = {};
+      const standards = ["5", "6", "7", "8", "9", "10"];
       
-      const registrationsByStandard = standardData?.reduce((acc: any, reg) => {
-        acc[reg.standard] = (acc[reg.standard] || 0) + 1;
-        return acc;
-      }, {}) || {};
-
-      // Fetch registrations by medium (aggregated)
-      const { data: mediumData } = await supabase
-        .from("registrations")
-        .select("medium");
-      
-      const registrationsByMedium = mediumData?.reduce((acc: any, reg) => {
-        if (reg.medium) {
-          acc[reg.medium] = (acc[reg.medium] || 0) + 1;
+      for (const standard of standards) {
+        const { count } = await supabase
+          .from("registrations")
+          .select("*", { count: 'exact', head: true })
+          .eq("standard", standard);
+        if (count && count > 0) {
+          registrationsByStandard[standard] = count;
         }
-        return acc;
-      }, {}) || {};
+      }
+
+      // Fetch registrations by medium (use count queries)
+      const registrationsByMedium: Record<string, number> = {};
+      const mediums = ["English", "Gujarati"];
+      
+      for (const medium of mediums) {
+        const { count } = await supabase
+          .from("registrations")
+          .select("*", { count: 'exact', head: true })
+          .eq("medium", medium);
+        if (count && count > 0) {
+          registrationsByMedium[medium] = count;
+        }
+      }
 
       // Generate registration trend data for last 7 days
       const registrationTrendData = [];
