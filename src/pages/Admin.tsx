@@ -6,10 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -61,6 +69,10 @@ export default function Admin() {
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editedRegNumber, setEditedRegNumber] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0 });
+  const itemsPerPage = 100;
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -152,36 +164,49 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    // When search term changes, fetch matching results
-    if (searchTerm) {
-      fetchFilteredRegistrations();
-    } else {
-      setFilteredRegistrations(registrations);
-    }
-  }, [searchTerm]);
+    // When search term or page changes, fetch matching results
+    const timer = setTimeout(() => {
+      if (searchTerm) {
+        fetchFilteredRegistrations();
+      } else {
+        fetchRegistrations();
+      }
+    }, 500); // Debounce search
+    
+    return () => clearTimeout(timer);
+  }, [searchTerm, currentPage]);
 
   const fetchFilteredRegistrations = async () => {
-    if (!searchTerm) return;
+    if (!searchTerm) {
+      setCurrentPage(1);
+      fetchRegistrations();
+      return;
+    }
     
+    setIsLoading(true);
     try {
-      const data = await fetchAll<Registration>(
-        'registrations',
-        '*',
-        { column: 'created_at', ascending: false }
-      );
+      // For search, use ilike pattern matching in the database
+      const { data, error, count } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact' })
+        .or(`student_name.ilike.%${searchTerm}%,mobile_number.ilike.%${searchTerm}%,registration_number.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,parent_name.ilike.%${searchTerm}%,district.ilike.%${searchTerm}%`)
+        .order('created_at', { ascending: false })
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
       
-      const filtered = data.filter(reg => 
-        reg.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.mobile_number?.includes(searchTerm) ||
-        reg.registration_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.parent_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reg.district?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      if (error) throw error;
       
-      setFilteredRegistrations(filtered);
+      setFilteredRegistrations(data || []);
+      setRegistrations(data || []);
+      setTotalCount(count || 0);
     } catch (error) {
       console.error("Error filtering:", error);
+      toast({
+        title: "Error",
+        description: "Failed to search registrations",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -189,20 +214,54 @@ export default function Admin() {
   const fetchRegistrations = async () => {
     setIsLoading(true);
     try {
-      console.log("Fetching all registrations...");
+      console.log(`Fetching registrations page ${currentPage}...`);
       
-      const data = await fetchAll<Registration>(
-        'registrations',
-        '*',
-        { column: 'created_at', ascending: false }
-      );
+      // Get total count
+      const { count } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true });
       
-      console.log(`Fetched ${data?.length} total registrations`);
+      setTotalCount(count || 0);
+      
+      // Get today's and yesterday's counts
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayISO = today.toISOString();
+      
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayISO = yesterday.toISOString();
+      
+      const { count: todayCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', todayISO);
+      
+      const { count: yesterdayCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', yesterdayISO)
+        .lt('created_at', todayISO);
+      
+      setStats({
+        total: count || 0,
+        todayRegistrations: todayCount || 0,
+        yesterdayRegistrations: yesterdayCount || 0
+      });
+      
+      // Fetch current page
+      const { data, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
+      
+      if (error) throw error;
+      
+      console.log(`Fetched ${data?.length} registrations for page ${currentPage}`);
       
       setRegistrations(data || []);
-      if (!searchTerm) {
-        setFilteredRegistrations(data || []);
-      }
+      setFilteredRegistrations(data || []);
     } catch (error: any) {
       console.error("Error fetching registrations:", error);
       toast({
@@ -395,68 +454,114 @@ export default function Admin() {
     }
   };
 
-  const exportToCSV = () => {
-    const headers = [
-      "Registration Number",
-      "Student Name",
-      "Parent Name",
-      "Mobile Number",
-      "WhatsApp Number",
-      "State",
-      "District",
-      "School Name",
-      "School Medium",
-      "Standard",
-      "Previous Year %",
-      "Time Slot",
-      "Reporting Time",
-      "Medium",
-      "Exam Center",
-      "Registration Date",
-    ];
+  const exportToCSV = async () => {
+    try {
+      // For CSV export, fetch all data matching current search
+      let allData: Registration[];
+      
+      if (searchTerm) {
+        const { data } = await supabase
+          .from('registrations')
+          .select('*')
+          .or(`student_name.ilike.%${searchTerm}%,mobile_number.ilike.%${searchTerm}%,registration_number.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,parent_name.ilike.%${searchTerm}%,district.ilike.%${searchTerm}%`)
+          .order('created_at', { ascending: false });
+        allData = data || [];
+      } else {
+        allData = await fetchAll<Registration>(
+          'registrations',
+          '*',
+          { column: 'created_at', ascending: false }
+        );
+      }
+      
+      const headers = [
+        "Registration Number",
+        "Student Name",
+        "Parent Name",
+        "Mobile Number",
+        "WhatsApp Number",
+        "State",
+        "District",
+        "School Name",
+        "School Medium",
+        "Standard",
+        "Previous Year %",
+        "Time Slot",
+        "Reporting Time",
+        "Medium",
+        "Exam Center",
+        "Registration Date",
+      ];
 
-    const csvData = filteredRegistrations.map((reg) => [
-      reg.registration_number,
-      reg.student_name,
-      reg.parent_name || 'N/A',
-      reg.mobile_number,
-      reg.whatsapp_number || 'N/A',
-      reg.state || 'N/A',
-      reg.district || 'N/A',
-      reg.school_name || 'N/A',
-      reg.school_medium || 'N/A',
-      reg.standard,
-      reg.previous_year_percentage || 'N/A',
-      formatTimeSlot(reg.time_slot),
-      getReportingTime(reg.time_slot),
-      formatMedium(reg.medium),
-      'PP Savani Center for excellence',
-      new Date(reg.created_at).toLocaleDateString(),
-    ]);
+      const csvData = allData.map((reg) => [
+        reg.registration_number,
+        reg.student_name,
+        reg.parent_name || 'N/A',
+        reg.mobile_number,
+        reg.whatsapp_number || 'N/A',
+        reg.state || 'N/A',
+        reg.district || 'N/A',
+        reg.school_name || 'N/A',
+        reg.school_medium || 'N/A',
+        reg.standard,
+        reg.previous_year_percentage || 'N/A',
+        formatTimeSlot(reg.time_slot),
+        getReportingTime(reg.time_slot),
+        formatMedium(reg.medium),
+        'PP Savani Center for excellence',
+        new Date(reg.created_at).toLocaleDateString(),
+      ]);
 
-    const csv = [
-      headers.join(","),
-      ...csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
+      const csv = [
+        headers.join(","),
+        ...csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+      ].join("\n");
 
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `registrations-${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `registrations-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
 
-    toast({
-      title: "Exported!",
-      description: "Registration data has been exported to CSV",
-    });
+      toast({
+        title: "Exported!",
+        description: `${allData.length} registrations exported to CSV`,
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to export data",
+        variant: "destructive",
+      });
+    }
   };
 
-  const printRegistrations = () => {
-    const printHTML = `
+  const printRegistrations = async () => {
+    try {
+      // For print, fetch all data matching current search
+      let allData: Registration[];
+      
+      if (searchTerm) {
+        const { data } = await supabase
+          .from('registrations')
+          .select('*')
+          .or(`student_name.ilike.%${searchTerm}%,mobile_number.ilike.%${searchTerm}%,registration_number.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,parent_name.ilike.%${searchTerm}%,district.ilike.%${searchTerm}%`)
+          .order('created_at', { ascending: false });
+        allData = data || [];
+      } else {
+        allData = await fetchAll<Registration>(
+          'registrations',
+          '*',
+          { column: 'created_at', ascending: false }
+        );
+      }
+      
+      const printHTML = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -479,7 +584,7 @@ export default function Admin() {
       <body>
         <div class="header">
           <h1>MEGA SPARK EXAM 2025 - Registration Data</h1>
-          <p>Total Registrations: ${filteredRegistrations.length} | Generated: ${new Date().toLocaleString()}</p>
+          <p>Total Registrations: ${allData.length} | Generated: ${new Date().toLocaleString()}</p>
         </div>
         
         <table>
@@ -501,7 +606,7 @@ export default function Admin() {
             </tr>
           </thead>
           <tbody>
-            ${filteredRegistrations.map(reg => `
+            ${allData.map(reg => `
               <tr>
                 <td>${reg.registration_number}</td>
                 <td>${reg.student_name}</td>
@@ -528,52 +633,38 @@ export default function Admin() {
       </html>
     `;
 
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(printHTML);
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.print();
-      };
-      
-      toast({
-        title: "Print Ready",
-        description: "Opening print dialog for registration data",
-      });
-    } else {
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(printHTML);
+        printWindow.document.close();
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+        
+        toast({
+          title: "Print Ready",
+          description: `Opening print dialog for ${allData.length} registrations`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Please allow popups to print data",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Print error:", error);
       toast({
         title: "Error",
-        description: "Please allow popups to print registration data",
+        description: "Failed to prepare print data",
         variant: "destructive",
       });
     }
   };
 
   const getStats = () => {
-    const total = registrations.length;
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const todayRegistrations = registrations.filter(reg => {
-      const regDate = new Date(reg.created_at);
-      regDate.setHours(0, 0, 0, 0);
-      return regDate.getTime() === today.getTime();
-    }).length;
-    
-    const yesterdayRegistrations = registrations.filter(reg => {
-      const regDate = new Date(reg.created_at);
-      regDate.setHours(0, 0, 0, 0);
-      return regDate.getTime() === yesterday.getTime();
-    }).length;
-
-    return { total, todayRegistrations, yesterdayRegistrations };
+    return stats;
   };
-
-  const stats = getStats();
 
   const handleEditRegNumber = (reg: Registration) => {
     setEditingRegistration(reg);
@@ -713,7 +804,7 @@ export default function Admin() {
               <Card className="bg-card">
                 <CardHeader className="border-b">
                   <CardTitle className="text-xl font-semibold">
-                    All Registrations ({filteredRegistrations.length})
+                    All Registrations ({totalCount} total, showing {filteredRegistrations.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -782,6 +873,73 @@ export default function Admin() {
                           ))}
                         </TableBody>
                       </Table>
+                    </div>
+                  )}
+                  
+                  {/* Pagination */}
+                  {!isLoading && filteredRegistrations.length > 0 && (
+                    <div className="border-t p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} registrations
+                        </div>
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="gap-2"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                                Previous
+                              </Button>
+                            </PaginationItem>
+                            
+                            {/* Page numbers */}
+                            {Array.from({ length: Math.min(5, Math.ceil(totalCount / itemsPerPage)) }, (_, i) => {
+                              const totalPages = Math.ceil(totalCount / itemsPerPage);
+                              let pageNum;
+                              
+                              if (totalPages <= 5) {
+                                pageNum = i + 1;
+                              } else if (currentPage <= 3) {
+                                pageNum = i + 1;
+                              } else if (currentPage >= totalPages - 2) {
+                                pageNum = totalPages - 4 + i;
+                              } else {
+                                pageNum = currentPage - 2 + i;
+                              }
+                              
+                              return (
+                                <PaginationItem key={pageNum}>
+                                  <PaginationLink
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    isActive={currentPage === pageNum}
+                                  >
+                                    {pageNum}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            })}
+                            
+                            <PaginationItem>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage(prev => Math.min(Math.ceil(totalCount / itemsPerPage), prev + 1))}
+                                disabled={currentPage >= Math.ceil(totalCount / itemsPerPage)}
+                                className="gap-2"
+                              >
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                              </Button>
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
                     </div>
                   )}
                 </CardContent>
