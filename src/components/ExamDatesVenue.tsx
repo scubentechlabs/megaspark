@@ -52,19 +52,36 @@ export const ExamDatesVenue = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-border">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center">
-                      <Clock className="h-6 w-6 text-white" />
+                <div className="flex flex-col gap-6 pt-6 border-t border-border">
+                  {/* Both Slots Display */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Morning Slot */}
+                    <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
+                      <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Morning Slot</p>
+                        <p className="text-lg font-bold text-primary">8:00 AM - 12:00 PM</p>
+                        <p className="text-xs text-accent font-semibold">Reporting: 8:00 AM</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Exam Time</p>
-                      <p className="text-xl font-bold text-primary">8:00 AM - 12:00 PM</p>
+
+                    {/* Afternoon Slot */}
+                    <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
+                      <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
+                        <Clock className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Afternoon Slot</p>
+                        <p className="text-lg font-bold text-primary">2:30 PM - 6:30 PM</p>
+                        <p className="text-xs text-accent font-semibold">Reporting: 2:30 PM</p>
+                      </div>
                     </div>
                   </div>
                   
                   {/* Sticky Note Style Callout */}
-                  <div className="relative">
+                  <div className="relative max-w-md mx-auto">
                     <div className="bg-[#fef9c3] p-6 rounded-lg shadow-lg border-l-4 border-accent rotate-1 transform hover:rotate-0 transition-transform">
                       <div className="absolute -top-3 -right-3 h-8 w-8 bg-accent/20 rounded-full" />
                       <div className="flex items-start gap-3">
@@ -72,8 +89,8 @@ export const ExamDatesVenue = () => {
                         <div>
                           <p className="font-bold text-lg text-primary mb-1">Important!</p>
                           <p className="text-sm text-foreground">
-                            Reporting starts at<br />
-                            <span className="text-2xl font-bold text-accent">8:00 AM</span> onwards
+                            Please arrive at your selected<br />
+                            <span className="text-xl font-bold text-accent">Reporting Time</span>
                           </p>
                         </div>
                       </div>
