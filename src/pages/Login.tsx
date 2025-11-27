@@ -170,7 +170,14 @@ export default function Login() {
 
     setConfirmDialogOpen(false);
     setIsUpdating(true);
+    
     try {
+      // Show initial progress
+      toast({
+        title: "Updating...",
+        description: "Saving changes to database",
+      });
+
       const { error: updateError } = await supabase
         .from("registrations")
         .update({
@@ -199,35 +206,63 @@ export default function Login() {
 
       if (updateError) throw updateError;
 
-      // Regenerate hall ticket
-      const { error: hallTicketError } = await supabase.functions.invoke('generate-hall-ticket', {
+      // Show progress for hall ticket generation
+      toast({
+        title: "Generating Hall Ticket...",
+        description: "Creating new hall ticket and sending via WhatsApp",
+      });
+
+      // Regenerate hall ticket and send via WhatsApp
+      const { data: hallTicketData, error: hallTicketError } = await supabase.functions.invoke('generate-hall-ticket', {
         body: { registrationId: editingRegistration.id }
       });
 
-      if (hallTicketError) throw hallTicketError;
+      if (hallTicketError) {
+        console.error("Hall ticket error:", hallTicketError);
+        throw new Error("Failed to generate hall ticket: " + hallTicketError.message);
+      }
+
+      if (!hallTicketData?.success) {
+        throw new Error(hallTicketData?.error || "Failed to generate hall ticket");
+      }
 
       // Refresh registrations list
-      const { data, error: fetchError } = await supabase
+      const { data: refreshedData, error: fetchError } = await supabase
         .from("registrations")
         .select("*")
         .eq("mobile_number", mobileNumber);
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error("Fetch error:", fetchError);
+      } else {
+        setRegistrations(refreshedData || []);
+      }
 
-      setRegistrations(data || []);
       setEditDialogOpen(false);
       setEditingRegistration(null);
 
+      // Show detailed success message
       toast({
-        title: "Success!",
-        description: "Details updated successfully and new hall ticket generated",
+        title: "✅ Update Successful!",
+        description: "Details updated, new hall ticket generated and sent via WhatsApp",
+        duration: 5000,
       });
     } catch (error: any) {
       console.error("Error updating registration:", error);
+      
+      // Show specific error message
+      let errorMessage = "Failed to update registration";
+      if (error.message?.includes("hall ticket")) {
+        errorMessage = "Details updated but failed to generate/send hall ticket. Please try downloading manually.";
+      } else {
+        errorMessage = error.message || "Failed to update registration";
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to update registration",
+        description: errorMessage,
         variant: "destructive",
+        duration: 6000,
       });
     } finally {
       setIsUpdating(false);
