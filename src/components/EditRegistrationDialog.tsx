@@ -202,23 +202,23 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
         .from("registrations")
         .update({
           student_name: formData.studentName,
-          email: formData.email,
+          email: formData.email || null,
           standard: formData.standard,
           exam_center: formData.examCenter,
-          whatsapp_number: formData.whatsappNumber,
+          whatsapp_number: formData.whatsappNumber || null,
           state: formData.state,
           district: formData.district,
           school_name: formData.schoolName,
-          school_address: formData.address,
+          school_address: formData.address || null,
           school_medium: formData.schoolMedium,
           previous_year_percentage: formData.previousYearPercentage,
-          date_of_birth: formData.dateOfBirth,
-          gender: formData.gender,
-          address: formData.address,
-          parent_first_name: formData.parentFirstName,
-          parent_last_name: formData.parentLastName,
-          parent_email: formData.parentEmail,
-          parent_phone: formData.parentPhone,
+          date_of_birth: formData.dateOfBirth || null, // Convert empty string to null
+          gender: formData.gender || null,
+          address: formData.address || null,
+          parent_first_name: formData.parentFirstName || null,
+          parent_last_name: formData.parentLastName || null,
+          parent_email: formData.parentEmail || null,
+          parent_phone: formData.parentPhone || null,
           parent_name: formData.parentName,
           medium: formData.schoolMedium, // Sync medium with school_medium
         })
