@@ -75,6 +75,14 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
   // Initialize form data when dialog opens
   useEffect(() => {
     if (registration && open) {
+      // Normalize standard value - extract just the number
+      const normalizeStandard = (std: string) => {
+        if (!std) return "";
+        // Extract number from strings like "5th", "Standard 5", "5", etc.
+        const match = std.match(/\d+/);
+        return match ? match[0] : "";
+      };
+
       setFormData({
         studentName: registration.student_name,
         parentName: registration.parent_name,
@@ -82,7 +90,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
         whatsappNumber: registration.whatsapp_number || "",
         state: registration.state || "",
         district: registration.district || "",
-        standard: registration.standard,
+        standard: normalizeStandard(registration.standard),
         schoolName: registration.school_name || "",
         schoolMedium: registration.school_medium || "",
         previousYearPercentage: registration.previous_year_percentage || "",
