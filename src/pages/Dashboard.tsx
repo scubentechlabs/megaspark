@@ -239,7 +239,7 @@ export default function Dashboard() {
   ].filter((item) => item.value > 0);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <SidebarInset className="flex-1">

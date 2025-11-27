@@ -677,7 +677,7 @@ export default function Admin() {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full bg-background">
         <AdminSidebar />
 

@@ -266,7 +266,7 @@ export default function UserManagement() {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="flex min-h-screen w-full">
         <AdminSidebar />
         <div className="flex-1 p-4 lg:p-8">
