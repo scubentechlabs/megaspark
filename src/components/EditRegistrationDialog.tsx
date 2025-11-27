@@ -397,7 +397,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="standard">Current Standard *</Label>
-                  <Select value={formData.standard} onValueChange={(value) => updateFormData({ standard: value })}>
+                  <Select value={formData.standard || ""} onValueChange={(value) => updateFormData({ standard: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select your standard" />
                     </SelectTrigger>
