@@ -85,12 +85,18 @@ export function AdminSidebar() {
     >
       <SidebarContent>
         {/* Header with Logo */}
-        <div className="p-6 border-b">
-          <img src={logo} alt="P.R. SAVANI MEGA SPARK" className="h-16 mx-auto mb-3" />
-          <div className="text-center">
-            <h2 className="font-bold text-lg">MEGA SPARK</h2>
-            <p className="text-sm text-muted-foreground">Admin Dashboard</p>
-          </div>
+        <div className="p-3 border-b">
+          {open ? (
+            <>
+              <img src={logo} alt="P.R. SAVANI MEGA SPARK" className="h-16 mx-auto mb-3" />
+              <div className="text-center">
+                <h2 className="font-bold text-lg">MEGA SPARK</h2>
+                <p className="text-sm text-muted-foreground">Admin Dashboard</p>
+              </div>
+            </>
+          ) : (
+            <img src={logo} alt="P.R. SAVANI MEGA SPARK" className="h-8 mx-auto" />
+          )}
         </div>
 
         {/* Menu */}
@@ -122,26 +128,47 @@ export function AdminSidebar() {
 
         {/* User Profile & Logout Section */}
         <div className="mt-auto border-t p-4 space-y-3">
-          {/* User Profile */}
-          <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-muted/50">
-            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">Admin</p>
-              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
-            </div>
-          </div>
+          {open ? (
+            <>
+              {/* User Profile */}
+              <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-muted/50">
+                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">Admin</p>
+                  <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+                </div>
+              </div>
 
-          {/* Logout Button */}
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </Button>
+              {/* Logout Button */}
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </Button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              {/* User Icon */}
+              <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-5 w-5 text-primary" />
+              </div>
+
+              {/* Logout Icon Button */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 text-destructive border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </SidebarContent>
     </Sidebar>
