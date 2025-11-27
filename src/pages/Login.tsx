@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +55,7 @@ export default function Login() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
@@ -159,9 +161,14 @@ export default function Login() {
     setEditDialogOpen(true);
   };
 
+  const handleConfirmUpdate = () => {
+    setConfirmDialogOpen(true);
+  };
+
   const handleUpdateRegistration = async () => {
     if (!editingRegistration) return;
 
+    setConfirmDialogOpen(false);
     setIsUpdating(true);
     try {
       const { error: updateError } = await supabase
@@ -714,7 +721,7 @@ export default function Login() {
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleUpdateRegistration}
+                  onClick={handleConfirmUpdate}
                   disabled={isUpdating}
                 >
                   {isUpdating ? "Updating..." : "Update & Generate New Hall Ticket"}
@@ -724,6 +731,29 @@ export default function Login() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Details Update</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to update the student details? This will:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Update all the modified information</li>
+                <li>Generate a new hall ticket with updated details</li>
+                <li>Send the new hall ticket via WhatsApp (if available)</li>
+              </ul>
+              <p className="mt-3 font-semibold">This action cannot be undone.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdating}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUpdateRegistration} disabled={isUpdating}>
+              {isUpdating ? "Updating..." : "Yes, Update Details"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
