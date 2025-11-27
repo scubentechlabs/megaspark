@@ -12,6 +12,27 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatRegistrationNumber } from "@/lib/formatters";
 
+interface SlotSetting {
+  slot_name: string;
+  is_enabled: boolean;
+  max_capacity: number;
+  current_count: number;
+  reporting_time: string;
+}
+
+interface SlotDateSetting {
+  exam_date: string;
+  slot_name: string;
+  is_enabled: boolean;
+}
+
+const examDates = [
+  { value: "2025-11-30", label: "30th November 2025 - Sunday" },
+  { value: "2025-12-07", label: "7th December 2025 - Sunday" },
+  { value: "2025-12-14", label: "14th December 2025 - Sunday" },
+  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
+];
+
 interface Registration {
   id: string;
   mobile_number: string;
@@ -63,6 +84,9 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
   const [formData, setFormData] = useState<any>({});
   const [isUpdating, setIsUpdating] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [slots, setSlots] = useState<SlotSetting[]>([]);
+  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(true);
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
@@ -71,6 +95,44 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
     { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
     { number: 3, title: "Review", icon: CheckCircle, description: "Confirm changes" }
   ];
+
+  // Fetch slot settings
+  useEffect(() => {
+    if (open) {
+      fetchSlotSettings();
+      fetchDateSlotSettings();
+    }
+  }, [open]);
+
+  const fetchSlotSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('slot_settings')
+        .select('*')
+        .order('slot_name');
+
+      if (error) throw error;
+      setSlots(data || []);
+    } catch (error) {
+      console.error('Error fetching slot settings:', error);
+      toast.error("Failed to load time slots");
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const fetchDateSlotSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('slot_date_settings')
+        .select('*');
+
+      if (error) throw error;
+      setDateSlots(data || []);
+    } catch (error) {
+      console.error('Error fetching date slot settings:', error);
+    }
+  };
 
   // Initialize form data when dialog opens
   useEffect(() => {
@@ -102,7 +164,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
         parentLastName: registration.parent_last_name || "",
         parentEmail: registration.parent_email || "",
         parentPhone: registration.parent_phone || "",
-        // Read-only fields
+        // Editable fields
         registrationNumber: registration.registration_number,
         examDate: registration.exam_date,
         timeSlot: registration.time_slot,
@@ -118,6 +180,61 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
 
   const handleStateChange = (value: string) => {
     updateFormData({ state: value, district: "" });
+  };
+
+  const getSlotLabel = (slotName: string) => {
+    return slotName.charAt(0).toUpperCase() + slotName.slice(1) + " Slot";
+  };
+
+  const isSlotAvailable = (slot: SlotSetting) => {
+    // Check date-specific overrides
+    if (formData.examDate) {
+      const dateOverride = dateSlots.find(
+        ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
+      );
+      if (dateOverride && !dateOverride.is_enabled) {
+        return false;
+      }
+    }
+    return slot.is_enabled && slot.current_count < slot.max_capacity;
+  };
+
+  const getSlotStatusMessage = (slot: SlotSetting) => {
+    // Check date-specific overrides
+    if (formData.examDate) {
+      const dateOverride = dateSlots.find(
+        ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
+      );
+      if (dateOverride && !dateOverride.is_enabled) {
+        return "Slot Is Full";
+      }
+    }
+    if (!slot.is_enabled) return "Disabled";
+    if (slot.current_count >= slot.max_capacity) return "Full";
+    return "";
+  };
+
+  const handleDateChange = (newDate: string) => {
+    // Check if current time slot is available for the new date
+    if (formData.timeSlot) {
+      const currentSlot = slots.find(s => s.slot_name === formData.timeSlot);
+      if (currentSlot) {
+        const dateOverride = dateSlots.find(
+          ds => ds.exam_date === newDate && ds.slot_name === currentSlot.slot_name
+        );
+        // If slot is disabled for new date or full, clear the selection
+        if ((dateOverride && !dateOverride.is_enabled) || 
+            !currentSlot.is_enabled || 
+            currentSlot.current_count >= currentSlot.max_capacity) {
+          updateFormData({ examDate: newDate, timeSlot: '' });
+          toast.warning("Time slot cleared", {
+            description: "Your previously selected slot is not available for this date. Please select a new slot."
+          });
+          return;
+        }
+      }
+    }
+    updateFormData({ examDate: newDate });
   };
 
   const validateStep = () => {
@@ -136,6 +253,14 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
       }
       if (!formData.district || formData.district.trim() === "") {
         toast.error("Please select district");
+        return false;
+      }
+      if (!formData.examDate) {
+        toast.error("Please select exam date");
+        return false;
+      }
+      if (!formData.timeSlot) {
+        toast.error("Please select time slot");
         return false;
       }
     } else if (currentStep === 2) {
@@ -199,6 +324,8 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
           student_name: formData.studentName,
           standard: formData.standard,
           exam_center: formData.examCenter,
+          exam_date: formData.examDate,
+          time_slot: formData.timeSlot,
           state: formData.state,
           district: formData.district,
           school_name: formData.schoolName,
@@ -295,7 +422,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
           <DialogHeader>
             <DialogTitle>Edit Student Details</DialogTitle>
             <DialogDescription>
-              Update student information. Registration number, exam date, time slot, and mobile number cannot be changed.
+              Update student information. Registration number and mobile number cannot be changed.
             </DialogDescription>
           </DialogHeader>
 
@@ -343,14 +470,6 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">WhatsApp Number</Label>
                     <Input value={formData.whatsappNumber || 'Not provided'} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground">Exam Date</Label>
-                    <Input value={formData.examDate ? new Date(formData.examDate).toLocaleDateString('en-GB') : 'TBA'} disabled />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-muted-foreground">Time Slot</Label>
-                    <Input value={formatTimeSlot(formData.timeSlot)} disabled />
                   </div>
                 </div>
 
@@ -412,6 +531,65 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="examDate">Exam Date *</Label>
+                    <Select value={formData.examDate || ""} onValueChange={handleDateChange}>
+                      <SelectTrigger id="examDate">
+                        <SelectValue placeholder="Select exam date" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {examDates.map((date) => (
+                          <SelectItem key={date.value} value={date.value}>
+                            {date.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="timeSlot">Time Slot *</Label>
+                    {loadingSlots ? (
+                      <p className="text-sm text-muted-foreground">Loading slots...</p>
+                    ) : (
+                      <Select 
+                        value={formData.timeSlot || ""} 
+                        onValueChange={(value) => updateFormData({ timeSlot: value })}
+                      >
+                        <SelectTrigger id="timeSlot">
+                          <SelectValue placeholder="Select time slot" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {slots.map((slot) => {
+                            const available = isSlotAvailable(slot);
+                            const statusMessage = getSlotStatusMessage(slot);
+                            return (
+                              <SelectItem 
+                                key={slot.slot_name} 
+                                value={slot.slot_name}
+                                disabled={!available}
+                              >
+                                <div className="flex items-center justify-between w-full">
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">{getSlotLabel(slot.slot_name)}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      Reporting: {slot.reporting_time}
+                                    </span>
+                                  </div>
+                                  {statusMessage && (
+                                    <span className="text-xs ml-4 text-red-600 font-medium">
+                                      {statusMessage}
+                                    </span>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
               </div>
@@ -513,6 +691,16 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                     <div className="grid grid-cols-3 gap-2">
                       <span className="text-muted-foreground">Location:</span>
                       <span className="col-span-2 font-medium">{formData.district}, {formData.state}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Exam Date:</span>
+                      <span className="col-span-2 font-medium">
+                        {formData.examDate ? new Date(formData.examDate).toLocaleDateString('en-GB') : 'Not selected'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Time Slot:</span>
+                      <span className="col-span-2 font-medium">{getSlotLabel(formData.timeSlot || '')}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <span className="text-muted-foreground">Standard:</span>
