@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
+import { Smartphone, Download, ArrowLeft, Send, Edit } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
@@ -28,6 +31,21 @@ interface Registration {
   building_name: string | null;
   exam_pattern: string | null;
   time_slot: string | null;
+  whatsapp_number: string | null;
+  state: string | null;
+  district: string | null;
+  school_name: string | null;
+  school_address: string | null;
+  school_medium: string | null;
+  previous_year_percentage: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
+  address: string | null;
+  parent_first_name: string | null;
+  parent_last_name: string | null;
+  parent_email: string | null;
+  parent_phone: string | null;
+  parent_name: string | null;
 }
 
 export default function Login() {
@@ -35,6 +53,9 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -131,6 +152,79 @@ export default function Login() {
     if (slot.toLowerCase() === 'morning') return '8:00 AM';
     if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
     return 'TBA';
+  };
+
+  const handleEditDetails = (registration: Registration) => {
+    setEditingRegistration({ ...registration });
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateRegistration = async () => {
+    if (!editingRegistration) return;
+
+    setIsUpdating(true);
+    try {
+      const { error: updateError } = await supabase
+        .from("registrations")
+        .update({
+          student_name: editingRegistration.student_name,
+          email: editingRegistration.email,
+          standard: editingRegistration.standard,
+          medium: editingRegistration.medium,
+          exam_center: editingRegistration.exam_center,
+          whatsapp_number: editingRegistration.whatsapp_number,
+          state: editingRegistration.state,
+          district: editingRegistration.district,
+          school_name: editingRegistration.school_name,
+          school_address: editingRegistration.school_address,
+          school_medium: editingRegistration.school_medium,
+          previous_year_percentage: editingRegistration.previous_year_percentage,
+          date_of_birth: editingRegistration.date_of_birth,
+          gender: editingRegistration.gender,
+          address: editingRegistration.address,
+          parent_first_name: editingRegistration.parent_first_name,
+          parent_last_name: editingRegistration.parent_last_name,
+          parent_email: editingRegistration.parent_email,
+          parent_phone: editingRegistration.parent_phone,
+          parent_name: editingRegistration.parent_name,
+        })
+        .eq("id", editingRegistration.id);
+
+      if (updateError) throw updateError;
+
+      // Regenerate hall ticket
+      const { error: hallTicketError } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId: editingRegistration.id }
+      });
+
+      if (hallTicketError) throw hallTicketError;
+
+      // Refresh registrations list
+      const { data, error: fetchError } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("mobile_number", mobileNumber);
+
+      if (fetchError) throw fetchError;
+
+      setRegistrations(data || []);
+      setEditDialogOpen(false);
+      setEditingRegistration(null);
+
+      toast({
+        title: "Success!",
+        description: "Details updated successfully and new hall ticket generated",
+      });
+    } catch (error: any) {
+      console.error("Error updating registration:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update registration",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleDownloadHallTicket = (registration: Registration) => {
@@ -358,11 +452,19 @@ export default function Login() {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                           <Button
+                            onClick={() => handleEditDetails(registration)}
+                            variant="outline"
+                            className="gap-2"
+                          >
+                            <Edit className="h-4 w-4" />
+                            Edit Details
+                          </Button>
+                          <Button
                             onClick={() => handleDownloadHallTicket(registration)}
                             className="bg-accent hover:bg-accent/90 gap-2"
                           >
                             <Download className="h-4 w-4" />
-                            Download Hall Ticket
+                            Download
                           </Button>
                           <Button
                             onClick={() => handleSendHallTicket(registration.id)}
@@ -370,7 +472,7 @@ export default function Login() {
                             className="gap-2"
                           >
                             <Send className="h-4 w-4" />
-                            Get on WhatsApp
+                            WhatsApp
                           </Button>
                         </div>
                       </div>
@@ -386,6 +488,242 @@ export default function Login() {
           <p>Need help? Contact us at digital.cfe.ppsavani@gmail.com or call 9978651002 / 3 / 4 / 5</p>
         </div>
       </div>
+
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Student Details</DialogTitle>
+            <DialogDescription>
+              Update student information. Registration number, exam date, time slot, and mobile number cannot be changed.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingRegistration && (
+            <div className="grid gap-4 py-4">
+              {/* Read-only fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Registration Number</Label>
+                  <Input value={formatRegistrationNumber(editingRegistration.registration_number)} disabled />
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Mobile Number</Label>
+                  <Input value={editingRegistration.mobile_number} disabled />
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Exam Date</Label>
+                  <Input value={editingRegistration.exam_date ? new Date(editingRegistration.exam_date).toLocaleDateString('en-GB') : 'TBA'} disabled />
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Time Slot</Label>
+                  <Input value={formatTimeSlot(editingRegistration.time_slot)} disabled />
+                </div>
+              </div>
+
+              {/* Editable fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="student_name">Student Name *</Label>
+                  <Input
+                    id="student_name"
+                    value={editingRegistration.student_name}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, student_name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editingRegistration.email || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="standard">Standard *</Label>
+                  <Select
+                    value={editingRegistration.standard}
+                    onValueChange={(value) => setEditingRegistration({ ...editingRegistration, standard: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5th">5th</SelectItem>
+                      <SelectItem value="6th">6th</SelectItem>
+                      <SelectItem value="7th">7th</SelectItem>
+                      <SelectItem value="8th">8th</SelectItem>
+                      <SelectItem value="9th">9th</SelectItem>
+                      <SelectItem value="10th">10th</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select
+                    value={editingRegistration.gender || ""}
+                    onValueChange={(value) => setEditingRegistration({ ...editingRegistration, gender: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="date_of_birth">Date of Birth</Label>
+                  <Input
+                    id="date_of_birth"
+                    type="date"
+                    value={editingRegistration.date_of_birth || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, date_of_birth: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="whatsapp_number">WhatsApp Number</Label>
+                  <Input
+                    id="whatsapp_number"
+                    value={editingRegistration.whatsapp_number || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, whatsapp_number: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                    maxLength={10}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={editingRegistration.address || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, address: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="state">State</Label>
+                  <Input
+                    id="state"
+                    value={editingRegistration.state || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, state: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="district">District</Label>
+                  <Input
+                    id="district"
+                    value={editingRegistration.district || ""}
+                    onChange={(e) => setEditingRegistration({ ...editingRegistration, district: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Parent Details */}
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-3">Parent Details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="parent_first_name">Parent First Name</Label>
+                    <Input
+                      id="parent_first_name"
+                      value={editingRegistration.parent_first_name || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, parent_first_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="parent_last_name">Parent Last Name</Label>
+                    <Input
+                      id="parent_last_name"
+                      value={editingRegistration.parent_last_name || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, parent_last_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="parent_email">Parent Email</Label>
+                    <Input
+                      id="parent_email"
+                      type="email"
+                      value={editingRegistration.parent_email || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, parent_email: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="parent_phone">Parent Phone</Label>
+                    <Input
+                      id="parent_phone"
+                      value={editingRegistration.parent_phone || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, parent_phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                      maxLength={10}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* School Details */}
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-3">School Details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="school_name">School Name</Label>
+                    <Input
+                      id="school_name"
+                      value={editingRegistration.school_name || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, school_name: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="school_medium">School Medium</Label>
+                    <Select
+                      value={editingRegistration.school_medium || ""}
+                      onValueChange={(value) => setEditingRegistration({ ...editingRegistration, school_medium: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select medium" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="English">English</SelectItem>
+                        <SelectItem value="Gujarati">Gujarati</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="school_address">School Address</Label>
+                    <Input
+                      id="school_address"
+                      value={editingRegistration.school_address || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, school_address: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="previous_year_percentage">Previous Year Percentage</Label>
+                    <Input
+                      id="previous_year_percentage"
+                      value={editingRegistration.previous_year_percentage || ""}
+                      onChange={(e) => setEditingRegistration({ ...editingRegistration, previous_year_percentage: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditDialogOpen(false)}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleUpdateRegistration}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Updating..." : "Update & Generate New Hall Ticket"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
