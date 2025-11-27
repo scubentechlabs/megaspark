@@ -20,7 +20,7 @@ export default function Coupons() {
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1">

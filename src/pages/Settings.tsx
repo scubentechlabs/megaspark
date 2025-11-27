@@ -252,7 +252,7 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <div className="min-h-screen flex w-full">
           <AdminSidebar />
           <main className="flex-1 flex items-center justify-center">
@@ -264,7 +264,7 @@ export default function Settings() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <main className="flex-1">

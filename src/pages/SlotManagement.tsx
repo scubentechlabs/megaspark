@@ -162,7 +162,7 @@ export default function SlotManagement() {
 
   if (loading) {
     return (
-      <SidebarProvider>
+      <SidebarProvider defaultOpen={false}>
         <div className="flex min-h-screen w-full">
           <AdminSidebar />
           <SidebarInset>
@@ -176,7 +176,7 @@ export default function SlotManagement() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="flex min-h-screen w-full">
         <AdminSidebar />
         <SidebarInset>

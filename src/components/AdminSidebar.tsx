@@ -14,12 +14,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 export function AdminSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [userEmail, setUserEmail] = useState<string>("");
+  const { open, setOpen } = useSidebar();
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
@@ -75,7 +77,12 @@ export function AdminSidebar() {
   };
 
   return (
-    <Sidebar className="border-r bg-background">
+    <Sidebar 
+      className="border-r bg-background"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      collapsible="icon"
+    >
       <SidebarContent>
         {/* Header with Logo */}
         <div className="p-6 border-b">
@@ -102,6 +109,7 @@ export function AdminSidebar() {
                         ? "bg-accent text-accent-foreground hover:bg-accent/90"
                         : "hover:bg-muted"
                     }
+                    tooltip={item.title}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
