@@ -219,6 +219,20 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
 
       if (updateError) throw updateError;
 
+      // Wait a moment and refetch to ensure we have the latest committed data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verify the update was saved
+      const { data: verifyData, error: verifyError } = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("id", registration.id)
+        .single();
+
+      if (verifyError) {
+        console.error("Failed to verify update:", verifyError);
+      }
+
       toast.info("Generating Hall Ticket...", {
         description: "Creating new hall ticket and sending via WhatsApp",
       });
