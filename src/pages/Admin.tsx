@@ -10,6 +10,7 @@ import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, Chevron
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
+import { EditRegistrationDialog } from "@/components/EditRegistrationDialog";
 import {
   Pagination,
   PaginationContent,
@@ -22,15 +23,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 
@@ -59,6 +51,14 @@ interface Registration {
   building_name: string | null;
   exam_pattern: string | null;
   time_slot: string | null;
+  school_address: string | null;
+  date_of_birth: string | null;
+  gender: string | null;
+  address: string | null;
+  parent_first_name: string | null;
+  parent_last_name: string | null;
+  parent_email: string | null;
+  parent_phone: string | null;
 }
 
 export default function Admin() {
@@ -68,7 +68,6 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editedRegNumber, setEditedRegNumber] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0 });
@@ -666,47 +665,15 @@ export default function Admin() {
     return stats;
   };
 
-  const handleEditRegNumber = (reg: Registration) => {
+  const handleEditRegistration = (reg: Registration) => {
     setEditingRegistration(reg);
-    setEditedRegNumber(reg.registration_number);
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveRegNumber = async () => {
-    if (!editingRegistration || !editedRegNumber.trim()) {
-      toast({
-        title: "Error",
-        description: "Registration number cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('registrations')
-        .update({ registration_number: editedRegNumber.trim() })
-        .eq('id', editingRegistration.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Registration number updated successfully",
-      });
-
-      setIsEditDialogOpen(false);
-      setEditingRegistration(null);
-      setEditedRegNumber("");
-      fetchRegistrations();
-    } catch (error: any) {
-      console.error('Error updating registration number:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update registration number",
-        variant: "destructive",
-      });
-    }
+  const handleEditSuccess = () => {
+    setIsEditDialogOpen(false);
+    setEditingRegistration(null);
+    fetchRegistrations();
   };
 
   return (
@@ -844,11 +811,11 @@ export default function Admin() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleEditRegNumber(reg)}
+                                    onClick={() => handleEditRegistration(reg)}
                                     className="gap-2"
                                   >
                                     <Edit className="h-4 w-4" />
-                                    Edit
+                                    Edit Details
                                   </Button>
                                   <Button
                                     size="sm"
@@ -949,35 +916,15 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Edit Registration Number Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Registration Number</DialogTitle>
-            <DialogDescription>
-              Update the registration number for {editingRegistration?.student_name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Label htmlFor="reg-number">Registration Number</Label>
-            <Input
-              id="reg-number"
-              value={editedRegNumber}
-              onChange={(e) => setEditedRegNumber(e.target.value)}
-              className="mt-2"
-              placeholder="Enter registration number"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSaveRegNumber}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Edit Registration Dialog */}
+      {editingRegistration && (
+        <EditRegistrationDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          registration={editingRegistration}
+          onUpdate={handleEditSuccess}
+        />
+      )}
 
     </SidebarProvider>
   );
