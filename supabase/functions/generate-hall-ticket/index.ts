@@ -17,7 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    const { registrationId } = await req.json();
+    const { registrationId, isUpdate } = await req.json();
     console.log('Generating hall ticket for registration:', registrationId);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -371,7 +371,8 @@ serve(async (req) => {
     console.log('PDF created, uploading to storage...');
 
     // Upload PDF to Supabase Storage
-    const fileName = `hall-ticket-${registration.registration_number || registrationId}.pdf`;
+    const filePrefix = isUpdate ? 'updated-hall-ticket-' : 'hall-ticket-';
+    const fileName = `${filePrefix}${registration.registration_number || registrationId}.pdf`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('hall-tickets')
       .upload(fileName, pdfBytes, {
