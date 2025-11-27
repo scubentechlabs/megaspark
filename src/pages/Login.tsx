@@ -5,12 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Smartphone, Download, ArrowLeft, Send, Edit } from "lucide-react";
+import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
-import { EditRegistrationDialog } from "@/components/EditRegistrationDialog";
 
 interface Registration {
   id: string;
@@ -51,24 +50,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const navigate = useNavigate();
-
-  const handleRefresh = async () => {
-    if (!mobileNumber) return;
-    try {
-      const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .eq("mobile_number", mobileNumber);
-
-      if (error) throw error;
-      setRegistrations(data || []);
-    } catch (error) {
-      console.error("Error refreshing registrations:", error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,11 +134,6 @@ export default function Login() {
     if (slot.toLowerCase() === 'morning') return '8:00 AM';
     if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
     return 'TBA';
-  };
-
-  const handleEditDetails = (registration: Registration) => {
-    setEditingRegistration(registration);
-    setEditDialogOpen(true);
   };
 
   const handleDownloadHallTicket = (registration: Registration) => {
@@ -381,14 +358,6 @@ export default function Login() {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                           <Button
-                            onClick={() => handleEditDetails(registration)}
-                            variant="outline"
-                            className="gap-2"
-                          >
-                            <Edit className="h-4 w-4" />
-                            Edit Details
-                          </Button>
-                          <Button
                             onClick={() => handleDownloadHallTicket(registration)}
                             className="bg-accent hover:bg-accent/90 gap-2"
                           >
@@ -417,13 +386,6 @@ export default function Login() {
           <p>Need help? Contact us at digital.cfe.ppsavani@gmail.com or call 9978651002 / 3 / 4 / 5</p>
         </div>
       </div>
-
-      <EditRegistrationDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        registration={editingRegistration}
-        onUpdate={handleRefresh}
-      />
     </div>
   );
 }
