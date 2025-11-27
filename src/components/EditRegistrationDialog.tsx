@@ -238,7 +238,10 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
       });
 
       const { data: hallTicketData, error: hallTicketError } = await supabase.functions.invoke('generate-hall-ticket', {
-        body: { registrationId: registration.id }
+        body: { 
+          registrationId: registration.id,
+          isUpdate: true 
+        }
       });
 
       if (hallTicketError) {
