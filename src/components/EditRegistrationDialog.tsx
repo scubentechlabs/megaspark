@@ -108,15 +108,6 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
     setFormData((prev: any) => ({ ...prev, ...updates }));
   };
 
-  const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 0 && !value.startsWith('91')) {
-      value = '91' + value;
-    }
-    value = value.slice(0, 12);
-    updateFormData({ whatsappNumber: value });
-  };
-
   const handleStateChange = (value: string) => {
     updateFormData({ state: value, district: "" });
   };
@@ -129,10 +120,6 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
       }
       if (!formData.parentName || formData.parentName.trim() === "") {
         toast.error("Please enter parent's name");
-        return false;
-      }
-      if (formData.whatsappNumber && (formData.whatsappNumber.length !== 12 || !formData.whatsappNumber.startsWith('91'))) {
-        toast.error("WhatsApp number must be exactly 12 digits (91 + 10-digit number)");
         return false;
       }
       if (!formData.state || formData.state.trim() === "") {
@@ -202,17 +189,15 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
         .from("registrations")
         .update({
           student_name: formData.studentName,
-          email: formData.email || null,
           standard: formData.standard,
           exam_center: formData.examCenter,
-          whatsapp_number: formData.whatsappNumber || null,
           state: formData.state,
           district: formData.district,
           school_name: formData.schoolName,
           school_address: formData.address || null,
           school_medium: formData.schoolMedium,
           previous_year_percentage: formData.previousYearPercentage,
-          date_of_birth: formData.dateOfBirth || null, // Convert empty string to null
+          date_of_birth: formData.dateOfBirth || null,
           gender: formData.gender || null,
           address: formData.address || null,
           parent_first_name: formData.parentFirstName || null,
@@ -220,7 +205,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
           parent_email: formData.parentEmail || null,
           parent_phone: formData.parentPhone || null,
           parent_name: formData.parentName,
-          medium: formData.schoolMedium, // Sync medium with school_medium
+          medium: formData.schoolMedium,
         })
         .eq("id", registration.id);
 
@@ -331,6 +316,10 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                     <Input value={formData.phoneNumber} disabled />
                   </div>
                   <div className="space-y-2">
+                    <Label className="text-muted-foreground">WhatsApp Number</Label>
+                    <Input value={formData.whatsappNumber || 'Not provided'} disabled />
+                  </div>
+                  <div className="space-y-2">
                     <Label className="text-muted-foreground">Exam Date</Label>
                     <Input value={formData.examDate ? new Date(formData.examDate).toLocaleDateString('en-GB') : 'TBA'} disabled />
                   </div>
@@ -361,32 +350,6 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                       onChange={(e) => updateFormData({ parentName: e.target.value })}
                       placeholder="Enter parent's full name"
                       required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
-                    <Input
-                      id="whatsappNumber"
-                      type="text"
-                      value={formData.whatsappNumber || ""}
-                      onChange={handleWhatsAppChange}
-                      placeholder="91XXXXXXXXXX"
-                      maxLength={12}
-                    />
-                    {formData.whatsappNumber && formData.whatsappNumber.length !== 12 && (
-                      <p className="text-xs text-destructive">WhatsApp number must be 12 digits (91 + 10-digit number)</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email || ""}
-                      onChange={(e) => updateFormData({ email: e.target.value })}
-                      placeholder="Enter email"
                     />
                   </div>
 
