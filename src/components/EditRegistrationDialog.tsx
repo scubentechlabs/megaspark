@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
   ];
 
   // Initialize form data when dialog opens
-  useState(() => {
+  useEffect(() => {
     if (registration && open) {
       setFormData({
         studentName: registration.student_name,
@@ -102,7 +102,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
       });
       setCurrentStep(1);
     }
-  });
+  }, [registration, open]);
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
