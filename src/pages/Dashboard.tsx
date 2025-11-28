@@ -89,7 +89,13 @@ export default function Dashboard() {
       if (error) throw error;
 
       // Get unique dates and filter out nulls
-      const uniqueDates = Array.from(new Set(data?.map(d => d.exam_date).filter(Boolean) || []));
+      const allDates = data?.map(d => d.exam_date).filter(Boolean) || [];
+      const uniqueDates = Array.from(new Set(allDates));
+      
+      console.log("Total exam date records:", data?.length);
+      console.log("Unique exam dates found:", uniqueDates.length);
+      console.log("Exam dates:", uniqueDates);
+      
       setExamDates(uniqueDates);
     } catch (error) {
       console.error("Error fetching exam dates:", error);
