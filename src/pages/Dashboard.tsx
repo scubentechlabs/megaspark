@@ -79,12 +79,13 @@ export default function Dashboard() {
 
   const fetchExamDates = async () => {
     try {
-      // Fetch all unique exam dates from registrations table
+      // Fetch all unique exam dates with a very high limit to get all records
       const { data, error } = await supabase
         .from("registrations")
         .select("exam_date")
         .not("exam_date", "is", null)
-        .order("exam_date", { ascending: true });
+        .order("exam_date", { ascending: true })
+        .limit(50000); // Very high limit to ensure we get all records
 
       if (error) throw error;
 
@@ -92,13 +93,18 @@ export default function Dashboard() {
       const allDates = data?.map(d => d.exam_date).filter(Boolean) || [];
       const uniqueDates = Array.from(new Set(allDates));
       
-      console.log("Total exam date records:", data?.length);
+      console.log("Total exam date records fetched:", data?.length);
       console.log("Unique exam dates found:", uniqueDates.length);
       console.log("Exam dates:", uniqueDates);
       
       setExamDates(uniqueDates);
+      
+      if (uniqueDates.length > 0) {
+        toast.success(`Loaded ${uniqueDates.length} exam dates`);
+      }
     } catch (error) {
       console.error("Error fetching exam dates:", error);
+      toast.error("Failed to load exam dates");
     }
   };
 
