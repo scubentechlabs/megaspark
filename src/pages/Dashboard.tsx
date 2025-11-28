@@ -79,14 +79,17 @@ export default function Dashboard() {
 
   const fetchExamDates = async () => {
     try {
+      // Fetch all unique exam dates from registrations table
       const { data, error } = await supabase
-        .from("slot_date_settings")
+        .from("registrations")
         .select("exam_date")
+        .not("exam_date", "is", null)
         .order("exam_date", { ascending: true });
 
       if (error) throw error;
 
-      const uniqueDates = Array.from(new Set(data?.map(d => d.exam_date) || []));
+      // Get unique dates and filter out nulls
+      const uniqueDates = Array.from(new Set(data?.map(d => d.exam_date).filter(Boolean) || []));
       setExamDates(uniqueDates);
     } catch (error) {
       console.error("Error fetching exam dates:", error);
