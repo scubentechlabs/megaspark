@@ -17,10 +17,12 @@ import {
   RefreshCw,
   FileText,
   CreditCard,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Removed fetchAll - using server-side aggregations instead
 import {
   BarChart,
@@ -57,9 +59,13 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedExamDate, setSelectedExamDate] = useState<string>("");
+  const [isSendingHallTickets, setIsSendingHallTickets] = useState(false);
+  const [examDates, setExamDates] = useState<string[]>([]);
 
   useEffect(() => {
     checkAuth();
+    fetchExamDates();
   }, []);
 
   const checkAuth = async () => {
@@ -69,6 +75,101 @@ export default function Dashboard() {
       return;
     }
     fetchDashboardData();
+  };
+
+  const fetchExamDates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("slot_date_settings")
+        .select("exam_date")
+        .order("exam_date", { ascending: true });
+
+      if (error) throw error;
+
+      const uniqueDates = Array.from(new Set(data?.map(d => d.exam_date) || []));
+      setExamDates(uniqueDates);
+    } catch (error) {
+      console.error("Error fetching exam dates:", error);
+    }
+  };
+
+  const resendHallTickets = async () => {
+    if (!selectedExamDate) {
+      toast.error("Please select an exam date");
+      return;
+    }
+
+    setIsSendingHallTickets(true);
+    
+    try {
+      // Fetch all registrations for the selected exam date
+      const { data: registrations, error: fetchError } = await supabase
+        .from("registrations")
+        .select("id, student_name, mobile_number, whatsapp_number, registration_number, hall_ticket_url")
+        .eq("exam_date", selectedExamDate)
+        .not("registration_number", "is", null);
+
+      if (fetchError) throw fetchError;
+
+      if (!registrations || registrations.length === 0) {
+        toast.error("No registrations found for this exam date");
+        setIsSendingHallTickets(false);
+        return;
+      }
+
+      toast.info(`Sending hall tickets to ${registrations.length} students...`);
+
+      let successCount = 0;
+      let failCount = 0;
+
+      // Send WhatsApp messages to all registrations
+      for (const reg of registrations) {
+        try {
+          const phoneNumber = reg.whatsapp_number || reg.mobile_number;
+          
+          if (!phoneNumber) {
+            failCount++;
+            continue;
+          }
+
+          // Call the send-whatsapp edge function
+          const { error: sendError } = await supabase.functions.invoke('send-whatsapp', {
+            body: {
+              phoneNumber: phoneNumber,
+              messageType: 'hall_ticket',
+              templateName: 'hallticketmegaspark_2',
+              registrationId: reg.id,
+              studentName: reg.student_name,
+              registrationNumber: reg.registration_number,
+              hallTicketUrl: reg.hall_ticket_url
+            }
+          });
+
+          if (sendError) {
+            console.error(`Failed to send to ${phoneNumber}:`, sendError);
+            failCount++;
+          } else {
+            successCount++;
+          }
+
+          // Add small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (error) {
+          console.error("Error sending individual message:", error);
+          failCount++;
+        }
+      }
+
+      toast.success(
+        `Hall tickets sent successfully!\nSuccess: ${successCount}\nFailed: ${failCount}`,
+        { duration: 5000 }
+      );
+    } catch (error: any) {
+      console.error("Error resending hall tickets:", error);
+      toast.error(error.message || "Failed to resend hall tickets");
+    } finally {
+      setIsSendingHallTickets(false);
+    }
   };
 
   const fetchDashboardData = async () => {
@@ -291,6 +392,60 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Hall Ticket Reminder Section */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5" />
+                  Reminder Hall Ticket
+                </CardTitle>
+                <CardDescription>
+                  Select an exam date and resend hall tickets to all registered students via WhatsApp
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <Select value={selectedExamDate} onValueChange={setSelectedExamDate}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Exam Date" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {examDates.length === 0 ? (
+                          <SelectItem value="no-dates" disabled>
+                            No exam dates available
+                          </SelectItem>
+                        ) : (
+                          examDates.map((date) => (
+                            <SelectItem key={date} value={date}>
+                              {format(new Date(date), "dd MMMM yyyy")}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={resendHallTickets}
+                    disabled={!selectedExamDate || isSendingHallTickets}
+                    className="gap-2"
+                  >
+                    {isSendingHallTickets ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" />
+                        Resend All Hall Tickets
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Registration Trend Graph */}
             <Card className="mb-6">
