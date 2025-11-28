@@ -60,12 +60,15 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedExamDate, setSelectedExamDate] = useState<string>("");
+  const [selectedSlot, setSelectedSlot] = useState<string>("");
   const [isSendingHallTickets, setIsSendingHallTickets] = useState(false);
   const [examDates, setExamDates] = useState<string[]>([]);
+  const [slots, setSlots] = useState<Array<{ slot_name: string }>>([]);
 
   useEffect(() => {
     checkAuth();
     fetchExamDates();
+    fetchSlots();
   }, []);
 
   const checkAuth = async () => {
@@ -108,31 +111,53 @@ export default function Dashboard() {
     }
   };
 
+  const fetchSlots = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("slot_settings")
+        .select("slot_name")
+        .order("slot_name", { ascending: true });
+
+      if (error) throw error;
+
+      setSlots(data || []);
+      console.log("Slots loaded:", data?.length);
+    } catch (error) {
+      console.error("Error fetching slots:", error);
+    }
+  };
+
   const resendHallTickets = async () => {
     if (!selectedExamDate) {
       toast.error("Please select an exam date");
       return;
     }
 
+    if (!selectedSlot) {
+      toast.error("Please select a time slot");
+      return;
+    }
+
     setIsSendingHallTickets(true);
     
     try {
-      // Fetch all registrations for the selected exam date
+      // Fetch all registrations for the selected exam date AND time slot
       const { data: registrations, error: fetchError } = await supabase
         .from("registrations")
         .select("id, student_name, mobile_number, whatsapp_number, registration_number, hall_ticket_url")
         .eq("exam_date", selectedExamDate)
+        .eq("time_slot", selectedSlot)
         .not("registration_number", "is", null);
 
       if (fetchError) throw fetchError;
 
       if (!registrations || registrations.length === 0) {
-        toast.error("No registrations found for this exam date");
+        toast.error(`No registrations found for ${selectedSlot} on this exam date`);
         setIsSendingHallTickets(false);
         return;
       }
 
-      toast.info(`Sending hall tickets to ${registrations.length} students...`);
+      toast.info(`Sending hall tickets to ${registrations.length} students in ${selectedSlot}...`);
 
       let successCount = 0;
       let failCount = 0;
@@ -441,9 +466,29 @@ export default function Dashboard() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="flex-1">
+                    <Select value={selectedSlot} onValueChange={setSelectedSlot}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Time Slot" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {slots.length === 0 ? (
+                          <SelectItem value="no-slots" disabled>
+                            No slots available
+                          </SelectItem>
+                        ) : (
+                          slots.map((slot) => (
+                            <SelectItem key={slot.slot_name} value={slot.slot_name}>
+                              {slot.slot_name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button 
                     onClick={resendHallTickets}
-                    disabled={!selectedExamDate || isSendingHallTickets}
+                    disabled={!selectedExamDate || !selectedSlot || isSendingHallTickets}
                     className="gap-2"
                   >
                     {isSendingHallTickets ? (
