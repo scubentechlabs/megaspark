@@ -141,23 +141,29 @@ export default function Dashboard() {
     setIsSendingHallTickets(true);
     
     try {
-      // Fetch all registrations for the selected exam date AND time slot
-      const { data: registrations, error: fetchError } = await supabase
+      // Build query based on slot selection
+      let query = supabase
         .from("registrations")
         .select("id, student_name, mobile_number, whatsapp_number, registration_number, hall_ticket_url")
         .eq("exam_date", selectedExamDate)
-        .eq("time_slot", selectedSlot)
         .not("registration_number", "is", null);
+
+      // Only filter by slot if not "All Slots"
+      if (selectedSlot !== "all") {
+        query = query.eq("time_slot", selectedSlot);
+      }
+
+      const { data: registrations, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
 
       if (!registrations || registrations.length === 0) {
-        toast.error(`No registrations found for ${selectedSlot} on this exam date`);
+        toast.error(`No registrations found for ${selectedSlot === "all" ? "this exam date" : selectedSlot + " on this exam date"}`);
         setIsSendingHallTickets(false);
         return;
       }
 
-      toast.info(`Sending hall tickets to ${registrations.length} students in ${selectedSlot}...`);
+      toast.info(`Sending hall tickets to ${registrations.length} students${selectedSlot === "all" ? "" : " in " + selectedSlot}...`);
 
       let successCount = 0;
       let failCount = 0;
@@ -447,11 +453,14 @@ export default function Dashboard() {
               <CardContent>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
+                    <label className="text-sm font-medium mb-2 block">
+                      Exam Date ({examDates.length} dates available)
+                    </label>
                     <Select value={selectedExamDate} onValueChange={setSelectedExamDate}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full bg-background">
                         <SelectValue placeholder="Select Exam Date" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background z-50 max-h-[300px]">
                         {examDates.length === 0 ? (
                           <SelectItem value="no-dates" disabled>
                             No exam dates available
@@ -467,11 +476,15 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   <div className="flex-1">
+                    <label className="text-sm font-medium mb-2 block">
+                      Time Slot ({slots.length} slots available)
+                    </label>
                     <Select value={selectedSlot} onValueChange={setSelectedSlot}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full bg-background">
                         <SelectValue placeholder="Select Time Slot" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background z-50">
+                        <SelectItem value="all">All Slots</SelectItem>
                         {slots.length === 0 ? (
                           <SelectItem value="no-slots" disabled>
                             No slots available
@@ -489,7 +502,7 @@ export default function Dashboard() {
                   <Button 
                     onClick={resendHallTickets}
                     disabled={!selectedExamDate || !selectedSlot || isSendingHallTickets}
-                    className="gap-2"
+                    className="gap-2 self-end"
                   >
                     {isSendingHallTickets ? (
                       <>
