@@ -150,12 +150,15 @@ export default function Reports() {
     
     const formatTimeSlot = (slot: string | null) => {
       if (!slot) return 'TBA (Time Be Announced)';
-      if (slot.toLowerCase() === 'morning') return 'TBA (Time Be Announced)';
-      if (slot.toLowerCase() === 'afternoon') return 'TBA (Time Be Announced)';
-      return 'TBA (Time Be Announced)';
+      if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+      if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
+      return slot;
     };
 
     const getReportingTime = (slot: string | null) => {
+      if (!slot) return 'TBA (Time Be Announced)';
+      if (slot.toLowerCase() === 'morning') return '8:00 AM';
+      if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
       return 'TBA (Time Be Announced)';
     };
 
@@ -281,10 +284,16 @@ export default function Reports() {
           <tbody>
             ${data.map(reg => {
               const formatTimeSlot = (slot: string | null) => {
-                return 'TBA (Time Be Announced)';
+                if (!slot) return 'TBA (Time Be Announced)';
+                if (slot.toLowerCase() === 'morning') return 'Morning';
+                if (slot.toLowerCase() === 'afternoon') return 'Afternoon';
+                return slot;
               };
               
               const getReportingTime = (slot: string | null) => {
+                if (!slot) return 'TBA (Time Be Announced)';
+                if (slot.toLowerCase() === 'morning') return '8:00 AM';
+                if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
                 return 'TBA (Time Be Announced)';
               };
               
