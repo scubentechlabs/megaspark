@@ -165,16 +165,23 @@ export default function Dashboard() {
   };
 
   const resendHallTickets = async () => {
+    console.log("=== Resend Hall Tickets Button Clicked ===");
+    console.log("Selected Exam Date:", selectedExamDate);
+    console.log("Selected Slot:", selectedSlot);
+    
     if (!selectedExamDate) {
+      console.error("No exam date selected");
       toast.error("Please select an exam date");
       return;
     }
 
     if (!selectedSlot) {
+      console.error("No slot selected");
       toast.error("Please select a time slot");
       return;
     }
 
+    console.log("Starting to send hall tickets...");
     setIsSendingHallTickets(true);
     
     try {
@@ -190,12 +197,20 @@ export default function Dashboard() {
         query = query.eq("time_slot", selectedSlot);
       }
 
+      console.log("Fetching registrations...");
       const { data: registrations, error: fetchError } = await query;
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error("Error fetching registrations:", fetchError);
+        throw fetchError;
+      }
+
+      console.log("Registrations found:", registrations?.length);
 
       if (!registrations || registrations.length === 0) {
-        toast.error(`No registrations found for ${selectedSlot === "all" ? "this exam date" : selectedSlot + " on this exam date"}`);
+        const message = `No registrations found for ${selectedSlot === "all" ? "this exam date" : selectedSlot + " on this exam date"}`;
+        console.warn(message);
+        toast.error(message);
         setIsSendingHallTickets(false);
         return;
       }
@@ -210,7 +225,10 @@ export default function Dashboard() {
         try {
           const phoneNumber = reg.whatsapp_number || reg.mobile_number;
           
+          console.log(`Processing student: ${reg.student_name} (${phoneNumber})`);
+          
           if (!phoneNumber) {
+            console.warn(`No phone number for ${reg.student_name}`);
             failCount++;
             continue;
           }
@@ -232,6 +250,7 @@ export default function Dashboard() {
             console.error(`Failed to send to ${phoneNumber}:`, sendError);
             failCount++;
           } else {
+            console.log(`✓ Sent to ${phoneNumber}`);
             successCount++;
           }
 
@@ -243,6 +262,9 @@ export default function Dashboard() {
         }
       }
 
+      console.log(`=== Sending Complete ===`);
+      console.log(`Success: ${successCount}, Failed: ${failCount}`);
+      
       toast.success(
         `Hall tickets sent successfully!\nSuccess: ${successCount}\nFailed: ${failCount}`,
         { duration: 5000 }
@@ -252,6 +274,7 @@ export default function Dashboard() {
       toast.error(error.message || "Failed to resend hall tickets");
     } finally {
       setIsSendingHallTickets(false);
+      console.log("=== Resend Hall Tickets Complete ===");
     }
   };
 
@@ -537,9 +560,14 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   <Button 
-                    onClick={resendHallTickets}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      console.log("Button clicked!");
+                      resendHallTickets();
+                    }}
                     disabled={!selectedExamDate || !selectedSlot || isSendingHallTickets}
-                    className="gap-2 self-end"
+                    className="gap-2"
+                    type="button"
                   >
                     {isSendingHallTickets ? (
                       <>
