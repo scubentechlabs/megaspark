@@ -82,28 +82,65 @@ export default function Dashboard() {
 
   const fetchExamDates = async () => {
     try {
-      // Fetch all unique exam dates with a very high limit to get all records
-      const { data, error } = await supabase
+      console.log("=== Starting exam dates fetch ===");
+      
+      // Method 1: Try to get count first
+      const { count: totalCount } = await supabase
         .from("registrations")
-        .select("exam_date")
-        .not("exam_date", "is", null)
-        .order("exam_date", { ascending: true })
-        .limit(50000); // Very high limit to ensure we get all records
+        .select("*", { count: 'exact', head: true })
+        .not("exam_date", "is", null);
+      
+      console.log("Total registrations with exam_date:", totalCount);
 
-      if (error) throw error;
+      // Method 2: Fetch ALL records without limit using pagination
+      let allRegistrations: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from("registrations")
+          .select("exam_date")
+          .not("exam_date", "is", null)
+          .order("exam_date", { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) {
+          console.error("Error fetching page:", error);
+          throw error;
+        }
+
+        if (data && data.length > 0) {
+          allRegistrations = [...allRegistrations, ...data];
+          console.log(`Fetched page: ${from} to ${from + pageSize - 1}, got ${data.length} records`);
+          from += pageSize;
+          
+          // If we got less than pageSize, we've reached the end
+          if (data.length < pageSize) {
+            hasMore = false;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+
+      console.log("Total records fetched:", allRegistrations.length);
 
       // Get unique dates and filter out nulls
-      const allDates = data?.map(d => d.exam_date).filter(Boolean) || [];
-      const uniqueDates = Array.from(new Set(allDates));
+      const allDates = allRegistrations.map(d => d.exam_date).filter(Boolean);
+      const uniqueDates = Array.from(new Set(allDates)).sort();
       
-      console.log("Total exam date records fetched:", data?.length);
+      console.log("All dates array length:", allDates.length);
       console.log("Unique exam dates found:", uniqueDates.length);
       console.log("Exam dates:", uniqueDates);
       
       setExamDates(uniqueDates);
       
       if (uniqueDates.length > 0) {
-        toast.success(`Loaded ${uniqueDates.length} exam dates`);
+        toast.success(`Loaded ${uniqueDates.length} exam dates from ${allRegistrations.length} registrations`);
+      } else {
+        toast.warning("No exam dates found in registrations");
       }
     } catch (error) {
       console.error("Error fetching exam dates:", error);
