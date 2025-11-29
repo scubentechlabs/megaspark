@@ -275,15 +275,17 @@ export default function Admin() {
 
   const formatTimeSlot = (slot: string | null) => {
     if (!slot) return 'TBA';
-    if (slot.toLowerCase() === 'morning') return 'Morning Slot';
-    if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
+    const slotLower = slot.toLowerCase();
+    if (slotLower.includes('morning')) return 'Morning Slot';
+    if (slotLower.includes('afternoon')) return 'Afternoon Slot';
     return slot;
   };
 
   const getReportingTime = (slot: string | null) => {
     if (!slot) return 'TBA';
-    if (slot.toLowerCase() === 'morning') return '8:00 AM';
-    if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
+    const slotLower = slot.toLowerCase();
+    if (slotLower.includes('morning')) return '8:00 AM';
+    if (slotLower.includes('afternoon')) return '2:30 PM';
     return 'TBA';
   };
 
