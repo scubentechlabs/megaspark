@@ -84,13 +84,19 @@ export default function Dashboard() {
     try {
       console.log("=== Starting exam dates fetch ===");
       
+      // Get today's date at midnight for comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayString = today.toISOString().split('T')[0];
+      
       // Method 1: Try to get count first
       const { count: totalCount } = await supabase
         .from("registrations")
         .select("*", { count: 'exact', head: true })
-        .not("exam_date", "is", null);
+        .not("exam_date", "is", null)
+        .gt("exam_date", todayString); // Only fetch dates > today (future dates only)
       
-      console.log("Total registrations with exam_date:", totalCount);
+      console.log("Total registrations with exam_date > today:", totalCount);
 
       // Method 2: Fetch ALL records without limit using pagination
       let allRegistrations: any[] = [];
@@ -103,6 +109,7 @@ export default function Dashboard() {
           .from("registrations")
           .select("exam_date")
           .not("exam_date", "is", null)
+          .gt("exam_date", todayString) // Only fetch dates > today (future dates only)
           .order("exam_date", { ascending: true })
           .range(from, from + pageSize - 1);
 

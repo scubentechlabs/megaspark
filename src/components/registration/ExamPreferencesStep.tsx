@@ -24,12 +24,24 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-const examDates = [
+const allExamDates = [
   { value: "2025-11-30", label: "30th November 2025 - Sunday" },
   { value: "2025-12-07", label: "7th December 2025 - Sunday" },
   { value: "2025-12-14", label: "14th December 2025 - Sunday" },
   { value: "2025-12-28", label: "28th December 2025 - Sunday" }
 ];
+
+// Filter out past and current dates - only show future dates
+const getAvailableExamDates = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return allExamDates.filter(date => {
+    const examDate = new Date(date.value);
+    return examDate > today; // Only future dates, not today
+  });
+};
+
+const examDates = getAvailableExamDates();
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
