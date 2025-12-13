@@ -24,9 +24,9 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-// Only 14th December 2025 is allowed for registration
+// Only 28th December 2025 is allowed for registration
 const examDates = [
-  { value: "2025-12-14", label: "14th December 2025 - Sunday" }
+  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
 ];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
