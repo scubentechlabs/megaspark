@@ -24,10 +24,8 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-// Only 28th December 2025 is allowed for registration
-const examDates = [
-  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
-];
+// No dates available for registration currently
+const examDates: { value: string; label: string }[] = [];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
@@ -154,18 +152,26 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <Label htmlFor="examDate">Preferred Exam Date *</Label>
-        <Select value={formData.examDate} onValueChange={handleDateChange}>
-          <SelectTrigger className="bg-background">
-            <SelectValue placeholder="Select exam date" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            {examDates.map((date) => (
-              <SelectItem key={date.value} value={date.value}>
-                {date.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {examDates.length === 0 ? (
+          <Card className="bg-red-50 border-red-200 p-4">
+            <p className="text-sm text-red-700 font-medium">
+              Registration is currently closed. No exam dates are available for registration at this time.
+            </p>
+          </Card>
+        ) : (
+          <Select value={formData.examDate} onValueChange={handleDateChange}>
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Select exam date" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              {examDates.map((date) => (
+                <SelectItem key={date.value} value={date.value}>
+                  {date.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div className="space-y-2">
