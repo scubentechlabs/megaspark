@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckCircle, Upload, X, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle, Upload, X, Loader2, ChevronRight, ChevronLeft, User, School, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +37,7 @@ interface NewRegistrationFormProps {
 
 export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mobileError, setMobileError] = useState<string>("");
@@ -43,6 +45,15 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
   const [marksheetFile, setMarksheetFile] = useState<File | null>(null);
   const [uploadingCert, setUploadingCert] = useState(false);
   const [uploadingMarksheet, setUploadingMarksheet] = useState(false);
+
+  const totalSteps = 3;
+  const progress = (currentStep / totalSteps) * 100;
+
+  const steps = [
+    { number: 1, title: "Personal Details", icon: User, description: "Basic information" },
+    { number: 2, title: "School Info", icon: School, description: "Academic details" },
+    { number: 3, title: "Documents", icon: FileText, description: "Upload documents" }
+  ];
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
@@ -111,13 +122,11 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File size must be less than 5MB");
       return;
     }
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Only JPG, PNG, and PDF files are allowed");
@@ -134,85 +143,112 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
   const removeFile = (type: 'certificate' | 'marksheet') => {
     if (type === 'certificate') {
       setOlympiadCertFile(null);
-      updateFormData({ olympiadCertificateUrl: null });
     } else {
       setMarksheetFile(null);
-      updateFormData({ marksheetUrl: null });
     }
   };
 
-  const validateForm = () => {
-    if (!formData.studentName?.trim()) {
-      toast.error("Please enter student's full name");
-      return false;
+  const validateStep = async () => {
+    if (currentStep === 1) {
+      if (!formData.studentName?.trim()) {
+        toast.error("Please enter student's full name");
+        return false;
+      }
+      if (!formData.phoneNumber || formData.phoneNumber.length !== 10) {
+        toast.error("Please enter a valid 10-digit phone number");
+        return false;
+      }
+      if (!formData.confirmPhoneNumber) {
+        toast.error("Please confirm your mobile number");
+        return false;
+      }
+      if (!formData.whatsappNumber || formData.whatsappNumber.length !== 12 || !formData.whatsappNumber.startsWith('91')) {
+        toast.error("WhatsApp number must be 12 digits (91 + 10-digit number)");
+        return false;
+      }
+
+      // Check for duplicate mobile on step 1
+      try {
+        const { data: existingRegistrations, error } = await supabase
+          .from('registrations')
+          .select('id, mobile_number')
+          .eq('mobile_number', formData.phoneNumber)
+          .limit(1);
+
+        if (error) throw error;
+
+        if (existingRegistrations && existingRegistrations.length > 0) {
+          setMobileError("This mobile number is already registered.");
+          return false;
+        }
+      } catch (error) {
+        console.error('Error checking mobile:', error);
+        return false;
+      }
     }
-    if (!formData.phoneNumber || formData.phoneNumber.length !== 10) {
-      toast.error("Please enter a valid 10-digit phone number");
-      return false;
+
+    if (currentStep === 2) {
+      if (!formData.standard) {
+        toast.error("Please select class");
+        return false;
+      }
+      if (!formData.schoolName?.trim()) {
+        toast.error("Please enter school name");
+        return false;
+      }
+      if (!formData.city?.trim()) {
+        toast.error("Please enter city");
+        return false;
+      }
+      if (!formData.district) {
+        toast.error("Please select district");
+        return false;
+      }
+      if (!formData.previousYearPercentage?.trim()) {
+        toast.error("Please enter previous class percentage");
+        return false;
+      }
+      if (!formData.classRank?.trim()) {
+        toast.error("Please enter class rank");
+        return false;
+      }
     }
-    if (!formData.confirmPhoneNumber) {
-      toast.error("Please confirm your mobile number");
-      return false;
+
+    if (currentStep === 3) {
+      if (!formData.olympiadAppeared) {
+        toast.error("Please select olympiad participation status");
+        return false;
+      }
+      if (!marksheetFile) {
+        toast.error("Please upload last class marksheet");
+        return false;
+      }
     }
-    if (!formData.whatsappNumber || formData.whatsappNumber.length !== 12 || !formData.whatsappNumber.startsWith('91')) {
-      toast.error("WhatsApp number must be 12 digits (91 + 10-digit number)");
-      return false;
-    }
-    if (!formData.standard) {
-      toast.error("Please select class");
-      return false;
-    }
-    if (!formData.schoolName?.trim()) {
-      toast.error("Please enter school name");
-      return false;
-    }
-    if (!formData.city?.trim()) {
-      toast.error("Please enter city");
-      return false;
-    }
-    if (!formData.district) {
-      toast.error("Please select district");
-      return false;
-    }
-    if (!formData.previousYearPercentage?.trim()) {
-      toast.error("Please enter previous class percentage");
-      return false;
-    }
-    if (!formData.classRank?.trim()) {
-      toast.error("Please enter class rank");
-      return false;
-    }
-    if (!formData.olympiadAppeared) {
-      toast.error("Please select olympiad participation status");
-      return false;
-    }
-    if (!marksheetFile) {
-      toast.error("Please upload last class marksheet");
-      return false;
-    }
+
     return true;
   };
 
+  const handleNext = async () => {
+    const isValid = await validateStep();
+    if (!isValid) return;
+    
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    const isValid = await validateStep();
+    if (!isValid) return;
 
     setIsSubmitting(true);
     try {
-      // Check for duplicate mobile number
-      const { data: existingRegistrations, error: checkError } = await supabase
-        .from('registrations')
-        .select('id, mobile_number')
-        .eq('mobile_number', formData.phoneNumber)
-        .limit(1);
-
-      if (checkError) throw checkError;
-
-      if (existingRegistrations && existingRegistrations.length > 0) {
-        setMobileError("This mobile number is already registered.");
-        setIsSubmitting(false);
-        return;
-      }
-
       // Upload files
       let olympiadCertUrl = null;
       let marksheetUrl = null;
@@ -280,262 +316,325 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           Mega Spark Exam Registration
         </CardTitle>
         <CardDescription className="text-center text-base">
-          Fill in your details to register for the exam
+          {steps[currentStep - 1].description}
         </CardDescription>
+
+        {/* Progress Bar */}
+        <div className="mt-6 space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground mb-2">
+            <span>Step {currentStep} of {totalSteps}</span>
+            <span>{Math.round(progress)}% Complete</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Step Indicators */}
+        <div className="flex justify-between mt-6">
+          {steps.map((step) => {
+            const StepIcon = step.icon;
+            return (
+              <div key={step.number} className="flex flex-col items-center flex-1">
+                <div
+                  className={`h-12 w-12 rounded-full flex items-center justify-center transition-all ${
+                    step.number < currentStep
+                      ? 'bg-primary text-white'
+                      : step.number === currentStep
+                      ? 'bg-accent text-white ring-4 ring-accent/20'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <StepIcon className="h-6 w-6" />
+                </div>
+                <div className={`mt-2 text-xs font-medium text-center hidden md:block ${
+                  step.number === currentStep ? 'text-accent' : 'text-muted-foreground'
+                }`}>
+                  {step.title}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </CardHeader>
 
       <CardContent className="px-4 md:px-6 pb-6 pt-6">
-        <div className="space-y-6">
-          {/* Full Name */}
-          <div className="space-y-2">
-            <Label htmlFor="studentName">Full Name *</Label>
-            <Input
-              id="studentName"
-              value={formData.studentName || ""}
-              onChange={(e) => updateFormData({ studentName: e.target.value })}
-              placeholder="Enter student's full name"
-              required
-            />
-          </div>
+        <div className="min-h-[350px]">
+          {/* Step 1: Personal Details */}
+          {currentStep === 1 && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="studentName">Full Name *</Label>
+                <Input
+                  id="studentName"
+                  value={formData.studentName || ""}
+                  onChange={(e) => updateFormData({ studentName: e.target.value })}
+                  placeholder="Enter student's full name"
+                  required
+                />
+              </div>
 
-          {/* Mobile Number */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Mobile Number *</Label>
-              <Input
-                id="phoneNumber"
-                type="text"
-                value={formData.phoneNumber || ""}
-                onChange={(e) => handlePhoneChange(e, 'phoneNumber')}
-                placeholder="Enter 10-digit mobile number"
-                maxLength={10}
-                required
-                className={mobileError ? "border-red-500" : ""}
-              />
-              {mobileError && <p className="text-sm text-red-600">{mobileError}</p>}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Mobile Number *</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="text"
+                    value={formData.phoneNumber || ""}
+                    onChange={(e) => handlePhoneChange(e, 'phoneNumber')}
+                    placeholder="Enter 10-digit mobile number"
+                    maxLength={10}
+                    required
+                    className={mobileError ? "border-red-500" : ""}
+                  />
+                  {mobileError && <p className="text-sm text-red-600">{mobileError}</p>}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
-              <Input
-                id="whatsappNumber"
-                type="text"
-                value={formData.whatsappNumber || ""}
-                onChange={handleWhatsAppChange}
-                placeholder="91XXXXXXXXXX"
-                maxLength={12}
-                required
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
+                  <Input
+                    id="whatsappNumber"
+                    type="text"
+                    value={formData.whatsappNumber || ""}
+                    onChange={handleWhatsAppChange}
+                    placeholder="91XXXXXXXXXX"
+                    maxLength={12}
+                    required
+                  />
+                </div>
+              </div>
 
-          {/* Phone Confirmation */}
-          {formData.phoneNumber?.length === 10 && (
-            <div className="flex items-start space-x-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
-              <Checkbox
-                id="confirmPhone"
-                checked={formData.confirmPhoneNumber || false}
-                onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
-                className="mt-1"
-              />
-              <Label htmlFor="confirmPhone" className="text-sm cursor-pointer">
-                I confirm that <strong>{formData.phoneNumber}</strong> is correct
-              </Label>
+              {formData.phoneNumber?.length === 10 && (
+                <div className="flex items-start space-x-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <Checkbox
+                    id="confirmPhone"
+                    checked={formData.confirmPhoneNumber || false}
+                    onCheckedChange={(checked) => updateFormData({ confirmPhoneNumber: checked })}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="confirmPhone" className="text-sm cursor-pointer">
+                    I confirm that <strong>{formData.phoneNumber}</strong> is correct
+                  </Label>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Class */}
-          <div className="space-y-2">
-            <Label htmlFor="standard">Class *</Label>
-            <Select value={formData.standard || ""} onValueChange={(value) => updateFormData({ standard: value })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select class" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">Class 5</SelectItem>
-                <SelectItem value="6">Class 6</SelectItem>
-                <SelectItem value="7">Class 7</SelectItem>
-                <SelectItem value="8">Class 8</SelectItem>
-                <SelectItem value="9">Class 9</SelectItem>
-                <SelectItem value="10">Class 10</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Step 2: School Info */}
+          {currentStep === 2 && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="standard">Class *</Label>
+                <Select value={formData.standard || ""} onValueChange={(value) => updateFormData({ standard: value })}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-50">
+                    <SelectItem value="5">Class 5</SelectItem>
+                    <SelectItem value="6">Class 6</SelectItem>
+                    <SelectItem value="7">Class 7</SelectItem>
+                    <SelectItem value="8">Class 8</SelectItem>
+                    <SelectItem value="9">Class 9</SelectItem>
+                    <SelectItem value="10">Class 10</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* School Name */}
-          <div className="space-y-2">
-            <Label htmlFor="schoolName">School Name *</Label>
-            <Input
-              id="schoolName"
-              value={formData.schoolName || ""}
-              onChange={(e) => updateFormData({ schoolName: e.target.value })}
-              placeholder="Enter school name"
-              required
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="schoolName">School Name *</Label>
+                <Input
+                  id="schoolName"
+                  value={formData.schoolName || ""}
+                  onChange={(e) => updateFormData({ schoolName: e.target.value })}
+                  placeholder="Enter school name"
+                  required
+                />
+              </div>
 
-          {/* City and District */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                value={formData.city || ""}
-                onChange={(e) => updateFormData({ city: e.target.value })}
-                placeholder="Enter city name"
-                required
-              />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City *</Label>
+                  <Input
+                    id="city"
+                    value={formData.city || ""}
+                    onChange={(e) => updateFormData({ city: e.target.value })}
+                    placeholder="Enter city name"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="district">District *</Label>
-              <Select value={formData.district || ""} onValueChange={(value) => updateFormData({ district: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select district" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gujaratDistricts.map((district) => (
-                    <SelectItem key={district} value={district}>
-                      {district}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="district">District *</Label>
+                  <Select value={formData.district || ""} onValueChange={(value) => updateFormData({ district: value })}>
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Select district" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-50">
+                      {gujaratDistricts.map((district) => (
+                        <SelectItem key={district} value={district}>
+                          {district}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          {/* Previous Year Percentage and Class Rank */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="previousYearPercentage">Previous Class Percentage (%) *</Label>
-              <Input
-                id="previousYearPercentage"
-                type="text"
-                value={formData.previousYearPercentage || ""}
-                onChange={handlePercentageChange}
-                placeholder="e.g., 85 or 85.5"
-                maxLength={6}
-                required
-              />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="previousYearPercentage">Previous Class Percentage (%) *</Label>
+                  <Input
+                    id="previousYearPercentage"
+                    type="text"
+                    value={formData.previousYearPercentage || ""}
+                    onChange={handlePercentageChange}
+                    placeholder="e.g., 85 or 85.5"
+                    maxLength={6}
+                    required
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="classRank">Class Rank *</Label>
-              <Input
-                id="classRank"
-                type="text"
-                value={formData.classRank || ""}
-                onChange={handleRankChange}
-                placeholder="Enter class rank"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Olympiad Participation */}
-          <div className="space-y-2">
-            <Label htmlFor="olympiadAppeared">Have you appeared for any Olympiad? *</Label>
-            <Select 
-              value={formData.olympiadAppeared || ""} 
-              onValueChange={(value) => updateFormData({ olympiadAppeared: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select option" />
-              </SelectTrigger>
-              <SelectContent>
-                {olympiadOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Olympiad Certificate Upload - only show if olympiad selected is not "None" */}
-          {formData.olympiadAppeared && formData.olympiadAppeared !== "None" && (
-            <div className="space-y-2">
-              <Label>Upload Olympiad Certificate (Optional)</Label>
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
-                {olympiadCertFile ? (
-                  <div className="flex items-center justify-between bg-muted/50 p-3 rounded">
-                    <span className="text-sm truncate flex-1">{olympiadCertFile.name}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFile('certificate')}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center cursor-pointer">
-                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">Click to upload certificate</span>
-                    <span className="text-xs text-muted-foreground">(JPG, PNG, PDF - Max 5MB)</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={(e) => handleFileChange(e, 'certificate')}
-                    />
-                  </label>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="classRank">Class Rank *</Label>
+                  <Input
+                    id="classRank"
+                    type="text"
+                    value={formData.classRank || ""}
+                    onChange={handleRankChange}
+                    placeholder="Enter class rank"
+                    required
+                  />
+                </div>
               </div>
             </div>
           )}
 
-          {/* Marksheet Upload */}
-          <div className="space-y-2">
-            <Label>Upload Last Class Marksheet *</Label>
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
-              {marksheetFile ? (
-                <div className="flex items-center justify-between bg-muted/50 p-3 rounded">
-                  <span className="text-sm truncate flex-1">{marksheetFile.name}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeFile('marksheet')}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center cursor-pointer">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <span className="text-sm text-muted-foreground">Click to upload marksheet</span>
-                  <span className="text-xs text-muted-foreground">(JPG, PNG, PDF - Max 5MB)</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".jpg,.jpeg,.png,.pdf"
-                    onChange={(e) => handleFileChange(e, 'marksheet')}
-                  />
-                </label>
-              )}
-            </div>
-          </div>
+          {/* Step 3: Documents */}
+          {currentStep === 3 && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="olympiadAppeared">Have you appeared for any Olympiad? *</Label>
+                <Select 
+                  value={formData.olympiadAppeared || ""} 
+                  onValueChange={(value) => updateFormData({ olympiadAppeared: value })}
+                >
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="Select option" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background z-50">
+                    {olympiadOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* Submit Button */}
+              {formData.olympiadAppeared && formData.olympiadAppeared !== "None" && (
+                <div className="space-y-2">
+                  <Label>Upload Olympiad Certificate (Optional)</Label>
+                  <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
+                    {olympiadCertFile ? (
+                      <div className="flex items-center justify-between bg-muted/50 p-3 rounded">
+                        <span className="text-sm truncate flex-1">{olympiadCertFile.name}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFile('certificate')}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center cursor-pointer">
+                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-sm text-muted-foreground">Click to upload certificate</span>
+                        <span className="text-xs text-muted-foreground">(JPG, PNG, PDF - Max 5MB)</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".jpg,.jpeg,.png,.pdf"
+                          onChange={(e) => handleFileChange(e, 'certificate')}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label>Upload Last Class Marksheet *</Label>
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
+                  {marksheetFile ? (
+                    <div className="flex items-center justify-between bg-muted/50 p-3 rounded">
+                      <span className="text-sm truncate flex-1">{marksheetFile.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeFile('marksheet')}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center cursor-pointer">
+                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                      <span className="text-sm text-muted-foreground">Click to upload marksheet</span>
+                      <span className="text-xs text-muted-foreground">(JPG, PNG, PDF - Max 5MB)</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        onChange={(e) => handleFileChange(e, 'marksheet')}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-8 pt-6 border-t">
           <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || uploadingCert || uploadingMarksheet}
-            className="w-full h-12 text-lg bg-primary hover:bg-primary/90"
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 1}
+            className="min-w-[120px]"
           >
-            {isSubmitting || uploadingCert || uploadingMarksheet ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                {uploadingCert ? "Uploading Certificate..." : uploadingMarksheet ? "Uploading Marksheet..." : "Processing..."}
-              </>
-            ) : (
-              <>
-                <CheckCircle className="mr-2 h-5 w-5" />
-                Submit Registration
-              </>
-            )}
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Back
           </Button>
+
+          {currentStep < totalSteps ? (
+            <Button 
+              onClick={handleNext} 
+              className="min-w-[120px] bg-accent hover:bg-accent/90"
+            >
+              Next
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || uploadingCert || uploadingMarksheet}
+              className="min-w-[160px] bg-primary hover:bg-primary/90"
+            >
+              {isSubmitting || uploadingCert || uploadingMarksheet ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {uploadingCert ? "Uploading..." : uploadingMarksheet ? "Uploading..." : "Processing..."}
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-5 w-5" />
+                  Submit Registration
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
