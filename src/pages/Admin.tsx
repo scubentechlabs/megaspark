@@ -1110,202 +1110,187 @@ export default function Admin() {
 
       {/* View Registration Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-xl">Registration Details</DialogTitle>
+            <DialogTitle className="text-lg">Registration Details</DialogTitle>
           </DialogHeader>
           {viewingRegistration && (
-            <div className="space-y-6">
-              {/* Status Badge */}
-              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <div className="mt-1">
-                    {viewingRegistration.status === 'pending' && (
-                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Pending Approval
-                      </Badge>
-                    )}
-                    {viewingRegistration.status === 'approved' && (
-                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                        <Check className="h-3 w-3 mr-1" />
-                        Approved
-                      </Badge>
-                    )}
-                    {viewingRegistration.status === 'rejected' && (
-                      <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                        <X className="h-3 w-3 mr-1" />
-                        Rejected
-                      </Badge>
-                    )}
-                  </div>
+            <div className="space-y-4">
+              {/* Status & Reg Number Row */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground">Status:</span>
+                  {viewingRegistration.status === 'pending' && (
+                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                      <Clock className="h-3 w-3 mr-1" />
+                      Pending
+                    </Badge>
+                  )}
+                  {viewingRegistration.status === 'approved' && (
+                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                      <Check className="h-3 w-3 mr-1" />
+                      Approved
+                    </Badge>
+                  )}
+                  {viewingRegistration.status === 'rejected' && (
+                    <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                      <X className="h-3 w-3 mr-1" />
+                      Rejected
+                    </Badge>
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Registration Number</p>
-                  <p className="text-lg font-bold text-primary">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Reg. No:</span>
+                  <span className="font-bold text-primary">
                     {viewingRegistration.registration_number ? formatRegistrationNumber(viewingRegistration.registration_number) : '—'}
-                  </p>
+                  </span>
                 </div>
               </div>
 
-              {/* Section 1: Personal Details */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-primary">
-                  <Users className="h-4 w-4" />
-                  Personal Details
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="text-muted-foreground text-xs">Student Name</label>
-                    <p className="font-medium">{viewingRegistration.student_name}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">Mobile Number</label>
-                    <p className="font-medium">{viewingRegistration.mobile_number}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">WhatsApp Number</label>
-                    <p className="font-medium">{viewingRegistration.whatsapp_number || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">Email</label>
-                    <p className="font-medium">{viewingRegistration.email || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 2: School Info */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-primary">
-                  <Calendar className="h-4 w-4" />
-                  School Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="text-muted-foreground text-xs">Class</label>
-                    <p className="font-medium">Class {viewingRegistration.standard}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">School Name</label>
-                    <p className="font-medium">{viewingRegistration.school_name || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">City</label>
-                    <p className="font-medium">{viewingRegistration.city || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">District</label>
-                    <p className="font-medium">{viewingRegistration.district || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">Previous Year Percentage</label>
-                    <p className="font-medium">{viewingRegistration.previous_year_percentage ? `${viewingRegistration.previous_year_percentage}%` : 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">Class Rank</label>
-                    <p className="font-medium">{viewingRegistration.class_rank || 'N/A'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 3: Documents */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-primary">
-                  <Download className="h-4 w-4" />
-                  Documents
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
-                  <div>
-                    <label className="text-muted-foreground text-xs">Olympiad Participated</label>
-                    <p className="font-medium">{viewingRegistration.olympiad_appeared || 'None'}</p>
-                  </div>
-                  <div>
-                    <label className="text-muted-foreground text-xs">Registered On</label>
-                    <p className="font-medium">{new Date(viewingRegistration.created_at).toLocaleString()}</p>
-                  </div>
-                </div>
-                
-                {/* Document Viewer */}
-                <div className="space-y-4">
-                  {viewingRegistration.marksheet_url && (
-                    <div className="border rounded-lg p-3 bg-muted/30">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="font-medium text-sm">Marksheet</label>
-                        <a 
-                          href={viewingRegistration.marksheet_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          <Download className="h-3 w-3" />
-                          Open in new tab
-                        </a>
+              {/* Two Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left Column - Personal & School */}
+                <div className="space-y-3">
+                  <div className="border rounded-lg p-3">
+                    <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
+                      <Users className="h-4 w-4" />
+                      Personal Details
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <label className="text-muted-foreground">Name</label>
+                        <p className="font-medium">{viewingRegistration.student_name}</p>
                       </div>
-                      {viewingRegistration.marksheet_url.toLowerCase().endsWith('.pdf') ? (
-                        <iframe 
-                          src={viewingRegistration.marksheet_url} 
-                          className="w-full h-[300px] rounded border"
-                          title="Marksheet PDF"
-                        />
-                      ) : (
-                        <img 
-                          src={viewingRegistration.marksheet_url} 
-                          alt="Marksheet" 
-                          className="max-w-full h-auto max-h-[300px] rounded border object-contain mx-auto"
-                        />
-                      )}
-                    </div>
-                  )}
-                  
-                  {viewingRegistration.olympiad_certificate_url && (
-                    <div className="border rounded-lg p-3 bg-muted/30">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="font-medium text-sm">Olympiad Certificate</label>
-                        <a 
-                          href={viewingRegistration.olympiad_certificate_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          <Download className="h-3 w-3" />
-                          Open in new tab
-                        </a>
+                      <div>
+                        <label className="text-muted-foreground">Mobile</label>
+                        <p className="font-medium">{viewingRegistration.mobile_number}</p>
                       </div>
-                      {viewingRegistration.olympiad_certificate_url.toLowerCase().endsWith('.pdf') ? (
-                        <iframe 
-                          src={viewingRegistration.olympiad_certificate_url} 
-                          className="w-full h-[300px] rounded border"
-                          title="Olympiad Certificate PDF"
-                        />
-                      ) : (
-                        <img 
-                          src={viewingRegistration.olympiad_certificate_url} 
-                          alt="Olympiad Certificate" 
-                          className="max-w-full h-auto max-h-[300px] rounded border object-contain mx-auto"
-                        />
-                      )}
+                      <div>
+                        <label className="text-muted-foreground">WhatsApp</label>
+                        <p className="font-medium">{viewingRegistration.whatsapp_number || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">Email</label>
+                        <p className="font-medium truncate">{viewingRegistration.email || 'N/A'}</p>
+                      </div>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="border rounded-lg p-3">
+                    <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
+                      <Calendar className="h-4 w-4" />
+                      School Information
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <label className="text-muted-foreground">Class</label>
+                        <p className="font-medium">Class {viewingRegistration.standard}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">School</label>
+                        <p className="font-medium truncate">{viewingRegistration.school_name || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">City</label>
+                        <p className="font-medium">{viewingRegistration.city || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">District</label>
+                        <p className="font-medium">{viewingRegistration.district || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">Previous %</label>
+                        <p className="font-medium">{viewingRegistration.previous_year_percentage ? `${viewingRegistration.previous_year_percentage}%` : 'N/A'}</p>
+                      </div>
+                      <div>
+                        <label className="text-muted-foreground">Class Rank</label>
+                        <p className="font-medium">{viewingRegistration.class_rank || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Documents */}
+                <div className="border rounded-lg p-3">
+                  <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
+                    <Download className="h-4 w-4" />
+                    Documents
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                    <div>
+                      <label className="text-muted-foreground">Olympiad</label>
+                      <p className="font-medium">{viewingRegistration.olympiad_appeared || 'None'}</p>
+                    </div>
+                    <div>
+                      <label className="text-muted-foreground">Registered</label>
+                      <p className="font-medium">{new Date(viewingRegistration.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
                   
-                  {!viewingRegistration.marksheet_url && !viewingRegistration.olympiad_certificate_url && (
-                    <p className="text-muted-foreground text-sm">No documents uploaded</p>
-                  )}
+                  {/* Document Thumbnails */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {viewingRegistration.marksheet_url && (
+                      <a 
+                        href={viewingRegistration.marksheet_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block border rounded-lg p-2 bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
+                        {viewingRegistration.marksheet_url.toLowerCase().endsWith('.pdf') ? (
+                          <div className="h-24 flex items-center justify-center bg-muted rounded text-xs text-muted-foreground">
+                            PDF Document
+                          </div>
+                        ) : (
+                          <img 
+                            src={viewingRegistration.marksheet_url} 
+                            alt="Marksheet" 
+                            className="w-full h-24 object-cover rounded"
+                          />
+                        )}
+                        <p className="text-xs font-medium mt-1 text-center">Marksheet</p>
+                      </a>
+                    )}
+                    {viewingRegistration.olympiad_certificate_url && (
+                      <a 
+                        href={viewingRegistration.olympiad_certificate_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block border rounded-lg p-2 bg-muted/30 hover:bg-muted/50 transition-colors"
+                      >
+                        {viewingRegistration.olympiad_certificate_url.toLowerCase().endsWith('.pdf') ? (
+                          <div className="h-24 flex items-center justify-center bg-muted rounded text-xs text-muted-foreground">
+                            PDF Document
+                          </div>
+                        ) : (
+                          <img 
+                            src={viewingRegistration.olympiad_certificate_url} 
+                            alt="Certificate" 
+                            className="w-full h-24 object-cover rounded"
+                          />
+                        )}
+                        <p className="text-xs font-medium mt-1 text-center">Certificate</p>
+                      </a>
+                    )}
+                    {!viewingRegistration.marksheet_url && !viewingRegistration.olympiad_certificate_url && (
+                      <p className="text-muted-foreground text-xs col-span-2">No documents uploaded</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Approve/Reject Buttons */}
+              {/* Action Buttons */}
               {viewingRegistration.status === 'pending' && (
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-3 pt-3 border-t">
                   <Button
                     onClick={() => {
                       handleApproveRegistration(viewingRegistration.id);
                       setIsViewDialogOpen(false);
                     }}
                     className="flex-1 bg-green-600 hover:bg-green-700"
+                    size="sm"
                   >
                     <Check className="h-4 w-4 mr-2" />
-                    Approve Registration
+                    Approve
                   </Button>
                   <Button
                     variant="destructive"
@@ -1314,18 +1299,20 @@ export default function Admin() {
                       setIsViewDialogOpen(false);
                     }}
                     className="flex-1"
+                    size="sm"
                   >
                     <X className="h-4 w-4 mr-2" />
-                    Reject Registration
+                    Reject
                   </Button>
                 </div>
               )}
 
               {viewingRegistration.status === 'approved' && (
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-3 pt-3 border-t">
                   <Button
                     onClick={() => handleSendHallTicket(viewingRegistration.id)}
                     className="flex-1"
+                    size="sm"
                   >
                     <Send className="h-4 w-4 mr-2" />
                     Send Hall Ticket via WhatsApp
