@@ -146,9 +146,8 @@ export default function Dashboard() {
       
       if (uniqueDates.length > 0) {
         toast.success(`Loaded ${uniqueDates.length} exam dates from ${allRegistrations.length} registrations`);
-      } else {
-        toast.warning("No exam dates found in registrations");
       }
+      // Silently handle no exam dates - this is normal when no exam dates are assigned yet
     } catch (error) {
       console.error("Error fetching exam dates:", error);
       toast.error("Failed to load exam dates");
