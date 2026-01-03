@@ -984,28 +984,6 @@ export default function Admin() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-2 flex-wrap">
-                                  {reg.status === 'pending' && (
-                                    <>
-                                      <Button
-                                        size="sm"
-                                        variant="default"
-                                        onClick={() => handleApproveRegistration(reg.id)}
-                                        className="gap-1 bg-green-600 hover:bg-green-700"
-                                      >
-                                        <Check className="h-3 w-3" />
-                                        Approve
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() => handleRejectRegistration(reg.id)}
-                                        className="gap-1"
-                                      >
-                                        <X className="h-3 w-3" />
-                                        Reject
-                                      </Button>
-                                    </>
-                                  )}
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -1237,7 +1215,7 @@ export default function Admin() {
                   <Download className="h-4 w-4" />
                   Documents
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
                   <div>
                     <label className="text-muted-foreground text-xs">Olympiad Participated</label>
                     <p className="font-medium">{viewingRegistration.olympiad_appeared || 'None'}</p>
@@ -1246,35 +1224,73 @@ export default function Admin() {
                     <label className="text-muted-foreground text-xs">Registered On</label>
                     <p className="font-medium">{new Date(viewingRegistration.created_at).toLocaleString()}</p>
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="text-muted-foreground text-xs">Uploaded Documents</label>
-                    <div className="flex gap-4 mt-2">
-                      {viewingRegistration.marksheet_url ? (
+                </div>
+                
+                {/* Document Viewer */}
+                <div className="space-y-4">
+                  {viewingRegistration.marksheet_url && (
+                    <div className="border rounded-lg p-3 bg-muted/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="font-medium text-sm">Marksheet</label>
                         <a 
                           href={viewingRegistration.marksheet_url} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
                           <Download className="h-3 w-3" />
-                          View Marksheet
+                          Open in new tab
                         </a>
+                      </div>
+                      {viewingRegistration.marksheet_url.toLowerCase().endsWith('.pdf') ? (
+                        <iframe 
+                          src={viewingRegistration.marksheet_url} 
+                          className="w-full h-[300px] rounded border"
+                          title="Marksheet PDF"
+                        />
                       ) : (
-                        <span className="text-muted-foreground">No marksheet uploaded</span>
+                        <img 
+                          src={viewingRegistration.marksheet_url} 
+                          alt="Marksheet" 
+                          className="max-w-full h-auto max-h-[300px] rounded border object-contain mx-auto"
+                        />
                       )}
-                      {viewingRegistration.olympiad_certificate_url && (
+                    </div>
+                  )}
+                  
+                  {viewingRegistration.olympiad_certificate_url && (
+                    <div className="border rounded-lg p-3 bg-muted/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="font-medium text-sm">Olympiad Certificate</label>
                         <a 
                           href={viewingRegistration.olympiad_certificate_url} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
                         >
                           <Download className="h-3 w-3" />
-                          View Olympiad Certificate
+                          Open in new tab
                         </a>
+                      </div>
+                      {viewingRegistration.olympiad_certificate_url.toLowerCase().endsWith('.pdf') ? (
+                        <iframe 
+                          src={viewingRegistration.olympiad_certificate_url} 
+                          className="w-full h-[300px] rounded border"
+                          title="Olympiad Certificate PDF"
+                        />
+                      ) : (
+                        <img 
+                          src={viewingRegistration.olympiad_certificate_url} 
+                          alt="Olympiad Certificate" 
+                          className="max-w-full h-auto max-h-[300px] rounded border object-contain mx-auto"
+                        />
                       )}
                     </div>
-                  </div>
+                  )}
+                  
+                  {!viewingRegistration.marksheet_url && !viewingRegistration.olympiad_certificate_url && (
+                    <p className="text-muted-foreground text-sm">No documents uploaded</p>
+                  )}
                 </div>
               </div>
 
