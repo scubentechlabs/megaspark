@@ -46,13 +46,14 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
   const [uploadingCert, setUploadingCert] = useState(false);
   const [uploadingMarksheet, setUploadingMarksheet] = useState(false);
 
-  const totalSteps = 3;
+  const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
   const steps = [
     { number: 1, title: "Personal Details", icon: User, description: "Basic information" },
     { number: 2, title: "School Info", icon: School, description: "Academic details" },
-    { number: 3, title: "Documents", icon: FileText, description: "Upload documents" }
+    { number: 3, title: "Documents", icon: FileText, description: "Upload documents" },
+    { number: 4, title: "Review", icon: CheckCircle, description: "Confirm your details" }
   ];
 
   const updateFormData = (updates: any) => {
@@ -591,6 +592,92 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
                     </label>
                   )}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Review */}
+          {currentStep === 4 && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <h3 className="font-semibold text-lg mb-4 text-primary">Review Your Details</h3>
+                
+                {/* Personal Details Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">Personal Details</h4>
+                  <div className="grid gap-3 text-sm">
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Full Name:</span>
+                      <span className="col-span-2 font-medium">{formData.studentName}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Mobile Number:</span>
+                      <span className="col-span-2 font-medium">{formData.phoneNumber}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">WhatsApp Number:</span>
+                      <span className="col-span-2 font-medium">{formData.whatsappNumber}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* School Info Section */}
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">School Information</h4>
+                  <div className="grid gap-3 text-sm">
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Class:</span>
+                      <span className="col-span-2 font-medium">Class {formData.standard}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">School Name:</span>
+                      <span className="col-span-2 font-medium">{formData.schoolName}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">City:</span>
+                      <span className="col-span-2 font-medium">{formData.city}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">District:</span>
+                      <span className="col-span-2 font-medium">{formData.district}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Previous Class %:</span>
+                      <span className="col-span-2 font-medium">{formData.previousYearPercentage}%</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Class Rank:</span>
+                      <span className="col-span-2 font-medium">{formData.classRank}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documents Section */}
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">Documents & Olympiad</h4>
+                  <div className="grid gap-3 text-sm">
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Olympiad:</span>
+                      <span className="col-span-2 font-medium">{formData.olympiadAppeared}</span>
+                    </div>
+                    {olympiadCertFile && (
+                      <div className="grid grid-cols-3 gap-2">
+                        <span className="text-muted-foreground">Certificate:</span>
+                        <span className="col-span-2 font-medium text-green-600">✓ {olympiadCertFile.name}</span>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="text-muted-foreground">Marksheet:</span>
+                      <span className="col-span-2 font-medium text-green-600">✓ {marksheetFile?.name}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
+                <p className="text-sm text-foreground">
+                  <strong>Please verify all details before submitting.</strong> Once submitted, you will receive a confirmation on your WhatsApp number.
+                </p>
               </div>
             </div>
           )}
