@@ -141,11 +141,6 @@ const RegistrationSuccess = () => {
     }
   };
 
-  const handleDownloadHallTicket = () => {
-    // Navigate to login page for hall ticket download
-    navigate('/login');
-    toast.success("Redirecting to download hall ticket...");
-  };
 
   const handleWhatsAppShare = () => {
     const message = encodeURIComponent(
@@ -194,23 +189,6 @@ const RegistrationSuccess = () => {
             <img src={logo} alt="P.P. SAVANI CFE" className="h-20 w-auto" />
           </div>
 
-          {/* Hall Ticket Download Section */}
-          <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 mb-6">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Download className="h-6 w-6 text-accent" />
-                <h3 className="text-xl font-bold text-foreground">Download Hall Ticket</h3>
-              </div>
-              <Button
-                onClick={handleDownloadHallTicket}
-                size="lg"
-                className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white h-12 font-semibold"
-              >
-                <Download className="mr-2 h-5 w-5" />
-                Download Hall Ticket
-              </Button>
-            </CardContent>
-          </Card>
 
           {/* WhatsApp Share Section */}
           <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-2 border-green-500/20 mb-8">
