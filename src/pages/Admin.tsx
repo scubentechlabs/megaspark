@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Check, X, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
@@ -64,6 +65,7 @@ interface Registration {
   olympiad_appeared: string | null;
   olympiad_certificate_url: string | null;
   marksheet_url: string | null;
+  status: string;
 }
 
 export default function Admin() {
@@ -75,7 +77,7 @@ export default function Admin() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0 });
+  const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0, pending: 0, approved: 0, rejected: 0 });
   const itemsPerPage = 100;
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -167,6 +169,59 @@ export default function Admin() {
     }
   };
 
+  const handleApproveRegistration = async (registrationId: string) => {
+    try {
+      toast({
+        title: "Approving...",
+        description: "Processing registration approval",
+      });
+
+      const { error } = await supabase
+        .from('registrations')
+        .update({ status: 'approved' })
+        .eq('id', registrationId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Registration approved and registration number generated",
+      });
+      fetchRegistrations();
+    } catch (error: any) {
+      console.error("Error approving registration:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to approve registration",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRejectRegistration = async (registrationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .update({ status: 'rejected' })
+        .eq('id', registrationId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Registration Rejected",
+        description: "The registration has been rejected",
+      });
+      fetchRegistrations();
+    } catch (error: any) {
+      console.error("Error rejecting registration:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reject registration",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     // When search term or page changes, fetch matching results
     const timer = setTimeout(() => {
@@ -246,11 +301,30 @@ export default function Admin() {
         .select('*', { count: 'exact', head: true })
         .gte('created_at', yesterdayISO)
         .lt('created_at', todayISO);
+
+      // Get status counts
+      const { count: pendingCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      const { count: approvedCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'approved');
+
+      const { count: rejectedCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'rejected');
       
       setStats({
         total: count || 0,
         todayRegistrations: todayCount || 0,
-        yesterdayRegistrations: yesterdayCount || 0
+        yesterdayRegistrations: yesterdayCount || 0,
+        pending: pendingCount || 0,
+        approved: approvedCount || 0,
+        rejected: rejectedCount || 0
       });
       
       // Fetch current page
@@ -706,40 +780,76 @@ export default function Admin() {
             <div className="max-w-7xl mx-auto space-y-6">
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Total Registrations
+                      Total
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold">{stats.total}</p>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold">{stats.total}</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card hover:shadow-md transition-shadow border-yellow-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-yellow-600 flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Pending
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card hover:shadow-md transition-shadow border-green-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-green-600 flex items-center gap-2">
+                      <Check className="h-4 w-4" />
+                      Approved
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-card hover:shadow-md transition-shadow border-red-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-red-600 flex items-center gap-2">
+                      <X className="h-4 w-4" />
+                      Rejected
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Today Registrations
+                      Today
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold">{stats.todayRegistrations}</p>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold">{stats.todayRegistrations}</p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Yesterday Registrations
+                      Yesterday
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold">{stats.yesterdayRegistrations}</p>
+                  <CardContent className="pt-0">
+                    <p className="text-2xl font-bold">{stats.yesterdayRegistrations}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -793,13 +903,13 @@ export default function Admin() {
                       <Table>
                         <TableHeader>
                           <TableRow className="bg-muted/50">
+                            <TableHead className="font-semibold">Status</TableHead>
                             <TableHead className="font-semibold">Reg. No.</TableHead>
                             <TableHead className="font-semibold">Student Name</TableHead>
                             <TableHead className="font-semibold">Mobile</TableHead>
                             <TableHead className="font-semibold">Class</TableHead>
                             <TableHead className="font-semibold">School</TableHead>
                             <TableHead className="font-semibold">City/Dist</TableHead>
-                            <TableHead className="font-semibold">%/Rank</TableHead>
                             <TableHead className="font-semibold">Documents</TableHead>
                             <TableHead className="font-semibold">Actions</TableHead>
                           </TableRow>
@@ -807,13 +917,36 @@ export default function Admin() {
                         <TableBody>
                           {filteredRegistrations.map((reg: any) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
-                              <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
+                              <TableCell>
+                                {reg.status === 'pending' && (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </Badge>
+                                )}
+                                {reg.status === 'approved' && (
+                                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                    <Check className="h-3 w-3 mr-1" />
+                                    Approved
+                                  </Badge>
+                                )}
+                                {reg.status === 'rejected' && (
+                                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                    <X className="h-3 w-3 mr-1" />
+                                    Rejected
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {reg.status === 'approved' && reg.registration_number 
+                                  ? formatRegistrationNumber(reg.registration_number) 
+                                  : <span className="text-muted-foreground">—</span>}
+                              </TableCell>
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
                               <TableCell className="max-w-[150px] truncate">{reg.school_name || 'N/A'}</TableCell>
                               <TableCell>{reg.city || reg.district || 'N/A'}</TableCell>
-                              <TableCell>{reg.previous_year_percentage || 'N/A'}% / {reg.class_rank || 'N/A'}</TableCell>
                               <TableCell>
                                 <div className="flex gap-1">
                                   {reg.marksheet_url && (
@@ -842,7 +975,29 @@ export default function Admin() {
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 flex-wrap">
+                                  {reg.status === 'pending' && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        variant="default"
+                                        onClick={() => handleApproveRegistration(reg.id)}
+                                        className="gap-1 bg-green-600 hover:bg-green-700"
+                                      >
+                                        <Check className="h-3 w-3" />
+                                        Approve
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() => handleRejectRegistration(reg.id)}
+                                        className="gap-1"
+                                      >
+                                        <X className="h-3 w-3" />
+                                        Reject
+                                      </Button>
+                                    </>
+                                  )}
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -852,15 +1007,17 @@ export default function Admin() {
                                     <Edit className="h-3 w-3" />
                                     Edit
                                   </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="default"
-                                    onClick={() => handleSendHallTicket(reg.id)}
-                                    className="gap-1"
-                                  >
-                                    <Send className="h-3 w-3" />
-                                    WhatsApp
-                                  </Button>
+                                  {reg.status === 'approved' && (
+                                    <Button
+                                      size="sm"
+                                      variant="default"
+                                      onClick={() => handleSendHallTicket(reg.id)}
+                                      className="gap-1"
+                                    >
+                                      <Send className="h-3 w-3" />
+                                      WhatsApp
+                                    </Button>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>
