@@ -59,6 +59,11 @@ interface Registration {
   parent_last_name: string | null;
   parent_email: string | null;
   parent_phone: string | null;
+  city: string | null;
+  class_rank: string | null;
+  olympiad_appeared: string | null;
+  olympiad_certificate_url: string | null;
+  marksheet_url: string | null;
 }
 
 export default function Admin() {
