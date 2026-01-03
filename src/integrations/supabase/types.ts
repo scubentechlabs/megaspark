@@ -265,6 +265,7 @@ export type Database = {
           school_name: string | null
           standard: string
           state: string | null
+          status: string
           student_name: string
           time_slot: string | null
           updated_at: string
@@ -305,6 +306,7 @@ export type Database = {
           school_name?: string | null
           standard: string
           state?: string | null
+          status?: string
           student_name: string
           time_slot?: string | null
           updated_at?: string
@@ -345,6 +347,7 @@ export type Database = {
           school_name?: string | null
           standard?: string
           state?: string | null
+          status?: string
           student_name?: string
           time_slot?: string | null
           updated_at?: string

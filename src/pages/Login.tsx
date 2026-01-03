@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
+import { Smartphone, Download, ArrowLeft, Send, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.png";
 import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
 import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
@@ -43,6 +44,7 @@ interface Registration {
   parent_email: string | null;
   parent_phone: string | null;
   parent_name: string | null;
+  status: string;
 }
 
 export default function Login() {
@@ -300,10 +302,10 @@ export default function Login() {
           <CardHeader className="text-center bg-gradient-to-r from-primary/10 to-accent/10">
             <CardTitle className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
               <Smartphone className="h-8 w-8 text-primary" />
-              Download Hall Ticket
+              View Registration
             </CardTitle>
             <CardDescription className="text-lg">
-              Enter your registered mobile number to access your hall tickets
+              Enter your registered mobile number to check registration status
             </CardDescription>
           </CardHeader>
 
@@ -339,40 +341,80 @@ export default function Login() {
                 {registrations.map((registration) => (
                   <Card key={registration.id} className="border-2 border-accent/20">
                     <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div className="space-y-2">
-                          <p className="text-lg font-bold text-foreground">
-                            {registration.student_name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Reg. No: <span className="font-semibold text-primary">{formatRegistrationNumber(registration.registration_number)}</span>
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Class {registration.standard} | {formatMedium(registration.medium)}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Center: {registration.exam_center === "To be announced" 
-                              ? "PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150" 
-                              : registration.exam_center}
-                          </p>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <p className="text-lg font-bold text-foreground">
+                                {registration.student_name}
+                              </p>
+                              {registration.status === 'pending' && (
+                                <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Pending Approval
+                                </Badge>
+                              )}
+                              {registration.status === 'approved' && (
+                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              )}
+                              {registration.status === 'rejected' && (
+                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
+                                  <XCircle className="h-3 w-3 mr-1" />
+                                  Rejected
+                                </Badge>
+                              )}
+                            </div>
+                            {registration.status === 'approved' && registration.registration_number && (
+                              <p className="text-sm text-muted-foreground">
+                                Reg. No: <span className="font-semibold text-primary">{formatRegistrationNumber(registration.registration_number)}</span>
+                              </p>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              Class {registration.standard} | {formatMedium(registration.medium)}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Center: {registration.exam_center === "To be announced" 
+                                ? "PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150" 
+                                : registration.exam_center}
+                            </p>
+                          </div>
+                          {registration.status === 'approved' && (
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button
+                                onClick={() => handleDownloadHallTicket(registration)}
+                                className="bg-accent hover:bg-accent/90 gap-2"
+                              >
+                                <Download className="h-4 w-4" />
+                                Download
+                              </Button>
+                              <Button
+                                onClick={() => handleSendHallTicket(registration.id)}
+                                variant="default"
+                                className="gap-2"
+                              >
+                                <Send className="h-4 w-4" />
+                                WhatsApp
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <Button
-                            onClick={() => handleDownloadHallTicket(registration)}
-                            className="bg-accent hover:bg-accent/90 gap-2"
-                          >
-                            <Download className="h-4 w-4" />
-                            Download
-                          </Button>
-                          <Button
-                            onClick={() => handleSendHallTicket(registration.id)}
-                            variant="default"
-                            className="gap-2"
-                          >
-                            <Send className="h-4 w-4" />
-                            WhatsApp
-                          </Button>
-                        </div>
+                        {registration.status === 'pending' && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <p className="text-sm text-yellow-800">
+                              <strong>Note:</strong> Your registration is under review. Once approved, you will receive your registration number and can download your hall ticket.
+                            </p>
+                          </div>
+                        )}
+                        {registration.status === 'rejected' && (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <p className="text-sm text-red-800">
+                              <strong>Note:</strong> Your registration has been rejected. Please contact the support team for more information.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
