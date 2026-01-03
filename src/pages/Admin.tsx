@@ -6,7 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Check, X, Clock } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Check, X, Clock, Eye } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
@@ -75,6 +81,8 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [viewingRegistration, setViewingRegistration] = useState<Registration | null>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0, pending: 0, approved: 0, rejected: 0 });
@@ -1001,6 +1009,18 @@ export default function Admin() {
                                   <Button
                                     size="sm"
                                     variant="outline"
+                                    onClick={() => {
+                                      setViewingRegistration(reg);
+                                      setIsViewDialogOpen(true);
+                                    }}
+                                    className="gap-1"
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                    View
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
                                     onClick={() => handleEditRegistration(reg)}
                                     className="gap-1"
                                   >
@@ -1109,6 +1129,136 @@ export default function Admin() {
           onUpdate={handleEditSuccess}
         />
       )}
+
+      {/* View Registration Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Registration Details</DialogTitle>
+          </DialogHeader>
+          {viewingRegistration && (
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-3">
+                <div>
+                  <label className="font-semibold text-muted-foreground">Status</label>
+                  <p>{viewingRegistration.status === 'pending' ? 'Pending' : viewingRegistration.status === 'approved' ? 'Approved' : 'Rejected'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Registration Number</label>
+                  <p>{viewingRegistration.registration_number ? formatRegistrationNumber(viewingRegistration.registration_number) : '—'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Student Name</label>
+                  <p>{viewingRegistration.student_name}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Date of Birth</label>
+                  <p>{viewingRegistration.date_of_birth || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Gender</label>
+                  <p>{viewingRegistration.gender || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Mobile Number</label>
+                  <p>{viewingRegistration.mobile_number}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">WhatsApp Number</label>
+                  <p>{viewingRegistration.whatsapp_number || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Email</label>
+                  <p>{viewingRegistration.email || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Address</label>
+                  <p>{viewingRegistration.address || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">City</label>
+                  <p>{viewingRegistration.city || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">District</label>
+                  <p>{viewingRegistration.district || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">State</label>
+                  <p>{viewingRegistration.state || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="font-semibold text-muted-foreground">Standard</label>
+                  <p>{viewingRegistration.standard}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Medium</label>
+                  <p>{formatMedium(viewingRegistration.medium)}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">School Name</label>
+                  <p>{viewingRegistration.school_name || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">School Medium</label>
+                  <p>{viewingRegistration.school_medium || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Previous Year %</label>
+                  <p>{viewingRegistration.previous_year_percentage || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Class Rank</label>
+                  <p>{viewingRegistration.class_rank || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Parent Name</label>
+                  <p>{viewingRegistration.parent_name || `${viewingRegistration.parent_first_name || ''} ${viewingRegistration.parent_last_name || ''}`.trim() || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Parent Phone</label>
+                  <p>{viewingRegistration.parent_phone || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Preferred Exam Date</label>
+                  <p>{viewingRegistration.preferred_exam_date || 'N/A'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Exam Date</label>
+                  <p>{viewingRegistration.exam_date || 'TBA'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Time Slot</label>
+                  <p>{viewingRegistration.time_slot || 'TBA'}</p>
+                </div>
+                <div>
+                  <label className="font-semibold text-muted-foreground">Registered On</label>
+                  <p>{new Date(viewingRegistration.created_at).toLocaleString()}</p>
+                </div>
+              </div>
+              {(viewingRegistration.marksheet_url || viewingRegistration.olympiad_certificate_url) && (
+                <div className="col-span-2 pt-3 border-t">
+                  <label className="font-semibold text-muted-foreground">Documents</label>
+                  <div className="flex gap-4 mt-2">
+                    {viewingRegistration.marksheet_url && (
+                      <a href={viewingRegistration.marksheet_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        View Marksheet
+                      </a>
+                    )}
+                    {viewingRegistration.olympiad_certificate_url && (
+                      <a href={viewingRegistration.olympiad_certificate_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        View Olympiad Certificate
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </SidebarProvider>
   );
