@@ -791,22 +791,50 @@ export default function Admin() {
                             <TableHead className="font-semibold">Reg. No.</TableHead>
                             <TableHead className="font-semibold">Student Name</TableHead>
                             <TableHead className="font-semibold">Mobile</TableHead>
-                            <TableHead className="font-semibold">Standard</TableHead>
-                            <TableHead className="font-semibold">Medium</TableHead>
-                            <TableHead className="font-semibold">Exam Date</TableHead>
+                            <TableHead className="font-semibold">Class</TableHead>
+                            <TableHead className="font-semibold">School</TableHead>
+                            <TableHead className="font-semibold">City/Dist</TableHead>
+                            <TableHead className="font-semibold">%/Rank</TableHead>
+                            <TableHead className="font-semibold">Documents</TableHead>
                             <TableHead className="font-semibold">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredRegistrations.map((reg) => (
+                          {filteredRegistrations.map((reg: any) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
                               <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
-                              <TableCell>{formatMedium(reg.school_medium)}</TableCell>
+                              <TableCell className="max-w-[150px] truncate">{reg.school_name || 'N/A'}</TableCell>
+                              <TableCell>{reg.city || reg.district || 'N/A'}</TableCell>
+                              <TableCell>{reg.previous_year_percentage || 'N/A'}% / {reg.class_rank || 'N/A'}</TableCell>
                               <TableCell>
-                                {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
+                                <div className="flex gap-1">
+                                  {reg.marksheet_url && (
+                                    <a 
+                                      href={reg.marksheet_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline"
+                                    >
+                                      Marksheet
+                                    </a>
+                                  )}
+                                  {reg.olympiad_certificate_url && (
+                                    <a 
+                                      href={reg.olympiad_certificate_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline ml-1"
+                                    >
+                                      Certificate
+                                    </a>
+                                  )}
+                                  {!reg.marksheet_url && !reg.olympiad_certificate_url && (
+                                    <span className="text-xs text-muted-foreground">None</span>
+                                  )}
+                                </div>
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
@@ -814,27 +842,19 @@ export default function Admin() {
                                     size="sm"
                                     variant="outline"
                                     onClick={() => handleEditRegistration(reg)}
-                                    className="gap-2"
+                                    className="gap-1"
                                   >
-                                    <Edit className="h-4 w-4" />
-                                    Edit Details
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleDownloadHallTicket(reg)}
-                                    className="gap-2"
-                                  >
-                                    <Download className="h-4 w-4" />
-                                    Hall Ticket
+                                    <Edit className="h-3 w-3" />
+                                    Edit
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="default"
                                     onClick={() => handleSendHallTicket(reg.id)}
-                                    className="gap-2"
+                                    className="gap-1"
                                   >
-                                    <Send className="h-4 w-4" />
-                                    Send on WhatsApp
+                                    <Send className="h-3 w-3" />
+                                    WhatsApp
                                   </Button>
                                 </div>
                               </TableCell>
