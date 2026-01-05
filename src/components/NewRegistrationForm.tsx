@@ -269,6 +269,24 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           return;
         }
       }
+      // Final duplicate check before insert
+      const { data: existingReg, error: checkError } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('mobile_number', formData.phoneNumber)
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      if (existingReg && existingReg.length > 0) {
+        toast.error("Registration Failed", {
+          description: "This mobile number is already registered. Please use a different number."
+        });
+        setCurrentStep(1);
+        setMobileError("This mobile number is already registered.");
+        setIsSubmitting(false);
+        return;
+      }
 
       // Insert registration
       const { data, error } = await supabase
@@ -293,7 +311,18 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle unique constraint violation
+        if (error.code === '23505') {
+          toast.error("Registration Failed", {
+            description: "This mobile number is already registered."
+          });
+          setCurrentStep(1);
+          setMobileError("This mobile number is already registered.");
+          return;
+        }
+        throw error;
+      }
 
       toast.success("Registration Successful!", {
         description: "Redirecting to confirmation page..."
