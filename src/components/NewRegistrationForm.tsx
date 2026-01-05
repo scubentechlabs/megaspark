@@ -726,6 +726,7 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           {currentStep < totalSteps ? (
             <Button 
               onClick={handleNext} 
+              disabled={!!mobileError}
               className="min-w-[120px] bg-accent hover:bg-accent/90"
             >
               Next
