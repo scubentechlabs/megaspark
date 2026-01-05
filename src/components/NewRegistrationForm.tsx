@@ -305,8 +305,7 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           olympiad_certificate_url: olympiadCertUrl,
           marksheet_url: marksheetUrl,
           exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150',
-          state: 'Gujarat',
-          registration_number: ''
+          state: 'Gujarat'
         } as any)
         .select()
         .single();
