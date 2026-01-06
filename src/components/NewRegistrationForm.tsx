@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, Upload, X, Loader2, ChevronRight, ChevronLeft, User, School, FileText } from "lucide-react";
+import { CheckCircle, Upload, X, Loader2, ChevronRight, ChevronLeft, User, School, FileText, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -412,9 +412,14 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
                     placeholder="Enter 10-digit mobile number"
                     maxLength={10}
                     required
-                    className={mobileError ? "border-red-500" : ""}
+                    className={mobileError ? "border-red-500 ring-2 ring-red-500 focus:ring-red-500" : ""}
                   />
-                  {mobileError && <p className="text-sm text-red-600">{mobileError}</p>}
+                  {mobileError && (
+                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                      <p className="text-sm font-semibold text-red-700">{mobileError}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
