@@ -40,7 +40,7 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [mobileError, setMobileError] = useState<string>("");
+  
   const [olympiadCertFile, setOlympiadCertFile] = useState<File | null>(null);
   const [marksheetFile, setMarksheetFile] = useState<File | null>(null);
   const [uploadingCert, setUploadingCert] = useState(false);
@@ -58,9 +58,6 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
-    if (updates.phoneNumber !== undefined) {
-      setMobileError("");
-    }
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
@@ -168,8 +165,6 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
         return false;
       }
 
-      // Mobile number validation passed - clear any previous error
-      setMobileError("");
     }
 
     if (currentStep === 2) {
@@ -253,24 +248,6 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           return;
         }
       }
-      // Final duplicate check before insert
-      const { data: existingReg, error: checkError } = await supabase
-        .from('registrations')
-        .select('id')
-        .eq('mobile_number', formData.phoneNumber)
-        .limit(1);
-
-      if (checkError) throw checkError;
-
-      if (existingReg && existingReg.length > 0) {
-        toast.error("Registration Failed", {
-          description: "This mobile number is already registered. Please use a different number."
-        });
-        setCurrentStep(1);
-        setMobileError("This mobile number is already registered.");
-        setIsSubmitting(false);
-        return;
-      }
 
       // Insert registration
       const { data, error } = await supabase
@@ -295,15 +272,6 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
         .single();
 
       if (error) {
-        // Handle unique constraint violation
-        if (error.code === '23505') {
-          toast.error("Registration Failed", {
-            description: "This mobile number is already registered."
-          });
-          setCurrentStep(1);
-          setMobileError("This mobile number is already registered.");
-          return;
-        }
         throw error;
       }
 
@@ -396,14 +364,7 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
                     placeholder="Enter 10-digit mobile number"
                     maxLength={10}
                     required
-                    className={mobileError ? "border-red-500 ring-2 ring-red-500 focus:ring-red-500" : ""}
                   />
-                  {mobileError && (
-                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
-                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                      <p className="text-sm font-semibold text-red-700">{mobileError}</p>
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -715,7 +676,6 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
           {currentStep < totalSteps ? (
             <Button 
               onClick={handleNext} 
-              disabled={!!mobileError}
               className="min-w-[120px] bg-accent hover:bg-accent/90"
             >
               Next
