@@ -168,24 +168,8 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
         return false;
       }
 
-      // Check for duplicate mobile on step 1
-      try {
-        const { data: existingRegistrations, error } = await supabase
-          .from('registrations')
-          .select('id, mobile_number')
-          .eq('mobile_number', formData.phoneNumber)
-          .limit(1);
-
-        if (error) throw error;
-
-        if (existingRegistrations && existingRegistrations.length > 0) {
-          setMobileError("This mobile number is already registered.");
-          return false;
-        }
-      } catch (error) {
-        console.error('Error checking mobile:', error);
-        return false;
-      }
+      // Mobile number validation passed - clear any previous error
+      setMobileError("");
     }
 
     if (currentStep === 2) {
