@@ -145,7 +145,7 @@ export default function Login() {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>MEGA SPARK EXAM Hall Ticket - ${registration.registration_number}</title>
+  <title>MEGA SPARK NATIONAL CHAMPION Hall Ticket - ${registration.registration_number}</title>
   <style>
     @page { 
       size: A4;
@@ -189,7 +189,7 @@ export default function Login() {
 <body>
   <div class="header">
     <h1>P.P. SAVANI GROUP</h1>
-    <h2>MEGA SPARK EXAM 2025</h2>
+    <h2>MEGA SPARK NATIONAL CHAMPION</h2>
     <h3>EXAMINATION HALL TICKET</h3>
   </div>
 
@@ -254,7 +254,7 @@ export default function Login() {
   </div>
 
   <div class="footer">
-    <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
+    <p><strong>MEGA SPARK NATIONAL CHAMPION COMMITTEE</strong></p>
     <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
   </div>
 

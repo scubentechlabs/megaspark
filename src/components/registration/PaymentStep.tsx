@@ -173,7 +173,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
         key: data.keyId,
         amount: data.amount,
         currency: data.currency,
-        name: "MEGA SPARK EXAM",
+        name: "MEGA SPARK NATIONAL CHAMPION",
         description: "Registration Fee",
         order_id: data.orderId,
         prefill: {
