@@ -58,7 +58,7 @@ serve(async (req) => {
     
     chunks.push(`-- SQL Database Backup\n`);
     chunks.push(`-- Generated: ${new Date().toISOString()}\n`);
-    chunks.push(`-- Project: MEGA SPARK EXAM 2025\n`);
+    chunks.push(`-- Project: MEGA SPARK NATIONAL CHAMPION\n`);
     chunks.push(`-- ============================================\n\n`);
 
     // Process each table

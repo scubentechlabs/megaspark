@@ -75,7 +75,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             <div>
               <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-accent via-primary to-accent text-white mb-6 shadow-2xl animate-pulse border-2 border-white/30">
                 <Sparkles className="h-5 w-5 animate-spin" />
-                <span className="text-base font-bold tracking-wide">Mega Spark Exam 2025</span>
+                <span className="text-base font-bold tracking-wide">Mega Spark National Champion</span>
                 <Sparkles className="h-5 w-5 animate-spin" />
               </div>
               
@@ -84,7 +84,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
                 <span className="text-foreground">₹75 Crore</span>
                 <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-4xl md:text-5xl">
-                  Mega Spark Exam 2025
+                  Mega Spark National Champion
                 </span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">

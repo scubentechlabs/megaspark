@@ -50,7 +50,7 @@ export const FAQ = () => {
               Frequently Asked Questions
             </h2>
             <p className="text-xl text-muted-foreground">
-              Find answers to common questions about the Mega Spark Exam
+              Find answers to common questions about the Mega Spark National Champion
             </p>
           </div>
 
