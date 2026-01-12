@@ -177,10 +177,10 @@ const RegistrationSuccess = () => {
               Congratulations! 🎉
             </h1>
             <p className="text-xl md:text-2xl text-foreground font-semibold mb-2">
-              You're officially registered for
+              Thank You For Registration
             </p>
             <p className="text-2xl md:text-3xl font-bold text-accent">
-              Mega Spark National Champion!
+              Mega Spark National Champion
             </p>
           </div>
 
@@ -222,7 +222,7 @@ const RegistrationSuccess = () => {
                   <ul className="mt-2 space-y-2 text-sm text-foreground">
                     <li className="flex items-start gap-2">
                       <span className="text-accent font-bold">•</span>
-                      <span>Report to exam center by <strong className="text-accent">8:00 AM</strong> on exam day</span>
+                      <span>Report to the center by <strong className="text-accent">8:00 AM</strong> on the scheduled day</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-accent font-bold">•</span>
