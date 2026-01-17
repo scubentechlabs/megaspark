@@ -212,24 +212,14 @@ const RegistrationSuccess = () => {
             </CardContent>
           </Card>
 
-          {/* Important Information */}
-          <Card className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-accent mb-6">
+          {/* Team Contact Note */}
+          <Card className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-primary mb-6">
             <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 rounded-full bg-accent animate-pulse mt-2" />
-                <div className="flex-1">
-                  <strong className="text-primary text-lg">Important Reminder:</strong>
-                  <ul className="mt-2 space-y-2 text-sm text-foreground">
-                    <li className="flex items-start gap-2">
-                      <span className="text-accent font-bold">•</span>
-                      <span>Report to the center by <strong className="text-accent">8:00 AM</strong> on the scheduled day</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-accent font-bold">•</span>
-                      <span>Bring valid ID proof (Aadhar Card) and your hall ticket</span>
-                    </li>
-                  </ul>
-                </div>
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-3 rounded-full bg-primary animate-pulse" />
+                <p className="text-primary text-lg font-semibold">
+                  📞 Our Team Will Contact You Shortly
+                </p>
               </div>
             </CardContent>
           </Card>
