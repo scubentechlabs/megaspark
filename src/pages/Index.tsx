@@ -3,7 +3,7 @@ import { NewHeader } from "@/components/NewHeader";
 import { NewHero } from "@/components/NewHero";
 import { BenefitsSection } from "@/components/BenefitsSection";
 import { ResultsPoster } from "@/components/ResultsPoster";
-import { ExamDatesVenue } from "@/components/ExamDatesVenue";
+
 import { Toppers } from "@/components/Toppers";
 import { RegistrationSection } from "@/components/RegistrationSection";
 import { HelpBox } from "@/components/HelpBox";
@@ -99,7 +99,6 @@ const Index = () => {
       }} />
       <BenefitsSection />
       <ResultsPoster />
-      <ExamDatesVenue />
       <RegistrationSection />
       <Toppers />
       <HelpBox />
