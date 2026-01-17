@@ -60,10 +60,12 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
   }, []);
 
   const handleDownloadGuide = () => {
-    const guideSection = document.getElementById('about');
-    if (guideSection) {
-      guideSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    const link = document.createElement('a');
+    link.href = '/brochure.pdf';
+    link.download = 'Mega-Spark-Brochure.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
