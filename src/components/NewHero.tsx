@@ -104,28 +104,6 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
               ))}
             </div>
 
-            {/* Countdown Timer */}
-            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-card">
-              <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
-                Exam Starts In:
-              </p>
-              <div className="grid grid-cols-4 gap-4">
-                {[
-                  { value: timeLeft.days, label: 'Days' },
-                  { value: timeLeft.hours, label: 'Hours' },
-                  { value: timeLeft.minutes, label: 'Minutes' },
-                  { value: timeLeft.seconds, label: 'Seconds' }
-                ].map((item, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="bg-gradient-to-br from-primary to-accent text-white rounded-xl p-3 mb-2">
-                      <div className="text-3xl font-bold">{String(item.value).padStart(2, '0')}</div>
-                    </div>
-                    <div className="text-xs text-muted-foreground font-medium">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="flex flex-wrap gap-4 items-center">
               <Button
                 size="lg"
