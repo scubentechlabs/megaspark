@@ -4,8 +4,6 @@ import { NewHero } from "@/components/NewHero";
 import { BenefitsSection } from "@/components/BenefitsSection";
 import { ResultsPoster } from "@/components/ResultsPoster";
 import { ExamDatesVenue } from "@/components/ExamDatesVenue";
-import { EligibilityCriteria } from "@/components/EligibilityCriteria";
-import { DownloadGuide } from "@/components/DownloadGuide";
 import { Toppers } from "@/components/Toppers";
 import { RegistrationSection } from "@/components/RegistrationSection";
 import { HelpBox } from "@/components/HelpBox";
@@ -102,8 +100,6 @@ const Index = () => {
       <BenefitsSection />
       <ResultsPoster />
       <ExamDatesVenue />
-      <EligibilityCriteria />
-      <DownloadGuide />
       <RegistrationSection />
       <Toppers />
       <HelpBox />
