@@ -150,17 +150,15 @@ export default function Reports() {
     
     const formatTimeSlot = (slot: string | null) => {
       if (!slot) return 'TBA (Time Be Announced)';
-      const slotLower = slot.toLowerCase();
-      if (slotLower.includes('morning')) return 'Morning Slot';
-      if (slotLower.includes('afternoon')) return 'Afternoon Slot';
+      if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+      if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
       return slot;
     };
 
     const getReportingTime = (slot: string | null) => {
       if (!slot) return 'TBA (Time Be Announced)';
-      const slotLower = slot.toLowerCase();
-      if (slotLower.includes('morning')) return '8:00 AM';
-      if (slotLower.includes('afternoon')) return '2:30 PM';
+      if (slot.toLowerCase() === 'morning') return '8:00 AM';
+      if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
       return 'TBA (Time Be Announced)';
     };
 
@@ -287,17 +285,15 @@ export default function Reports() {
             ${data.map(reg => {
               const formatTimeSlot = (slot: string | null) => {
                 if (!slot) return 'TBA (Time Be Announced)';
-                const slotLower = slot.toLowerCase();
-                if (slotLower.includes('morning')) return 'Morning';
-                if (slotLower.includes('afternoon')) return 'Afternoon';
+                if (slot.toLowerCase() === 'morning') return 'Morning';
+                if (slot.toLowerCase() === 'afternoon') return 'Afternoon';
                 return slot;
               };
               
               const getReportingTime = (slot: string | null) => {
                 if (!slot) return 'TBA (Time Be Announced)';
-                const slotLower = slot.toLowerCase();
-                if (slotLower.includes('morning')) return '8:00 AM';
-                if (slotLower.includes('afternoon')) return '2:30 PM';
+                if (slot.toLowerCase() === 'morning') return '8:00 AM';
+                if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
                 return 'TBA (Time Be Announced)';
               };
               

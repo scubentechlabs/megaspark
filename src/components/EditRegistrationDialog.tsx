@@ -65,24 +65,7 @@ interface Registration {
   parent_email: string | null;
   parent_phone: string | null;
   parent_name: string | null;
-  city: string | null;
-  class_rank: string | null;
-  olympiad_appeared: string | null;
-  olympiad_certificate_url: string | null;
-  marksheet_url: string | null;
 }
-
-const olympiadOptions = [
-  "None",
-  "SOF (Science Olympiad Foundation)",
-  "IMO (International Mathematics Olympiad)",
-  "NSO (National Science Olympiad)",
-  "IEO (International English Olympiad)",
-  "NCO (National Cyber Olympiad)",
-  "NTSE (National Talent Search Exam)",
-  "KVPY (Kishore Vaigyanik Protsahan Yojana)",
-  "Other"
-];
 
 interface EditRegistrationDialogProps {
   open: boolean;
@@ -169,15 +152,10 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
         whatsappNumber: registration.whatsapp_number || "",
         state: registration.state || "",
         district: registration.district || "",
-        city: registration.city || "",
         standard: normalizeStandard(registration.standard),
         schoolName: registration.school_name || "",
         schoolMedium: registration.school_medium || "",
         previousYearPercentage: registration.previous_year_percentage || "",
-        classRank: registration.class_rank || "",
-        olympiadAppeared: registration.olympiad_appeared || "",
-        olympiadCertificateUrl: registration.olympiad_certificate_url || "",
-        marksheetUrl: registration.marksheet_url || "",
         email: registration.email || "",
         gender: registration.gender || "",
         dateOfBirth: registration.date_of_birth || "",
@@ -350,13 +328,10 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
           time_slot: formData.timeSlot,
           state: formData.state,
           district: formData.district,
-          city: formData.city || null,
           school_name: formData.schoolName,
           school_address: formData.address || null,
           school_medium: formData.schoolMedium,
           previous_year_percentage: formData.previousYearPercentage,
-          class_rank: formData.classRank || null,
-          olympiad_appeared: formData.olympiadAppeared || null,
           date_of_birth: formData.dateOfBirth || null,
           gender: formData.gender || null,
           address: formData.address || null,
@@ -366,7 +341,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
           parent_phone: formData.parentPhone || null,
           parent_name: formData.parentName,
           medium: formData.schoolMedium,
-        } as any)
+        })
         .eq("id", registration.id);
 
       if (updateError) throw updateError;
@@ -623,48 +598,38 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
             {/* Step 2: School Info */}
             {currentStep === 2 && (
               <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="standard">Current Standard *</Label>
+                  <Select value={formData.standard || ""} onValueChange={(value) => updateFormData({ standard: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your standard" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">Standard 5</SelectItem>
+                      <SelectItem value="6">Standard 6</SelectItem>
+                      <SelectItem value="7">Standard 7</SelectItem>
+                      <SelectItem value="8">Standard 8</SelectItem>
+                      <SelectItem value="9">Standard 9</SelectItem>
+                      <SelectItem value="10">Standard 10</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="standard">Class *</Label>
-                    <Select value={formData.standard || ""} onValueChange={(value) => updateFormData({ standard: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select class" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">Class 5</SelectItem>
-                        <SelectItem value="6">Class 6</SelectItem>
-                        <SelectItem value="7">Class 7</SelectItem>
-                        <SelectItem value="8">Class 8</SelectItem>
-                        <SelectItem value="9">Class 9</SelectItem>
-                        <SelectItem value="10">Class 10</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={formData.city || ""}
-                      onChange={(e) => updateFormData({ city: e.target.value })}
-                      placeholder="Enter city name"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="schoolName">School Name *</Label>
+                    <Label htmlFor="schoolName">Current School Name *</Label>
                     <Input
                       id="schoolName"
                       value={formData.schoolName || ""}
                       onChange={(e) => updateFormData({ schoolName: e.target.value })}
-                      placeholder="Enter school name"
+                      placeholder="Enter current school name"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="schoolMedium">School Medium</Label>
-                    <Select value={formData.schoolMedium || ""} onValueChange={(value) => updateFormData({ schoolMedium: value })}>
+                    <Label htmlFor="schoolMedium">School Medium / School Language *</Label>
+                    <Select value={formData.schoolMedium} onValueChange={(value) => updateFormData({ schoolMedium: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select medium" />
                       </SelectTrigger>
@@ -675,8 +640,8 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="previousYearPercentage">Previous Class Percentage (%)</Label>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="previousYearPercentage">Your Previous Year Percentage *</Label>
                     <Input
                       id="previousYearPercentage"
                       type="text"
@@ -696,72 +661,11 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                         }
                         updateFormData({ previousYearPercentage: value });
                       }}
-                      placeholder="e.g., 85 or 85.5"
+                      placeholder="Enter percentage (e.g., 85 or 85.5)"
                       maxLength={6}
+                      required
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="classRank">Class Rank</Label>
-                    <Input
-                      id="classRank"
-                      type="text"
-                      value={formData.classRank || ""}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        updateFormData({ classRank: value });
-                      }}
-                      placeholder="Enter class rank"
-                    />
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="olympiadAppeared">Olympiad Appeared</Label>
-                    <Select 
-                      value={formData.olympiadAppeared || ""} 
-                      onValueChange={(value) => updateFormData({ olympiadAppeared: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {olympiadOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Document Links - Read Only */}
-                  {(formData.marksheetUrl || formData.olympiadCertificateUrl) && (
-                    <div className="md:col-span-2 p-4 bg-muted/30 rounded-lg">
-                      <Label className="text-muted-foreground mb-2 block">Uploaded Documents</Label>
-                      <div className="flex gap-4">
-                        {formData.marksheetUrl && (
-                          <a 
-                            href={formData.marksheetUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline"
-                          >
-                            View Marksheet
-                          </a>
-                        )}
-                        {formData.olympiadCertificateUrl && (
-                          <a 
-                            href={formData.olympiadCertificateUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm text-primary hover:underline"
-                          >
-                            View Olympiad Certificate
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -786,9 +690,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <span className="text-muted-foreground">Location:</span>
-                      <span className="col-span-2 font-medium">
-                        {formData.city && `${formData.city}, `}{formData.district}, {formData.state}
-                      </span>
+                      <span className="col-span-2 font-medium">{formData.district}, {formData.state}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <span className="text-muted-foreground">Exam Date:</span>
@@ -801,24 +703,20 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
                       <span className="col-span-2 font-medium">{getSlotLabel(formData.timeSlot || '')}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <span className="text-muted-foreground">Class:</span>
-                      <span className="col-span-2 font-medium">Class {formData.standard}</span>
+                      <span className="text-muted-foreground">Standard:</span>
+                      <span className="col-span-2 font-medium">Standard {formData.standard}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <span className="text-muted-foreground">School:</span>
                       <span className="col-span-2 font-medium">{formData.schoolName}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <span className="text-muted-foreground">Previous %:</span>
-                      <span className="col-span-2 font-medium">{formData.previousYearPercentage || 'N/A'}%</span>
+                      <span className="text-muted-foreground">School Medium:</span>
+                      <span className="col-span-2 font-medium">{formData.schoolMedium}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
-                      <span className="text-muted-foreground">Class Rank:</span>
-                      <span className="col-span-2 font-medium">{formData.classRank || 'N/A'}</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <span className="text-muted-foreground">Olympiad:</span>
-                      <span className="col-span-2 font-medium">{formData.olympiadAppeared || 'None'}</span>
+                      <span className="text-muted-foreground">Previous Year %:</span>
+                      <span className="col-span-2 font-medium">{formData.previousYearPercentage}%</span>
                     </div>
                   </div>
                 </div>

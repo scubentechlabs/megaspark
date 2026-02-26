@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
-import { Settings as SettingsIcon, Save, Download, Database, FileText, Code, HardDrive } from "lucide-react";
+import { Settings as SettingsIcon, Save, Download, Database, FileText } from "lucide-react";
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
@@ -140,37 +140,9 @@ export default function Settings() {
     }
   };
 
-  const downloadBackup = async (type: 'registrations' | 'payments' | 'coupons' | 'all' | 'sql') => {
+  const downloadBackup = async (type: 'registrations' | 'payments' | 'coupons' | 'all') => {
     setIsDownloading(true);
     try {
-      // Handle SQL backup separately
-      if (type === 'sql') {
-        toast({
-          title: "Generating SQL Backup",
-          description: "Please wait while we generate your SQL database backup...",
-        });
-
-        const { data: sqlData, error: sqlError } = await supabase.functions.invoke('generate-sql-backup');
-        
-        if (sqlError) throw sqlError;
-
-        const blob = new Blob([sqlData], { type: 'application/sql' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `database-backup-${new Date().toISOString().split('T')[0]}.sql`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        toast({
-          title: "SQL Backup Complete",
-          description: "SQL database backup downloaded successfully",
-        });
-        return;
-      }
-
       let data: any[] = [];
       let filename = '';
       
@@ -402,92 +374,58 @@ export default function Settings() {
                 <p className="text-sm text-muted-foreground mb-6">
                   Download backup copies of your database for safekeeping and data analysis.
                 </p>
-                
-                {/* Primary Backup Options */}
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium mb-3">Complete Backups</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button
-                      variant="default"
-                      onClick={() => downloadBackup('sql')}
-                      disabled={isDownloading}
-                      className="h-auto py-4 flex flex-col items-center gap-2 bg-primary hover:bg-primary/90"
-                    >
-                      <HardDrive className="h-6 w-6" />
-                      <div className="text-center">
-                        <div className="font-semibold">SQL Database Backup</div>
-                        <div className="text-xs opacity-80">All tables with INSERT statements</div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      onClick={() => downloadBackup('all')}
-                      disabled={isDownloading}
-                      className="h-auto py-4 flex flex-col items-center gap-2"
-                    >
-                      <Database className="h-6 w-6" />
-                      <div className="text-center">
-                        <div className="font-semibold">JSON Backup</div>
-                        <div className="text-xs text-muted-foreground">All data in JSON format</div>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Individual Table Downloads */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Individual Tables (CSV)</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => downloadBackup('registrations')}
-                      disabled={isDownloading}
-                      className="h-auto py-3 flex flex-col items-center gap-1"
-                    >
-                      <FileText className="h-5 w-5" />
-                      <div className="text-center">
-                        <div className="font-medium text-sm">Registrations</div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      onClick={() => downloadBackup('payments')}
-                      disabled={isDownloading}
-                      className="h-auto py-3 flex flex-col items-center gap-1"
-                    >
-                      <Download className="h-5 w-5" />
-                      <div className="text-center">
-                        <div className="font-medium text-sm">Payments</div>
-                      </div>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      onClick={() => downloadBackup('coupons')}
-                      disabled={isDownloading}
-                      className="h-auto py-3 flex flex-col items-center gap-1"
-                    >
-                      <FileText className="h-5 w-5" />
-                      <div className="text-center">
-                        <div className="font-medium text-sm">Coupons</div>
-                      </div>
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Source Code Note */}
-                <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
-                  <div className="flex items-start gap-3">
-                    <Code className="h-5 w-5 text-muted-foreground mt-0.5" />
-                    <div>
-                      <h5 className="font-medium text-sm">Source Code Backup</h5>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        To download the complete source code, use GitHub. Go to your repository and click "Code" → "Download ZIP".
-                      </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('all')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <Database className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Complete Backup</div>
+                      <div className="text-xs text-muted-foreground">All data (JSON)</div>
                     </div>
-                  </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('registrations')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <FileText className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Registrations</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('payments')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <Download className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Payments</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={() => downloadBackup('coupons')}
+                    disabled={isDownloading}
+                    className="h-auto py-4 flex flex-col items-center gap-2"
+                  >
+                    <FileText className="h-6 w-6" />
+                    <div className="text-center">
+                      <div className="font-semibold">Coupons</div>
+                      <div className="text-xs text-muted-foreground">CSV Format</div>
+                    </div>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

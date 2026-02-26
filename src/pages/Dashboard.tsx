@@ -82,72 +82,29 @@ export default function Dashboard() {
 
   const fetchExamDates = async () => {
     try {
-      console.log("=== Starting exam dates fetch ===");
-      
-      // Get today's date at midnight for comparison
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayString = today.toISOString().split('T')[0];
-      
-      // Method 1: Try to get count first
-      const { count: totalCount } = await supabase
+      // Fetch all unique exam dates with a very high limit to get all records
+      const { data, error } = await supabase
         .from("registrations")
-        .select("*", { count: 'exact', head: true })
+        .select("exam_date")
         .not("exam_date", "is", null)
-        .gt("exam_date", todayString); // Only fetch dates > today (future dates only)
-      
-      console.log("Total registrations with exam_date > today:", totalCount);
+        .order("exam_date", { ascending: true })
+        .limit(50000); // Very high limit to ensure we get all records
 
-      // Method 2: Fetch ALL records without limit using pagination
-      let allRegistrations: any[] = [];
-      let from = 0;
-      const pageSize = 1000;
-      let hasMore = true;
-
-      while (hasMore) {
-        const { data, error } = await supabase
-          .from("registrations")
-          .select("exam_date")
-          .not("exam_date", "is", null)
-          .gt("exam_date", todayString) // Only fetch dates > today (future dates only)
-          .order("exam_date", { ascending: true })
-          .range(from, from + pageSize - 1);
-
-        if (error) {
-          console.error("Error fetching page:", error);
-          throw error;
-        }
-
-        if (data && data.length > 0) {
-          allRegistrations = [...allRegistrations, ...data];
-          console.log(`Fetched page: ${from} to ${from + pageSize - 1}, got ${data.length} records`);
-          from += pageSize;
-          
-          // If we got less than pageSize, we've reached the end
-          if (data.length < pageSize) {
-            hasMore = false;
-          }
-        } else {
-          hasMore = false;
-        }
-      }
-
-      console.log("Total records fetched:", allRegistrations.length);
+      if (error) throw error;
 
       // Get unique dates and filter out nulls
-      const allDates = allRegistrations.map(d => d.exam_date).filter(Boolean);
-      const uniqueDates = Array.from(new Set(allDates)).sort();
+      const allDates = data?.map(d => d.exam_date).filter(Boolean) || [];
+      const uniqueDates = Array.from(new Set(allDates));
       
-      console.log("All dates array length:", allDates.length);
+      console.log("Total exam date records fetched:", data?.length);
       console.log("Unique exam dates found:", uniqueDates.length);
       console.log("Exam dates:", uniqueDates);
       
       setExamDates(uniqueDates);
       
       if (uniqueDates.length > 0) {
-        toast.success(`Loaded ${uniqueDates.length} exam dates from ${allRegistrations.length} registrations`);
+        toast.success(`Loaded ${uniqueDates.length} exam dates`);
       }
-      // Silently handle no exam dates - this is normal when no exam dates are assigned yet
     } catch (error) {
       console.error("Error fetching exam dates:", error);
       toast.error("Failed to load exam dates");
@@ -171,57 +128,36 @@ export default function Dashboard() {
   };
 
   const resendHallTickets = async () => {
-    console.log("=== Resend Hall Tickets Button Clicked ===");
-    console.log("Selected Exam Date:", selectedExamDate);
-    console.log("Selected Slot:", selectedSlot);
-    
     if (!selectedExamDate) {
-      console.error("No exam date selected");
       toast.error("Please select an exam date");
       return;
     }
 
     if (!selectedSlot) {
-      console.error("No slot selected");
       toast.error("Please select a time slot");
       return;
     }
 
-    console.log("Starting to send hall tickets...");
     setIsSendingHallTickets(true);
     
     try {
-      // Build query based on slot selection
-      let query = supabase
+      // Fetch all registrations for the selected exam date AND time slot
+      const { data: registrations, error: fetchError } = await supabase
         .from("registrations")
         .select("id, student_name, mobile_number, whatsapp_number, registration_number, hall_ticket_url")
         .eq("exam_date", selectedExamDate)
+        .eq("time_slot", selectedSlot)
         .not("registration_number", "is", null);
 
-      // Only filter by slot if not "All Slots"
-      if (selectedSlot !== "all") {
-        query = query.eq("time_slot", selectedSlot);
-      }
-
-      console.log("Fetching registrations...");
-      const { data: registrations, error: fetchError } = await query;
-
-      if (fetchError) {
-        console.error("Error fetching registrations:", fetchError);
-        throw fetchError;
-      }
-
-      console.log("Registrations found:", registrations?.length);
+      if (fetchError) throw fetchError;
 
       if (!registrations || registrations.length === 0) {
-        const message = `No registrations found for ${selectedSlot === "all" ? "this exam date" : selectedSlot + " on this exam date"}`;
-        console.warn(message);
-        toast.error(message);
+        toast.error(`No registrations found for ${selectedSlot} on this exam date`);
         setIsSendingHallTickets(false);
         return;
       }
 
-      toast.info(`Sending hall tickets to ${registrations.length} students${selectedSlot === "all" ? "" : " in " + selectedSlot}...`);
+      toast.info(`Sending hall tickets to ${registrations.length} students in ${selectedSlot}...`);
 
       let successCount = 0;
       let failCount = 0;
@@ -231,10 +167,7 @@ export default function Dashboard() {
         try {
           const phoneNumber = reg.whatsapp_number || reg.mobile_number;
           
-          console.log(`Processing student: ${reg.student_name} (${phoneNumber})`);
-          
           if (!phoneNumber) {
-            console.warn(`No phone number for ${reg.student_name}`);
             failCount++;
             continue;
           }
@@ -256,7 +189,6 @@ export default function Dashboard() {
             console.error(`Failed to send to ${phoneNumber}:`, sendError);
             failCount++;
           } else {
-            console.log(`✓ Sent to ${phoneNumber}`);
             successCount++;
           }
 
@@ -268,9 +200,6 @@ export default function Dashboard() {
         }
       }
 
-      console.log(`=== Sending Complete ===`);
-      console.log(`Success: ${successCount}, Failed: ${failCount}`);
-      
       toast.success(
         `Hall tickets sent successfully!\nSuccess: ${successCount}\nFailed: ${failCount}`,
         { duration: 5000 }
@@ -280,7 +209,6 @@ export default function Dashboard() {
       toast.error(error.message || "Failed to resend hall tickets");
     } finally {
       setIsSendingHallTickets(false);
-      console.log("=== Resend Hall Tickets Complete ===");
     }
   };
 
@@ -519,14 +447,11 @@ export default function Dashboard() {
               <CardContent>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
-                    <label className="text-sm font-medium mb-2 block">
-                      Exam Date ({examDates.length} dates available)
-                    </label>
                     <Select value={selectedExamDate} onValueChange={setSelectedExamDate}>
-                      <SelectTrigger className="w-full bg-background">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Exam Date" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background z-50 max-h-[300px]">
+                      <SelectContent>
                         {examDates.length === 0 ? (
                           <SelectItem value="no-dates" disabled>
                             No exam dates available
@@ -542,15 +467,11 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   <div className="flex-1">
-                    <label className="text-sm font-medium mb-2 block">
-                      Time Slot ({slots.length} slots available)
-                    </label>
                     <Select value={selectedSlot} onValueChange={setSelectedSlot}>
-                      <SelectTrigger className="w-full bg-background">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Time Slot" />
                       </SelectTrigger>
-                      <SelectContent className="bg-background z-50">
-                        <SelectItem value="all">All Slots</SelectItem>
+                      <SelectContent>
                         {slots.length === 0 ? (
                           <SelectItem value="no-slots" disabled>
                             No slots available
@@ -566,14 +487,9 @@ export default function Dashboard() {
                     </Select>
                   </div>
                   <Button 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log("Button clicked!");
-                      resendHallTickets();
-                    }}
+                    onClick={resendHallTickets}
                     disabled={!selectedExamDate || !selectedSlot || isSendingHallTickets}
                     className="gap-2"
-                    type="button"
                   >
                     {isSendingHallTickets ? (
                       <>

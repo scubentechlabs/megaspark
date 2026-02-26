@@ -24,8 +24,12 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-// No dates available for registration currently
-const examDates: { value: string; label: string }[] = [];
+const examDates = [
+  { value: "2025-11-30", label: "30th November 2025 - Sunday" },
+  { value: "2025-12-07", label: "7th December 2025 - Sunday" },
+  { value: "2025-12-14", label: "14th December 2025 - Sunday" },
+  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
+];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
   const [slots, setSlots] = useState<SlotSetting[]>([]);
@@ -79,11 +83,6 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   const isSlotAvailable = (slot: SlotSetting) => {
-    // Only Morning Slot is allowed for 14th December 2025
-    if (!slot.slot_name.toLowerCase().includes('morning')) {
-      return false;
-    }
-    
     // Check date-specific overrides
     if (formData.examDate) {
       const dateOverride = dateSlots.find(
@@ -97,11 +96,6 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   const getSlotStatusMessage = (slot: SlotSetting) => {
-    // Only Morning Slot is allowed
-    if (!slot.slot_name.toLowerCase().includes('morning')) {
-      return "Not Available";
-    }
-    
     // Check date-specific overrides
     if (formData.examDate) {
       const dateOverride = dateSlots.find(
@@ -152,26 +146,18 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <Label htmlFor="examDate">Preferred Exam Date *</Label>
-        {examDates.length === 0 ? (
-          <Card className="bg-red-50 border-red-200 p-4">
-            <p className="text-sm text-red-700 font-medium">
-              Registration is currently closed. No exam dates are available for registration at this time.
-            </p>
-          </Card>
-        ) : (
-          <Select value={formData.examDate} onValueChange={handleDateChange}>
-            <SelectTrigger className="bg-background">
-              <SelectValue placeholder="Select exam date" />
-            </SelectTrigger>
-            <SelectContent className="bg-background z-50">
-              {examDates.map((date) => (
-                <SelectItem key={date.value} value={date.value}>
-                  {date.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <Select value={formData.examDate} onValueChange={handleDateChange}>
+          <SelectTrigger className="bg-background">
+            <SelectValue placeholder="Select exam date" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            {examDates.map((date) => (
+              <SelectItem key={date.value} value={date.value}>
+                {date.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">

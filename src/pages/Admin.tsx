@@ -6,14 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Check, X, Clock, Eye } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
@@ -66,12 +59,6 @@ interface Registration {
   parent_last_name: string | null;
   parent_email: string | null;
   parent_phone: string | null;
-  city: string | null;
-  class_rank: string | null;
-  olympiad_appeared: string | null;
-  olympiad_certificate_url: string | null;
-  marksheet_url: string | null;
-  status: string;
 }
 
 export default function Admin() {
@@ -81,11 +68,9 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [viewingRegistration, setViewingRegistration] = useState<Registration | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0, pending: 0, approved: 0, rejected: 0 });
+  const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0 });
   const itemsPerPage = 100;
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -177,59 +162,6 @@ export default function Admin() {
     }
   };
 
-  const handleApproveRegistration = async (registrationId: string) => {
-    try {
-      toast({
-        title: "Approving...",
-        description: "Processing registration approval",
-      });
-
-      const { error } = await supabase
-        .from('registrations')
-        .update({ status: 'approved' })
-        .eq('id', registrationId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Registration approved and registration number generated",
-      });
-      fetchRegistrations();
-    } catch (error: any) {
-      console.error("Error approving registration:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to approve registration",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRejectRegistration = async (registrationId: string) => {
-    try {
-      const { error } = await supabase
-        .from('registrations')
-        .update({ status: 'rejected' })
-        .eq('id', registrationId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Registration Rejected",
-        description: "The registration has been rejected",
-      });
-      fetchRegistrations();
-    } catch (error: any) {
-      console.error("Error rejecting registration:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to reject registration",
-        variant: "destructive",
-      });
-    }
-  };
-
   useEffect(() => {
     // When search term or page changes, fetch matching results
     const timer = setTimeout(() => {
@@ -309,30 +241,11 @@ export default function Admin() {
         .select('*', { count: 'exact', head: true })
         .gte('created_at', yesterdayISO)
         .lt('created_at', todayISO);
-
-      // Get status counts
-      const { count: pendingCount } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-
-      const { count: approvedCount } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'approved');
-
-      const { count: rejectedCount } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'rejected');
       
       setStats({
         total: count || 0,
         todayRegistrations: todayCount || 0,
-        yesterdayRegistrations: yesterdayCount || 0,
-        pending: pendingCount || 0,
-        approved: approvedCount || 0,
-        rejected: rejectedCount || 0
+        yesterdayRegistrations: yesterdayCount || 0
       });
       
       // Fetch current page
@@ -362,17 +275,15 @@ export default function Admin() {
 
   const formatTimeSlot = (slot: string | null) => {
     if (!slot) return 'TBA';
-    const slotLower = slot.toLowerCase();
-    if (slotLower.includes('morning')) return 'Morning Slot';
-    if (slotLower.includes('afternoon')) return 'Afternoon Slot';
+    if (slot.toLowerCase() === 'morning') return 'Morning Slot';
+    if (slot.toLowerCase() === 'afternoon') return 'Afternoon Slot';
     return slot;
   };
 
   const getReportingTime = (slot: string | null) => {
     if (!slot) return 'TBA';
-    const slotLower = slot.toLowerCase();
-    if (slotLower.includes('morning')) return '8:00 AM';
-    if (slotLower.includes('afternoon')) return '2:30 PM';
+    if (slot.toLowerCase() === 'morning') return '8:00 AM';
+    if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
     return 'TBA';
   };
 
@@ -788,76 +699,40 @@ export default function Admin() {
             <div className="max-w-7xl mx-auto space-y-6">
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Total
+                      Total Registrations
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold">{stats.total}</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card hover:shadow-md transition-shadow border-yellow-200">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-yellow-600 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Pending
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card hover:shadow-md transition-shadow border-green-200">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-green-600 flex items-center gap-2">
-                      <Check className="h-4 w-4" />
-                      Approved
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card hover:shadow-md transition-shadow border-red-200">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-red-600 flex items-center gap-2">
-                      <X className="h-4 w-4" />
-                      Rejected
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
+                  <CardContent>
+                    <p className="text-3xl font-bold">{stats.total}</p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Today
+                      Today Registrations
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold">{stats.todayRegistrations}</p>
+                  <CardContent>
+                    <p className="text-3xl font-bold">{stats.todayRegistrations}</p>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-card hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Yesterday
+                      Yesterday Registrations
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-2xl font-bold">{stats.yesterdayRegistrations}</p>
+                  <CardContent>
+                    <p className="text-3xl font-bold">{stats.yesterdayRegistrations}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -911,111 +786,54 @@ export default function Admin() {
                       <Table>
                         <TableHeader>
                           <TableRow className="bg-muted/50">
-                            <TableHead className="font-semibold">Status</TableHead>
                             <TableHead className="font-semibold">Reg. No.</TableHead>
                             <TableHead className="font-semibold">Student Name</TableHead>
                             <TableHead className="font-semibold">Mobile</TableHead>
-                            <TableHead className="font-semibold">Class</TableHead>
-                            <TableHead className="font-semibold">School</TableHead>
-                            <TableHead className="font-semibold">City/Dist</TableHead>
-                            <TableHead className="font-semibold">Documents</TableHead>
+                            <TableHead className="font-semibold">Standard</TableHead>
+                            <TableHead className="font-semibold">Medium</TableHead>
+                            <TableHead className="font-semibold">Exam Date</TableHead>
                             <TableHead className="font-semibold">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredRegistrations.map((reg: any) => (
+                          {filteredRegistrations.map((reg) => (
                             <TableRow key={reg.id} className="hover:bg-muted/50">
-                              <TableCell>
-                                {reg.status === 'pending' && (
-                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                                    <Clock className="h-3 w-3 mr-1" />
-                                    Pending
-                                  </Badge>
-                                )}
-                                {reg.status === 'approved' && (
-                                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                    <Check className="h-3 w-3 mr-1" />
-                                    Approved
-                                  </Badge>
-                                )}
-                                {reg.status === 'rejected' && (
-                                  <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                                    <X className="h-3 w-3 mr-1" />
-                                    Rejected
-                                  </Badge>
-                                )}
-                              </TableCell>
-                              <TableCell className="font-medium">
-                                {reg.status === 'approved' && reg.registration_number 
-                                  ? formatRegistrationNumber(reg.registration_number) 
-                                  : <span className="text-muted-foreground">—</span>}
-                              </TableCell>
+                              <TableCell className="font-medium">{formatRegistrationNumber(reg.registration_number)}</TableCell>
                               <TableCell>{reg.student_name}</TableCell>
                               <TableCell>{reg.mobile_number}</TableCell>
                               <TableCell>{reg.standard}</TableCell>
-                              <TableCell className="max-w-[150px] truncate">{reg.school_name || 'N/A'}</TableCell>
-                              <TableCell>{reg.city || reg.district || 'N/A'}</TableCell>
+                              <TableCell>{formatMedium(reg.school_medium)}</TableCell>
                               <TableCell>
-                                <div className="flex gap-1">
-                                  {reg.marksheet_url && (
-                                    <a 
-                                      href={reg.marksheet_url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-primary hover:underline"
-                                    >
-                                      Marksheet
-                                    </a>
-                                  )}
-                                  {reg.olympiad_certificate_url && (
-                                    <a 
-                                      href={reg.olympiad_certificate_url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-primary hover:underline ml-1"
-                                    >
-                                      Certificate
-                                    </a>
-                                  )}
-                                  {!reg.marksheet_url && !reg.olympiad_certificate_url && (
-                                    <span className="text-xs text-muted-foreground">None</span>
-                                  )}
-                                </div>
+                                {reg.exam_date ? new Date(reg.exam_date).toLocaleDateString('en-GB') : 'TBA'}
                               </TableCell>
                               <TableCell>
-                                <div className="flex gap-2 flex-wrap">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      setViewingRegistration(reg);
-                                      setIsViewDialogOpen(true);
-                                    }}
-                                    className="gap-1"
-                                  >
-                                    <Eye className="h-3 w-3" />
-                                    View
-                                  </Button>
+                                <div className="flex gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() => handleEditRegistration(reg)}
-                                    className="gap-1"
+                                    className="gap-2"
                                   >
-                                    <Edit className="h-3 w-3" />
-                                    Edit
+                                    <Edit className="h-4 w-4" />
+                                    Edit Details
                                   </Button>
-                                  {reg.status === 'approved' && (
-                                    <Button
-                                      size="sm"
-                                      variant="default"
-                                      onClick={() => handleSendHallTicket(reg.id)}
-                                      className="gap-1"
-                                    >
-                                      <Send className="h-3 w-3" />
-                                      WhatsApp
-                                    </Button>
-                                  )}
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleDownloadHallTicket(reg)}
+                                    className="gap-2"
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    Hall Ticket
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() => handleSendHallTicket(reg.id)}
+                                    className="gap-2"
+                                  >
+                                    <Send className="h-4 w-4" />
+                                    Send on WhatsApp
+                                  </Button>
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -1107,222 +925,6 @@ export default function Admin() {
           onUpdate={handleEditSuccess}
         />
       )}
-
-      {/* View Registration Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg">Registration Details</DialogTitle>
-          </DialogHeader>
-          {viewingRegistration && (
-            <div className="space-y-4">
-              {/* Status & Reg Number Row */}
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">Status:</span>
-                  {viewingRegistration.status === 'pending' && (
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Pending
-                    </Badge>
-                  )}
-                  {viewingRegistration.status === 'approved' && (
-                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                      <Check className="h-3 w-3 mr-1" />
-                      Approved
-                    </Badge>
-                  )}
-                  {viewingRegistration.status === 'rejected' && (
-                    <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">
-                      <X className="h-3 w-3 mr-1" />
-                      Rejected
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Reg. No:</span>
-                  <span className="font-bold text-primary">
-                    {viewingRegistration.registration_number ? formatRegistrationNumber(viewingRegistration.registration_number) : '—'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Two Column Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Left Column - Personal & School */}
-                <div className="space-y-3">
-                  <div className="border rounded-lg p-3">
-                    <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
-                      <Users className="h-4 w-4" />
-                      Personal Details
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <label className="text-muted-foreground">Name</label>
-                        <p className="font-medium">{viewingRegistration.student_name}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Mobile</label>
-                        <p className="font-medium">{viewingRegistration.mobile_number}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">WhatsApp</label>
-                        <p className="font-medium">{viewingRegistration.whatsapp_number || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Email</label>
-                        <p className="font-medium truncate">{viewingRegistration.email || 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border rounded-lg p-3">
-                    <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
-                      <Calendar className="h-4 w-4" />
-                      School Information
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <label className="text-muted-foreground">Class</label>
-                        <p className="font-medium">Class {viewingRegistration.standard}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">School</label>
-                        <p className="font-medium truncate">{viewingRegistration.school_name || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">City</label>
-                        <p className="font-medium">{viewingRegistration.city || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">District</label>
-                        <p className="font-medium">{viewingRegistration.district || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Previous %</label>
-                        <p className="font-medium">{viewingRegistration.previous_year_percentage ? `${viewingRegistration.previous_year_percentage}%` : 'N/A'}</p>
-                      </div>
-                      <div>
-                        <label className="text-muted-foreground">Class Rank</label>
-                        <p className="font-medium">{viewingRegistration.class_rank || 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column - Documents */}
-                <div className="border rounded-lg p-3">
-                  <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-primary">
-                    <Download className="h-4 w-4" />
-                    Documents
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                    <div>
-                      <label className="text-muted-foreground">Olympiad</label>
-                      <p className="font-medium">{viewingRegistration.olympiad_appeared || 'None'}</p>
-                    </div>
-                    <div>
-                      <label className="text-muted-foreground">Registered</label>
-                      <p className="font-medium">{new Date(viewingRegistration.created_at).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Document Thumbnails */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {viewingRegistration.marksheet_url && (
-                      <a 
-                        href={viewingRegistration.marksheet_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block border rounded-lg p-2 bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        {viewingRegistration.marksheet_url.toLowerCase().endsWith('.pdf') ? (
-                          <div className="h-24 flex items-center justify-center bg-muted rounded text-xs text-muted-foreground">
-                            PDF Document
-                          </div>
-                        ) : (
-                          <img 
-                            src={viewingRegistration.marksheet_url} 
-                            alt="Marksheet" 
-                            className="w-full h-24 object-cover rounded"
-                          />
-                        )}
-                        <p className="text-xs font-medium mt-1 text-center">Marksheet</p>
-                      </a>
-                    )}
-                    {viewingRegistration.olympiad_certificate_url && (
-                      <a 
-                        href={viewingRegistration.olympiad_certificate_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block border rounded-lg p-2 bg-muted/30 hover:bg-muted/50 transition-colors"
-                      >
-                        {viewingRegistration.olympiad_certificate_url.toLowerCase().endsWith('.pdf') ? (
-                          <div className="h-24 flex items-center justify-center bg-muted rounded text-xs text-muted-foreground">
-                            PDF Document
-                          </div>
-                        ) : (
-                          <img 
-                            src={viewingRegistration.olympiad_certificate_url} 
-                            alt="Certificate" 
-                            className="w-full h-24 object-cover rounded"
-                          />
-                        )}
-                        <p className="text-xs font-medium mt-1 text-center">Certificate</p>
-                      </a>
-                    )}
-                    {!viewingRegistration.marksheet_url && !viewingRegistration.olympiad_certificate_url && (
-                      <p className="text-muted-foreground text-xs col-span-2">No documents uploaded</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              {viewingRegistration.status === 'pending' && (
-                <div className="flex gap-3 pt-3 border-t">
-                  <Button
-                    onClick={() => {
-                      handleApproveRegistration(viewingRegistration.id);
-                      setIsViewDialogOpen(false);
-                    }}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    size="sm"
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Approve
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      handleRejectRegistration(viewingRegistration.id);
-                      setIsViewDialogOpen(false);
-                    }}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Reject
-                  </Button>
-                </div>
-              )}
-
-              {viewingRegistration.status === 'approved' && (
-                <div className="flex gap-3 pt-3 border-t">
-                  <Button
-                    onClick={() => handleSendHallTicket(viewingRegistration.id)}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Hall Ticket via WhatsApp
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
     </SidebarProvider>
   );
