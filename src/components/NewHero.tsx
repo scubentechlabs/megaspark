@@ -60,12 +60,10 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
   }, []);
 
   const handleDownloadGuide = () => {
-    const link = document.createElement('a');
-    link.href = '/brochure.pdf';
-    link.download = 'Mega-Spark-Brochure.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const guideSection = document.getElementById('about');
+    if (guideSection) {
+      guideSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -77,7 +75,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
             <div>
               <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-accent via-primary to-accent text-white mb-6 shadow-2xl animate-pulse border-2 border-white/30">
                 <Sparkles className="h-5 w-5 animate-spin" />
-                <span className="text-base font-bold tracking-wide">Mega Spark National Champion</span>
+                <span className="text-base font-bold tracking-wide">Mega Spark Exam 2025</span>
                 <Sparkles className="h-5 w-5 animate-spin" />
               </div>
               
@@ -86,7 +84,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
                 <span className="text-foreground">₹75 Crore</span>
                 <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent text-4xl md:text-5xl">
-                  Mega Spark National Champion
+                  Mega Spark Exam 2025
                 </span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
@@ -104,6 +102,28 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
                   className="w-full h-[180px] object-cover rounded-2xl shadow-lg"
                 />
               ))}
+            </div>
+
+            {/* Countdown Timer */}
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 shadow-card">
+              <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wide">
+                Exam Starts In:
+              </p>
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { value: timeLeft.days, label: 'Days' },
+                  { value: timeLeft.hours, label: 'Hours' },
+                  { value: timeLeft.minutes, label: 'Minutes' },
+                  { value: timeLeft.seconds, label: 'Seconds' }
+                ].map((item, idx) => (
+                  <div key={idx} className="text-center">
+                    <div className="bg-gradient-to-br from-primary to-accent text-white rounded-xl p-3 mb-2">
+                      <div className="text-3xl font-bold">{String(item.value).padStart(2, '0')}</div>
+                    </div>
+                    <div className="text-xs text-muted-foreground font-medium">{item.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-4 items-center">

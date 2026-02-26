@@ -58,7 +58,7 @@ export const DownloadGuide = () => {
             View <span className="text-accent">Exam Guide</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Get comprehensive study materials to prepare for the Mega Spark National Champion
+            Get comprehensive study materials to prepare for the Mega Spark Exam
           </p>
         </div>
 

@@ -407,8 +407,8 @@ export default function Admin() {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🌟 MEGA SPARK NATIONAL CHAMPION 🌟</h1>
-            <h2>મેગા સ્પાર્ક નેશનલ ચેમ્પિયન</h2>
+            <h1>🌟 MEGA SPARK EXAM 2025 🌟</h1>
+            <h2>મેગા સ્પાર્ક પરીક્ષા - 2025</h2>
             <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
           </div>
           
@@ -513,7 +513,7 @@ export default function Admin() {
           </div>
 
           <div class="footer">
-            <p><strong>MEGA SPARK NATIONAL CHAMPION COMMITTEE</strong></p>
+            <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
             <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
           </div>
         </div>
@@ -654,7 +654,7 @@ export default function Admin() {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>Registration Data - MEGA SPARK NATIONAL CHAMPION</title>
+        <title>Registration Data - MEGA SPARK EXAM 2025</title>
         <style>
           @page { size: A4 landscape; margin: 10mm; }
           body { margin: 0; padding: 10px; font-family: Arial, sans-serif; font-size: 7px; }
@@ -671,7 +671,7 @@ export default function Admin() {
       </head>
       <body>
         <div class="header">
-          <h1>MEGA SPARK NATIONAL CHAMPION - Registration Data</h1>
+          <h1>MEGA SPARK EXAM 2025 - Registration Data</h1>
           <p>Total Registrations: ${allData.length} | Generated: ${new Date().toLocaleString()}</p>
         </div>
         
@@ -715,7 +715,7 @@ export default function Admin() {
         </table>
         
         <div class="footer">
-          <p>MEGA SPARK NATIONAL CHAMPION COMMITTEE | Website: www.megasparkexam.com</p>
+          <p>MEGA SPARK EXAM COMMITTEE | Website: www.megasparkexam.com</p>
         </div>
       </body>
       </html>

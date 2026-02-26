@@ -294,7 +294,7 @@ export const NewRegistrationForm = ({ onClose }: NewRegistrationFormProps) => {
     <Card className="w-full border-0 shadow-none rounded-lg">
       <CardHeader className="pb-6 border-b">
         <CardTitle className="text-2xl md:text-3xl font-bold text-center text-primary">
-          Mega Spark National Champion Registration
+          Mega Spark Exam Registration
         </CardTitle>
         <CardDescription className="text-center text-base">
           {steps[currentStep - 1].description}

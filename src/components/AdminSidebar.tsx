@@ -88,14 +88,14 @@ export function AdminSidebar() {
         <div className="p-3 border-b">
           {open ? (
             <>
-              <img src={logo} alt="P.R. SAVANI MEGA SPARK NATIONAL CHAMPION" className="h-16 mx-auto mb-3" />
+              <img src={logo} alt="P.R. SAVANI MEGA SPARK" className="h-16 mx-auto mb-3" />
               <div className="text-center">
-                <h2 className="font-bold text-lg">MEGA SPARK NC</h2>
+                <h2 className="font-bold text-lg">MEGA SPARK</h2>
                 <p className="text-sm text-muted-foreground">Admin Dashboard</p>
               </div>
             </>
           ) : (
-            <img src={logo} alt="P.R. SAVANI MEGA SPARK NATIONAL CHAMPION" className="h-8 mx-auto" />
+            <img src={logo} alt="P.R. SAVANI MEGA SPARK" className="h-8 mx-auto" />
           )}
         </div>
 

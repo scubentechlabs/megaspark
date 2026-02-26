@@ -246,7 +246,7 @@ export default function Reports() {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>${reportTitle} - MEGA SPARK NATIONAL CHAMPION</title>
+        <title>${reportTitle} - MEGA SPARK EXAM 2025</title>
         <style>
           @page { size: A4 landscape; margin: 15mm; }
           body { margin: 0; padding: 20px; font-family: Arial, sans-serif; font-size: 10px; }
@@ -263,7 +263,7 @@ export default function Reports() {
       </head>
       <body>
         <div class="header">
-          <h1>MEGA SPARK NATIONAL CHAMPION - ${reportTitle}</h1>
+          <h1>MEGA SPARK EXAM 2025 - ${reportTitle}</h1>
           <p>Total Registrations: ${data.length} | Generated: ${new Date().toLocaleString()}</p>
         </div>
         

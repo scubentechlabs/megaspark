@@ -21,7 +21,7 @@ const benefits = [
     icon: Award,
     title: "Educational NASA & Japan Trip for Free",
     description: "Global exposure for top performers",
-    detail: "Top students earn global exposure through Mega Spark National Champion scholarships.",
+    detail: "Top students earn global exposure through Mega Spark Exam 2025 scholarships.",
     color: "bg-gradient-to-br from-primary to-primary/80"
   },
   {
@@ -53,7 +53,7 @@ export const BenefitsSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-primary">
-            Why Choose Mega Spark National Champion
+            Why Choose Mega Spark Exam
           </h2>
         </div>
 

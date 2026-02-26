@@ -15,7 +15,7 @@ export const RegistrationSection = () => {
             Complete Your <span className="text-accent">Registration</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Fill in the details below to secure your spot in the Mega Spark National Champion
+            Fill in the details below to secure your spot in the Mega Spark Exam 2025
           </p>
         </div>
 

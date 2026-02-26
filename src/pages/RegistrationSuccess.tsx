@@ -144,7 +144,7 @@ const RegistrationSuccess = () => {
 
   const handleWhatsAppShare = () => {
     const message = encodeURIComponent(
-      "🎉 I just registered for Mega Spark National Champion! Join me and compete for scholarships worth ₹75 Crores. Register now at: https://megasparkexam.com"
+      "🎉 I just registered for Mega Spark Exam 2025! Join me and compete for scholarships worth ₹75 Crores. Register now at: https://megasparkexam.com"
     );
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
@@ -177,10 +177,10 @@ const RegistrationSuccess = () => {
               Congratulations! 🎉
             </h1>
             <p className="text-xl md:text-2xl text-foreground font-semibold mb-2">
-              Thank You For Registration
+              You're officially registered for
             </p>
             <p className="text-2xl md:text-3xl font-bold text-accent">
-              Mega Spark National Champion
+              Mega Spark Exam 2025!
             </p>
           </div>
 
@@ -212,14 +212,24 @@ const RegistrationSuccess = () => {
             </CardContent>
           </Card>
 
-          {/* Team Contact Note */}
-          <Card className="bg-blue-50 dark:bg-blue-950/20 border-l-4 border-primary mb-6">
+          {/* Important Information */}
+          <Card className="bg-amber-50 dark:bg-amber-950/20 border-l-4 border-accent mb-6">
             <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="h-3 w-3 rounded-full bg-primary animate-pulse" />
-                <p className="text-primary text-lg font-semibold">
-                  📞 Our Team Will Contact You Shortly
-                </p>
+              <div className="flex items-start gap-3">
+                <div className="h-2 w-2 rounded-full bg-accent animate-pulse mt-2" />
+                <div className="flex-1">
+                  <strong className="text-primary text-lg">Important Reminder:</strong>
+                  <ul className="mt-2 space-y-2 text-sm text-foreground">
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent font-bold">•</span>
+                      <span>Report to exam center by <strong className="text-accent">8:00 AM</strong> on exam day</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-accent font-bold">•</span>
+                      <span>Bring valid ID proof (Aadhar Card) and your hall ticket</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>

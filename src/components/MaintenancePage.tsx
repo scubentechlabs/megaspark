@@ -7,7 +7,7 @@ export const MaintenancePage = () => {
         <div className="flex justify-center">
           <img 
             src={logo} 
-            alt="Mega Spark National Champion Logo" 
+            alt="Mega Spark Exam Logo" 
             className="h-24 md:h-32 w-auto object-contain"
           />
         </div>
@@ -18,7 +18,7 @@ export const MaintenancePage = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto">
-            The Mega Spark National Champion website is temporarily down due to heavy traffic. 
+            The Mega Spark exam website is temporarily down due to heavy traffic. 
             Please check again in two hours.
           </p>
         </div>

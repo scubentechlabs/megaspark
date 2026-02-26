@@ -20,7 +20,7 @@ export default function Settings() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
   const [examSettings, setExamSettings] = useState({
-    examName: "MEGA SPARK NATIONAL CHAMPION",
+    examName: "MEGA SPARK EXAM 2025",
     organizationName: "P.R. SAVANI",
     contactEmail: "info@megaspark.com",
     contactPhone: "+91 1234567890",
@@ -55,7 +55,7 @@ export default function Settings() {
           const { data: newSettings, error: insertError } = await supabase
             .from("settings")
             .insert({
-              exam_name: "MEGA SPARK NATIONAL CHAMPION",
+              exam_name: "MEGA SPARK EXAM 2025",
               organization_name: "P.R. SAVANI",
               contact_email: "info@megaspark.com",
               contact_phone: "+91 1234567890"
