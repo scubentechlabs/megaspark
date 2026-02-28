@@ -1,40 +1,11 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MapPin, Clock, Loader2 } from "lucide-react";
 import schoolBuilding from "@/assets/school-building.webp";
-import { supabase } from "@/integrations/supabase/client";
-
-interface ExamDate {
-  exam_date: string;
-  label: string;
-  day_name: string | null;
-  exam_time: string | null;
-  is_active: boolean;
-}
+import { useActiveExamDates } from "@/hooks/useExamData";
 
 export const ExamDatesVenue = () => {
-  const [examDates, setExamDates] = useState<ExamDate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: examDates = [], isLoading } = useActiveExamDates();
 
-  useEffect(() => {
-    const fetchExamDates = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('exam_dates')
-          .select('*')
-          .eq('is_active', true)
-          .order('exam_date', { ascending: true });
-
-        if (error) throw error;
-        setExamDates((data as ExamDate[]) || []);
-      } catch (error) {
-        console.error('Error fetching exam dates:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchExamDates();
-  }, []);
   return (
     <section id="dates" className="py-12 bg-muted/30 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -60,7 +31,7 @@ export const ExamDatesVenue = () => {
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                {loading ? (
+                {isLoading ? (
                   <div className="col-span-full flex justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
@@ -93,9 +64,7 @@ export const ExamDatesVenue = () => {
                 </div>
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
-                  {/* Both Slots Display */}
                   <div className="grid md:grid-cols-2 gap-6">
-                    {/* Morning Slot */}
                     <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
                       <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
                         <Clock className="h-6 w-6 text-white" />
@@ -106,8 +75,6 @@ export const ExamDatesVenue = () => {
                         <p className="text-xs text-accent font-semibold">Reporting: 8:00 AM</p>
                       </div>
                     </div>
-
-                    {/* Afternoon Slot */}
                     <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
                       <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
                         <Clock className="h-6 w-6 text-white" />
@@ -120,7 +87,6 @@ export const ExamDatesVenue = () => {
                     </div>
                   </div>
                   
-                  {/* Sticky Note Style Callout */}
                   <div className="relative max-w-md mx-auto">
                     <div className="bg-[#fef9c3] p-6 rounded-lg shadow-lg border-l-4 border-accent rotate-1 transform hover:rotate-0 transition-transform">
                       <div className="absolute -top-3 -right-3 h-8 w-8 bg-accent/20 rounded-full" />
@@ -153,7 +119,6 @@ export const ExamDatesVenue = () => {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* School Photo */}
             <Card className="overflow-hidden hover:shadow-hover transition-all duration-300">
               <img
                 src={schoolBuilding}
@@ -169,7 +134,6 @@ export const ExamDatesVenue = () => {
               </CardContent>
             </Card>
 
-            {/* Google Map with Clickable Link */}
             <Card 
               className="overflow-hidden hover:shadow-hover transition-all duration-300 cursor-pointer"
               onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=P.P.+Savani+CFE+Abrama+Surat+Gujarat', '_blank')}

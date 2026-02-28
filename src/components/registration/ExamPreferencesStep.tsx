@@ -1,127 +1,40 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useExamDateOptions, useSlotSettings, useDateSlotSettings } from "@/hooks/useExamData";
+import type { SlotSetting } from "@/hooks/useExamData";
 
 interface ExamPreferencesStepProps {
   formData: any;
   updateFormData: (data: any) => void;
 }
 
-interface SlotSetting {
-  slot_name: string;
-  is_enabled: boolean;
-  max_capacity: number;
-  current_count: number;
-  reporting_time: string;
-}
-
-interface SlotDateSetting {
-  exam_date: string;
-  slot_name: string;
-  is_enabled: boolean;
-}
-
-interface ExamDateOption {
-  value: string;
-  label: string;
-}
-
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
-  const [slots, setSlots] = useState<SlotSetting[]>([]);
-  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
-  const [examDates, setExamDates] = useState<ExamDateOption[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchSlotSettings();
-    fetchDateSlotSettings();
-    fetchExamDates();
-  }, []);
-
-  const fetchExamDates = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('exam_dates')
-        .select('*')
-        .eq('is_active', true)
-        .order('exam_date', { ascending: true });
-
-      if (error) throw error;
-      setExamDates((data || []).map((d: any) => ({
-        value: d.exam_date,
-        label: d.label + (d.day_name ? ` - ${d.day_name}` : ''),
-      })));
-    } catch (error) {
-      console.error('Error fetching exam dates:', error);
-    }
-  };
-
-  const fetchSlotSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_settings')
-        .select('*')
-        .order('slot_name');
-
-      if (error) throw error;
-      setSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching slot settings:', error);
-      toast.error("Failed to load time slots");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDateSlotSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_date_settings')
-        .select('*');
-
-      if (error) throw error;
-      setDateSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching date slot settings:', error);
-    }
-  };
+  const { data: examDates = [] } = useExamDateOptions();
+  const { data: slots = [], isLoading: loading } = useSlotSettings();
+  const { data: dateSlots = [] } = useDateSlotSettings();
 
   const getSlotLabel = (slotName: string) => {
     return slotName.charAt(0).toUpperCase() + slotName.slice(1) + " Slot";
   };
 
-  const getSlotAvailability = (slot: SlotSetting) => {
-    const remaining = slot.max_capacity - slot.current_count;
-    if (remaining <= 0) return "Full";
-    if (remaining < 100) return `Only ${remaining} seats left`;
-    return `${remaining} seats available`;
-  };
-
   const isSlotAvailable = (slot: SlotSetting) => {
-    // Check date-specific overrides
     if (formData.examDate) {
       const dateOverride = dateSlots.find(
         ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
       );
-      if (dateOverride && !dateOverride.is_enabled) {
-        return false;
-      }
+      if (dateOverride && !dateOverride.is_enabled) return false;
     }
     return slot.is_enabled && slot.current_count < slot.max_capacity;
   };
 
   const getSlotStatusMessage = (slot: SlotSetting) => {
-    // Check date-specific overrides
     if (formData.examDate) {
       const dateOverride = dateSlots.find(
         ds => ds.exam_date === formData.examDate && ds.slot_name === slot.slot_name
       );
-      if (dateOverride && !dateOverride.is_enabled) {
-        return "Slot Is Full";
-      }
+      if (dateOverride && !dateOverride.is_enabled) return "Slot Is Full";
     }
     if (!slot.is_enabled) return "Disabled";
     if (slot.current_count >= slot.max_capacity) return "Full";
@@ -138,14 +51,12 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   const handleDateChange = (newDate: string) => {
-    // Check if current time slot is available for the new date
     if (formData.timeSlot) {
       const currentSlot = slots.find(s => s.slot_name === formData.timeSlot);
       if (currentSlot) {
         const dateOverride = dateSlots.find(
           ds => ds.exam_date === newDate && ds.slot_name === currentSlot.slot_name
         );
-        // If slot is disabled for new date or full, clear the selection
         if ((dateOverride && !dateOverride.is_enabled) || 
             !currentSlot.is_enabled || 
             currentSlot.current_count >= currentSlot.max_capacity) {

@@ -20,62 +20,18 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { supabase } from "@/integrations/supabase/client";
+import { useMaintenanceMode } from "@/hooks/useExamData";
 
 const Index = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: isMaintenanceMode, isLoading } = useMaintenanceMode();
 
   useEffect(() => {
-    checkMaintenanceMode();
-    
-    // Safety timeout: if loading takes too long, show the page anyway
-    const safetyTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-
-    // Open popup after 10 seconds
     const timer = setTimeout(() => {
       setIsPopupOpen(true);
     }, 10000);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(safetyTimer);
-    };
+    return () => clearTimeout(timer);
   }, []);
-
-  const checkMaintenanceMode = async () => {
-    try {
-      // Fetch maintenance mode setting
-      const { data, error } = await supabase
-        .from('settings')
-        .select('maintenance_mode')
-        .single();
-
-      if (error) {
-        console.error('Error fetching maintenance mode:', error);
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if we're on a Lovable preview domain
-      const hostname = window.location.hostname;
-      const isLovableDomain = hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
-      
-      // Show maintenance mode only if:
-      // 1. Maintenance mode is enabled in settings
-      // 2. NOT on a Lovable preview domain
-      if (data?.maintenance_mode && !isLovableDomain) {
-        setIsMaintenanceMode(true);
-      }
-    } catch (error) {
-      console.error('Error checking maintenance mode:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return (
