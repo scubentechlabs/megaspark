@@ -42,17 +42,21 @@ export default function ExamDateManagement() {
   });
 
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate("/admin/login");
+          return;
+        }
+        fetchExamDates();
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setLoading(false);
+      }
+    };
     checkAuth();
   }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
-    }
-    fetchExamDates();
-  };
 
   const fetchExamDates = async () => {
     try {
