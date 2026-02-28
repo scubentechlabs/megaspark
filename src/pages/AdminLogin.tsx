@@ -19,11 +19,14 @@ export default function AdminLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/admin");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/admin");
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
       }
     };
     checkAuth();
@@ -58,21 +61,26 @@ export default function AdminLogin() {
         let country = null;
 
         try {
-          // Try to get IP
-          const ipResponse = await fetch('https://api.ipify.org?format=json');
+          const ipController = new AbortController();
+          const ipTimeout = setTimeout(() => ipController.abort(), 3000);
+          
+          const ipResponse = await fetch('https://api.ipify.org?format=json', {
+            signal: ipController.signal
+          });
+          clearTimeout(ipTimeout);
+          
           if (ipResponse.ok) {
             const ipData = await ipResponse.json();
             ipAddress = ipData.ip;
 
-            // Try to get location from IP (with timeout)
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            const locController = new AbortController();
+            const locTimeout = setTimeout(() => locController.abort(), 3000);
             
             try {
               const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`, {
-                signal: controller.signal
+                signal: locController.signal
               });
-              clearTimeout(timeoutId);
+              clearTimeout(locTimeout);
               
               if (locationResponse.ok) {
                 const locationData = await locationResponse.json();
