@@ -1,15 +1,40 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Clock } from "lucide-react";
+import { Calendar, MapPin, Clock, Loader2 } from "lucide-react";
 import schoolBuilding from "@/assets/school-building.webp";
+import { supabase } from "@/integrations/supabase/client";
 
-const examDates = [
-  { date: "30th November", day: "Sunday", time: "8:00 AM - 12:00 PM" },
-  { date: "7th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
-  { date: "14th December", day: "Sunday", time: "8:00 AM - 12:00 PM" },
-  { date: "28th December", day: "Sunday", time: "8:00 AM - 12:00 PM" }
-];
+interface ExamDate {
+  exam_date: string;
+  label: string;
+  day_name: string | null;
+  exam_time: string | null;
+  is_active: boolean;
+}
 
 export const ExamDatesVenue = () => {
+  const [examDates, setExamDates] = useState<ExamDate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExamDates = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('exam_dates')
+          .select('*')
+          .eq('is_active', true)
+          .order('exam_date', { ascending: true });
+
+        if (error) throw error;
+        setExamDates((data as ExamDate[]) || []);
+      } catch (error) {
+        console.error('Error fetching exam dates:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchExamDates();
+  }, []);
   return (
     <section id="dates" className="py-12 bg-muted/30 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -35,21 +60,36 @@ export const ExamDatesVenue = () => {
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                  {examDates.map((exam, idx) => (
-                    <div
-                      key={idx}
-                      className="text-center p-4 border-2 border-accent rounded-lg bg-background"
-                    >
-                      <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
-                        <Calendar className="h-7 w-7" />
+                {loading ? (
+                  <div className="col-span-full flex justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : examDates.length === 0 ? (
+                  <div className="col-span-full text-center py-8 text-muted-foreground">
+                    No exam dates available yet.
+                  </div>
+                ) : (
+                  examDates.map((exam, idx) => {
+                    const parts = exam.label.split(' ');
+                    const dateNum = parts[0] || '';
+                    const month = parts[1] || '';
+                    return (
+                      <div
+                        key={idx}
+                        className="text-center p-4 border-2 border-accent rounded-lg bg-background"
+                      >
+                        <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
+                          <Calendar className="h-7 w-7" />
+                        </div>
+                        <div className="text-2xl font-bold mb-1 text-foreground">
+                          {dateNum}
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-1">{exam.day_name || ''}</div>
+                        <div className="text-sm font-semibold text-accent">{month}</div>
                       </div>
-                      <div className="text-2xl font-bold mb-1 text-foreground">
-                        {exam.date.split(' ')[0]}
-                      </div>
-                      <div className="text-sm text-muted-foreground mb-1">{exam.day}</div>
-                      <div className="text-sm font-semibold text-accent">{exam.date.split(' ')[1]}</div>
-                    </div>
-                  ))}
+                    );
+                  })
+                )}
                 </div>
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
