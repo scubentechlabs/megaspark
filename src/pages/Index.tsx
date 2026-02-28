@@ -33,13 +33,7 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
+  // Don't block rendering for maintenance check - show page immediately
 
   if (isMaintenanceMode) {
     return <MaintenancePage />;
