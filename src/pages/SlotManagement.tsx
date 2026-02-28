@@ -11,82 +11,36 @@ import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-
-interface SlotSetting {
-  id: string;
-  slot_name: string;
-  is_enabled: boolean;
-  max_capacity: number;
-  current_count: number;
-  reporting_time: string;
-}
-
-interface SlotDateSetting {
-  id: string;
-  exam_date: string;
-  slot_name: string;
-  is_enabled: boolean;
-}
-
-interface ExamDateOption {
-  value: string;
-  label: string;
-}
+import { useExamDateOptions, useSlotSettings, useDateSlotSettings } from "@/hooks/useExamData";
+import { useQueryClient } from "@tanstack/react-query";
+import type { SlotSetting } from "@/hooks/useExamData";
 
 export default function SlotManagement() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: examDates = [] } = useExamDateOptions();
+  const { data: slotsData = [], isLoading: loading } = useSlotSettings();
+  const { data: dateSlotsData = [] } = useDateSlotSettings();
   const [slots, setSlots] = useState<SlotSetting[]>([]);
-  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
-  const [examDates, setExamDates] = useState<ExamDateOption[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [dateSlots, setDateSlots] = useState<typeof dateSlotsData>([]);
   const [updating, setUpdating] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<string>("");
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) navigate("/admin/login");
+    };
     checkAuth();
   }, []);
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
-    }
-    fetchSlots();
-    fetchDateSlots();
-  };
+  useEffect(() => { setSlots(slotsData); }, [slotsData]);
+  useEffect(() => { setDateSlots(dateSlotsData); }, [dateSlotsData]);
 
-  const fetchSlots = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_settings')
-        .select('*')
-        .order('slot_name');
-
-      if (error) throw error;
-      setSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching slots:', error);
-      toast.error("Failed to load slot settings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchDateSlots = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_date_settings')
-        .select('*')
-        .order('exam_date', { ascending: false });
-
-      if (error) throw error;
-      setDateSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching date slots:', error);
-      toast.error("Failed to load date-specific slot settings");
-    }
+  const refreshData = () => {
+    queryClient.invalidateQueries({ queryKey: ["slotSettings"] });
+    queryClient.invalidateQueries({ queryKey: ["dateSlotSettings"] });
   };
 
   const updateSlot = async (id: string, updates: Partial<SlotSetting>) => {
@@ -100,7 +54,7 @@ export default function SlotManagement() {
       if (error) throw error;
 
       toast.success("Slot settings updated successfully");
-      fetchSlots();
+      refreshData();
     } catch (error) {
       console.error('Error updating slot:', error);
       toast.error("Failed to update slot settings");
@@ -129,7 +83,7 @@ export default function SlotManagement() {
       if (error) throw error;
 
       toast.success("Date-specific slot setting added");
-      fetchDateSlots();
+      refreshData();
       setSelectedDate("");
       setSelectedSlot("");
     } catch (error) {
@@ -148,7 +102,7 @@ export default function SlotManagement() {
       if (error) throw error;
 
       toast.success("Slot status updated");
-      fetchDateSlots();
+      refreshData();
     } catch (error) {
       console.error('Error updating date slot:', error);
       toast.error("Failed to update slot status");
@@ -238,7 +192,7 @@ export default function SlotManagement() {
                   <div key={dateSlot.id} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
                     <div>
                       <span className="font-medium">
-                        {examDates.find((d: ExamDateOption) => d.value === dateSlot.exam_date)?.label || dateSlot.exam_date}
+                        {examDates.find((d) => d.value === dateSlot.exam_date)?.label || dateSlot.exam_date}
                       </span>
                       <span className="mx-2">-</span>
                       <span>{getSlotLabel(dateSlot.slot_name)}</span>

@@ -11,25 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatRegistrationNumber } from "@/lib/formatters";
-
-interface SlotSetting {
-  slot_name: string;
-  is_enabled: boolean;
-  max_capacity: number;
-  current_count: number;
-  reporting_time: string;
-}
-
-interface SlotDateSetting {
-  exam_date: string;
-  slot_name: string;
-  is_enabled: boolean;
-}
-
-interface ExamDateOption {
-  value: string;
-  label: string;
-}
+import { useExamDateOptions, useSlotSettings, useDateSlotSettings } from "@/hooks/useExamData";
+import type { SlotSetting } from "@/hooks/useExamData";
 
 interface Registration {
   id: string;
@@ -82,10 +65,9 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
   const [formData, setFormData] = useState<any>({});
   const [isUpdating, setIsUpdating] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [slots, setSlots] = useState<SlotSetting[]>([]);
-  const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
-  const [examDates, setExamDates] = useState<ExamDateOption[]>([]);
-  const [loadingSlots, setLoadingSlots] = useState(true);
+  const { data: examDates = [] } = useExamDateOptions();
+  const { data: slots = [], isLoading: loadingSlots } = useSlotSettings();
+  const { data: dateSlots = [] } = useDateSlotSettings();
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
@@ -94,63 +76,6 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
     { number: 2, title: "School Info", icon: Users, description: "School and academic details" },
     { number: 3, title: "Review", icon: CheckCircle, description: "Confirm changes" }
   ];
-
-  // Fetch slot settings
-  useEffect(() => {
-    if (open) {
-      fetchSlotSettings();
-      fetchDateSlotSettings();
-      fetchExamDates();
-    }
-  }, [open]);
-
-  const fetchExamDates = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('exam_dates')
-        .select('*')
-        .eq('is_active', true)
-        .order('exam_date', { ascending: true });
-
-      if (error) throw error;
-      setExamDates((data || []).map((d: any) => ({
-        value: d.exam_date,
-        label: d.label + (d.day_name ? ` - ${d.day_name}` : ''),
-      })));
-    } catch (error) {
-      console.error('Error fetching exam dates:', error);
-    }
-  };
-
-  const fetchSlotSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_settings')
-        .select('*')
-        .order('slot_name');
-
-      if (error) throw error;
-      setSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching slot settings:', error);
-      toast.error("Failed to load time slots");
-    } finally {
-      setLoadingSlots(false);
-    }
-  };
-
-  const fetchDateSlotSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('slot_date_settings')
-        .select('*');
-
-      if (error) throw error;
-      setDateSlots(data || []);
-    } catch (error) {
-      console.error('Error fetching date slot settings:', error);
-    }
-  };
 
   // Initialize form data when dialog opens
   useEffect(() => {
