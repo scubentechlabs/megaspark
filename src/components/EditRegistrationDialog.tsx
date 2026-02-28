@@ -26,12 +26,10 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-const examDates = [
-  { value: "2025-11-30", label: "30th November 2025 - Sunday" },
-  { value: "2025-12-07", label: "7th December 2025 - Sunday" },
-  { value: "2025-12-14", label: "14th December 2025 - Sunday" },
-  { value: "2025-12-28", label: "28th December 2025 - Sunday" }
-];
+interface ExamDateOption {
+  value: string;
+  label: string;
+}
 
 interface Registration {
   id: string;
@@ -86,6 +84,7 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [slots, setSlots] = useState<SlotSetting[]>([]);
   const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
+  const [examDates, setExamDates] = useState<ExamDateOption[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(true);
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
@@ -101,8 +100,27 @@ export const EditRegistrationDialog = ({ open, onOpenChange, registration, onUpd
     if (open) {
       fetchSlotSettings();
       fetchDateSlotSettings();
+      fetchExamDates();
     }
   }, [open]);
+
+  const fetchExamDates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exam_dates')
+        .select('*')
+        .eq('is_active', true)
+        .order('exam_date', { ascending: true });
+
+      if (error) throw error;
+      setExamDates((data || []).map((d: any) => ({
+        value: d.exam_date,
+        label: d.label + (d.day_name ? ` - ${d.day_name}` : ''),
+      })));
+    } catch (error) {
+      console.error('Error fetching exam dates:', error);
+    }
+  };
 
   const fetchSlotSettings = async () => {
     try {

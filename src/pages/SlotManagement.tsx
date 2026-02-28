@@ -28,17 +28,16 @@ interface SlotDateSetting {
   is_enabled: boolean;
 }
 
-const examDates = [
-  { value: "2025-11-30", label: "30th November 2025" },
-  { value: "2025-12-07", label: "7th December 2025" },
-  { value: "2025-12-14", label: "14th December 2025" },
-  { value: "2025-12-28", label: "28th December 2025" }
-];
+interface ExamDateOption {
+  value: string;
+  label: string;
+}
 
 export default function SlotManagement() {
   const navigate = useNavigate();
   const [slots, setSlots] = useState<SlotSetting[]>([]);
   const [dateSlots, setDateSlots] = useState<SlotDateSetting[]>([]);
+  const [examDates, setExamDates] = useState<ExamDateOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -239,7 +238,7 @@ export default function SlotManagement() {
                   <div key={dateSlot.id} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
                     <div>
                       <span className="font-medium">
-                        {examDates.find(d => d.value === dateSlot.exam_date)?.label || dateSlot.exam_date}
+                        {examDates.find((d: ExamDateOption) => d.value === dateSlot.exam_date)?.label || dateSlot.exam_date}
                       </span>
                       <span className="mx-2">-</span>
                       <span>{getSlotLabel(dateSlot.slot_name)}</span>
