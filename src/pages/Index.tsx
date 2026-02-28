@@ -30,12 +30,20 @@ const Index = () => {
   useEffect(() => {
     checkMaintenanceMode();
     
+    // Safety timeout: if loading takes too long, show the page anyway
+    const safetyTimer = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+
     // Open popup after 10 seconds
     const timer = setTimeout(() => {
       setIsPopupOpen(true);
     }, 10000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(safetyTimer);
+    };
   }, []);
 
   const checkMaintenanceMode = async () => {
