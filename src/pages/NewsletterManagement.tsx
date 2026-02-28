@@ -33,12 +33,17 @@ export default function NewsletterManagement() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      fetchData();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setIsLoading(false);
     }
-    fetchData();
   };
 
   const fetchData = async () => {

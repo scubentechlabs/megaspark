@@ -89,32 +89,36 @@ export default function UserManagement() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .single();
+
+      if (!roleData) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to access this page",
+          variant: "destructive",
+        });
+        navigate("/admin");
+        return;
+      }
+
+      setCurrentUserRole("admin");
+      fetchUsers();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setIsLoading(false);
     }
-
-    // Check if user is admin
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", session.user.id)
-      .eq("role", "admin")
-      .single();
-
-    if (!roleData) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to access this page",
-        variant: "destructive",
-      });
-      navigate("/admin");
-      return;
-    }
-
-    setCurrentUserRole("admin");
-    fetchUsers();
   };
 
   const fetchUsers = async () => {

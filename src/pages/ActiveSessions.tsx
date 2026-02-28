@@ -71,13 +71,18 @@ export default function ActiveSessions() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      setCurrentUserId(session.user.id);
+      fetchSessions();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setIsLoading(false);
     }
-    setCurrentUserId(session.user.id);
-    fetchSessions();
   };
 
   const fetchSessions = async () => {

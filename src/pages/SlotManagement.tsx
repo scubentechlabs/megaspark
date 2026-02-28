@@ -29,8 +29,12 @@ export default function SlotManagement() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) navigate("/admin/login");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) navigate("/admin/login");
+      } catch (error) {
+        console.error("Auth check failed:", error);
+      }
     };
     checkAuth();
   }, []);

@@ -104,12 +104,17 @@ export default function Admin() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      fetchRegistrations();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setIsLoading(false);
     }
-    fetchRegistrations();
   };
 
   const handleLogout = async () => {
