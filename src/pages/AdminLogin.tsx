@@ -46,91 +46,88 @@ export default function AdminLogin() {
 
     setIsLoading(true);
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const maxRetries = 2;
 
-      if (error) throw error;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (data.session) {
-        // Get IP and location info with fallback
-        let ipAddress = 'Unknown';
-        let city = null;
-        let country = null;
-
-        try {
-          const ipController = new AbortController();
-          const ipTimeout = setTimeout(() => ipController.abort(), 3000);
-          
-          const ipResponse = await fetch('https://api.ipify.org?format=json', {
-            signal: ipController.signal
-          });
-          clearTimeout(ipTimeout);
-          
-          if (ipResponse.ok) {
-            const ipData = await ipResponse.json();
-            ipAddress = ipData.ip;
-
-            const locController = new AbortController();
-            const locTimeout = setTimeout(() => locController.abort(), 3000);
-            
-            try {
-              const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`, {
-                signal: locController.signal
-              });
-              clearTimeout(locTimeout);
-              
-              if (locationResponse.ok) {
-                const locationData = await locationResponse.json();
-                city = locationData.city;
-                country = locationData.country_name;
-              }
-            } catch (locErr) {
-              console.log('Could not fetch location:', locErr);
-            }
+        if (error) {
+          if (error.message === 'Failed to fetch' && attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+            continue;
           }
-        } catch (err) {
-          console.log('Could not fetch IP:', err);
+          throw error;
         }
 
-        // Create admin session record - don't block login if this fails
-        try {
-          const { error: sessionError } = await supabase
-            .from('admin_sessions')
-            .insert({
+        if (data.session) {
+          let ipAddress = 'Unknown';
+          let city = null;
+          let country = null;
+
+          try {
+            const ipController = new AbortController();
+            const ipTimeout = setTimeout(() => ipController.abort(), 3000);
+            const ipResponse = await fetch('https://api.ipify.org?format=json', { signal: ipController.signal });
+            clearTimeout(ipTimeout);
+            if (ipResponse.ok) {
+              const ipData = await ipResponse.json();
+              ipAddress = ipData.ip;
+              try {
+                const locController = new AbortController();
+                const locTimeout = setTimeout(() => locController.abort(), 3000);
+                const locationResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`, { signal: locController.signal });
+                clearTimeout(locTimeout);
+                if (locationResponse.ok) {
+                  const locationData = await locationResponse.json();
+                  city = locationData.city;
+                  country = locationData.country_name;
+                }
+              } catch {}
+            }
+          } catch {}
+
+          try {
+            await supabase.from('admin_sessions').insert({
               user_id: data.session.user.id,
               user_email: email,
               ip_address: ipAddress,
               user_agent: navigator.userAgent,
-              city: city,
-              country: country,
+              city,
+              country,
             });
+          } catch {}
 
-          if (sessionError) {
-            console.error('Error creating session record:', sessionError);
-          }
-        } catch (sessionErr) {
-          console.error('Session tracking failed:', sessionErr);
+          toast({ title: "Login Successful", description: "Welcome to the admin panel" });
+          navigate("/admin");
+          setIsLoading(false);
+          return;
         }
-
+      } catch (error: any) {
+        if (error.message === 'Failed to fetch' && attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+        console.error("Login error:", error);
         toast({
-          title: "Login Successful",
-          description: "Welcome to the admin panel",
+          title: "Login Failed",
+          description: error.message || "Invalid email or password",
+          variant: "destructive",
         });
-        navigate("/admin");
+        setIsLoading(false);
+        return;
       }
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
+
+    toast({
+      title: "Connection Error",
+      description: "Unable to connect. Please check your internet and try again.",
+      variant: "destructive",
+    });
+    setIsLoading(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
