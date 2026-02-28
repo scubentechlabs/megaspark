@@ -94,7 +94,8 @@ export function useMaintenanceMode() {
     queryFn: fetchMaintenanceMode,
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: 0,
+    placeholderData: false,
   });
 }
 
