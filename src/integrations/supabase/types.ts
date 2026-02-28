@@ -140,6 +140,39 @@ export type Database = {
         }
         Relationships: []
       }
+      exam_dates: {
+        Row: {
+          created_at: string
+          day_name: string | null
+          exam_date: string
+          exam_time: string | null
+          id: string
+          is_active: boolean
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_name?: string | null
+          exam_date: string
+          exam_time?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_name?: string | null
+          exam_date?: string
+          exam_time?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -233,6 +266,8 @@ export type Database = {
         Row: {
           address: string | null
           building_name: string | null
+          city: string | null
+          class_rank: string | null
           created_at: string
           date_of_birth: string | null
           district: string | null
@@ -244,8 +279,11 @@ export type Database = {
           gender: string | null
           hall_ticket_url: string | null
           id: string
+          marksheet_url: string | null
           medium: string | null
           mobile_number: string
+          olympiad_appeared: string | null
+          olympiad_certificate_url: string | null
           parent_email: string | null
           parent_first_name: string | null
           parent_last_name: string | null
@@ -260,6 +298,7 @@ export type Database = {
           school_name: string | null
           standard: string
           state: string | null
+          status: string
           student_name: string
           time_slot: string | null
           updated_at: string
@@ -268,6 +307,8 @@ export type Database = {
         Insert: {
           address?: string | null
           building_name?: string | null
+          city?: string | null
+          class_rank?: string | null
           created_at?: string
           date_of_birth?: string | null
           district?: string | null
@@ -279,8 +320,11 @@ export type Database = {
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
+          marksheet_url?: string | null
           medium?: string | null
           mobile_number: string
+          olympiad_appeared?: string | null
+          olympiad_certificate_url?: string | null
           parent_email?: string | null
           parent_first_name?: string | null
           parent_last_name?: string | null
@@ -295,6 +339,7 @@ export type Database = {
           school_name?: string | null
           standard: string
           state?: string | null
+          status?: string
           student_name: string
           time_slot?: string | null
           updated_at?: string
@@ -303,6 +348,8 @@ export type Database = {
         Update: {
           address?: string | null
           building_name?: string | null
+          city?: string | null
+          class_rank?: string | null
           created_at?: string
           date_of_birth?: string | null
           district?: string | null
@@ -314,8 +361,11 @@ export type Database = {
           gender?: string | null
           hall_ticket_url?: string | null
           id?: string
+          marksheet_url?: string | null
           medium?: string | null
           mobile_number?: string
+          olympiad_appeared?: string | null
+          olympiad_certificate_url?: string | null
           parent_email?: string | null
           parent_first_name?: string | null
           parent_last_name?: string | null
@@ -330,6 +380,7 @@ export type Database = {
           school_name?: string | null
           standard?: string
           state?: string | null
+          status?: string
           student_name?: string
           time_slot?: string | null
           updated_at?: string
