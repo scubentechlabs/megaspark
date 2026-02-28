@@ -38,12 +38,17 @@ export default function PaymentSummary() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      fetchPayments();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setLoading(false);
     }
-    fetchPayments();
   };
 
   const fetchPayments = async () => {

@@ -34,12 +34,17 @@ export default function Settings() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/admin/login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      await loadSettings();
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      setIsLoading(false);
     }
-    await loadSettings();
   };
 
   const loadSettings = async () => {
