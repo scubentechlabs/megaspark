@@ -96,9 +96,27 @@ export const ExamDatesVenue = () => {
           <div className="text-center mb-8">
             <h3 className="text-3xl font-bold text-primary mb-2 flex items-center justify-center gap-2">
               <MapPin className="h-8 w-8 text-accent" />
-              Exam Centre Location
+              Exam Centre Locations
             </h3>
-            <p className="text-muted-foreground">PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</p>
+            <p className="text-muted-foreground">3 Exam Centers across Surat</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {[
+              { name: "ABRAMA", address: "PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150" },
+              { name: "HIRABAUG", address: "PP Savani School, Hirabaug, Surat, Gujarat" },
+              { name: "UMRA", address: "PP Savani School, Umra, Surat, Gujarat" },
+            ].map((center) => (
+              <Card key={center.name} className="overflow-hidden hover:shadow-hover transition-all duration-300 border-2 border-accent/20 hover:border-accent">
+                <CardContent className="p-6 text-center">
+                  <div className="h-14 w-14 mx-auto rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                    <MapPin className="h-7 w-7 text-accent" />
+                  </div>
+                  <h4 className="text-xl font-bold text-primary mb-2">{center.name}</h4>
+                  <p className="text-sm text-muted-foreground">{center.address}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -109,7 +127,7 @@ export const ExamDatesVenue = () => {
                 className="w-full h-[300px] object-cover"
               />
               <CardContent className="p-6">
-                <h4 className="text-xl font-bold text-foreground mb-2">PP Savani Cfe</h4>
+                <h4 className="text-xl font-bold text-foreground mb-2">PP Savani Cfe - Abrama</h4>
                 <p className="text-sm text-muted-foreground">
                   Abrama Rd, Mota Varachha, Surat, Gujarat 394150 - State-of-the-art facilities with air-conditioned examination halls and 
                   comfortable seating arrangements for all candidates.
