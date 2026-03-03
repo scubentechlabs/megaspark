@@ -37,7 +37,7 @@ export const NewHero = ({ onRegisterClick }: NewHeroProps) => {
   }, []);
 
   useEffect(() => {
-    const targetDate = new Date('2025-12-07T00:00:00').getTime();
+    const targetDate = new Date('2028-03-15T00:00:00').getTime();
 
     const updateCountdown = () => {
       const now = new Date().getTime();
