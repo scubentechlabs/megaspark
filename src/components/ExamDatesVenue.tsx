@@ -1,10 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Clock, Loader2 } from "lucide-react";
+import { Calendar, MapPin, Clock } from "lucide-react";
 import schoolBuilding from "@/assets/school-building.webp";
-import { useActiveExamDates } from "@/hooks/useExamData";
+
+const staticExamDates = [
+  { label: "15 March 2026", day_name: "Sunday" },
+  { label: "22 March 2026", day_name: "Sunday" },
+];
 
 export const ExamDatesVenue = () => {
-  const { data: examDates = [], isLoading } = useActiveExamDates();
 
   return (
     <section id="dates" className="py-12 bg-muted/30 relative overflow-hidden">
@@ -31,16 +34,7 @@ export const ExamDatesVenue = () => {
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                {isLoading ? (
-                  <div className="col-span-full flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </div>
-                ) : examDates.length === 0 ? (
-                  <div className="col-span-full text-center py-8 text-muted-foreground">
-                    No exam dates available yet.
-                  </div>
-                ) : (
-                  examDates.map((exam, idx) => {
+                {staticExamDates.map((exam, idx) => {
                     const parts = exam.label.split(' ');
                     const dateNum = parts[0] || '';
                     const month = parts[1] || '';
@@ -59,8 +53,7 @@ export const ExamDatesVenue = () => {
                         <div className="text-sm font-semibold text-accent">{month}</div>
                       </div>
                     );
-                  })
-                )}
+                  })}
                 </div>
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
