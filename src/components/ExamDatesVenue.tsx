@@ -21,7 +21,7 @@ export const ExamDatesVenue = () => {
             Exam Dates & <span className="text-accent">Venue</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Mark your calendar for all exam dates in November and December 2025
+            Mark your calendar for all exam dates in March 2026
           </p>
         </div>
 
