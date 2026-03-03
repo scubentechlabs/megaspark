@@ -323,8 +323,8 @@ export default function Admin() {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🌟 MEGA SPARK EXAM 2025 🌟</h1>
-            <h2>મેગા સ્પાર્ક પરીક્ષા - 2025</h2>
+            <h1>🌟 MEGA SPARK EXAM 2026 🌟</h1>
+            <h2>મેગા સ્પાર્ક પરીક્ષા - 2026</h2>
             <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
           </div>
           
@@ -570,7 +570,7 @@ export default function Admin() {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>Registration Data - MEGA SPARK EXAM 2025</title>
+        <title>Registration Data - MEGA SPARK EXAM 2026</title>
         <style>
           @page { size: A4 landscape; margin: 10mm; }
           body { margin: 0; padding: 10px; font-family: Arial, sans-serif; font-size: 7px; }
@@ -587,7 +587,7 @@ export default function Admin() {
       </head>
       <body>
         <div class="header">
-          <h1>MEGA SPARK EXAM 2025 - Registration Data</h1>
+          <h1>MEGA SPARK EXAM 2026 - Registration Data</h1>
           <p>Total Registrations: ${allData.length} | Generated: ${new Date().toLocaleString()}</p>
         </div>
         

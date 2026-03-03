@@ -21,7 +21,7 @@ const benefits = [
     icon: Award,
     title: "Educational NASA & Japan Trip for Free",
     description: "Global exposure for top performers",
-    detail: "Top students earn global exposure through Mega Spark Exam 2025 scholarships.",
+    detail: "Top students earn global exposure through Mega Spark Exam 2026 scholarships.",
     color: "bg-gradient-to-br from-primary to-primary/80"
   },
   {

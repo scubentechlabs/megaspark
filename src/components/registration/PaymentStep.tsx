@@ -294,7 +294,7 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
           </>
         )}
         <div className="text-5xl font-bold mb-2">₹{finalAmount.toFixed(2)}</div>
-        <div className="text-sm opacity-90">One-time payment for Mega Spark Exam 2025</div>
+        <div className="text-sm opacity-90">One-time payment for Mega Spark Exam 2026</div>
       </Card>
 
       {/* Payment/Registration Button */}
