@@ -187,7 +187,7 @@ export default function Login() {
 <body>
   <div class="header">
     <h1>P.P. SAVANI GROUP</h1>
-    <h2>MEGA SPARK EXAM 2025</h2>
+    <h2>MEGA SPARK EXAM 2026</h2>
     <h3>EXAMINATION HALL TICKET</h3>
   </div>
 
