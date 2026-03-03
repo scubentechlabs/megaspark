@@ -64,8 +64,8 @@ export const ExamDatesVenue = () => {
                 </div>
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
+                <div className="flex justify-center">
+                    <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30 max-w-md w-full">
                       <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
                         <Clock className="h-6 w-6 text-white" />
                       </div>
@@ -73,16 +73,6 @@ export const ExamDatesVenue = () => {
                         <p className="text-sm text-muted-foreground">Morning Slot</p>
                         <p className="text-lg font-bold text-primary">8:00 AM - 12:00 PM</p>
                         <p className="text-xs text-accent font-semibold">Reporting: 8:00 AM</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30">
-                      <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
-                        <Clock className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Afternoon Slot</p>
-                        <p className="text-lg font-bold text-primary">2:30 PM - 6:30 PM</p>
-                        <p className="text-xs text-accent font-semibold">Reporting: 2:30 PM</p>
                       </div>
                     </div>
                   </div>
