@@ -43,7 +43,7 @@ serve(async (req) => {
     
     const getReportingTime = (slot: string | null) => {
       if (!slot) return 'TBA';
-      if (slot.toLowerCase() === 'morning') return '8:00 AM';
+      if (slot.toLowerCase() === 'morning') return '7:45 AM';
       if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
       return 'TBA';
     };
