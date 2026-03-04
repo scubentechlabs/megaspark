@@ -1,0 +1,3 @@
+ALTER TABLE public.registrations DROP CONSTRAINT IF EXISTS registrations_registration_number_unique;
+ALTER TABLE public.registrations DROP CONSTRAINT IF EXISTS registration_registration_number_unique;
+ALTER TABLE public.registrations DROP CONSTRAINT IF EXISTS registrations_registration_number_key;
