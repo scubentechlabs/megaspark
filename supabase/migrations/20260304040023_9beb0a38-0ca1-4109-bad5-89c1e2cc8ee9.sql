@@ -1,0 +1,1 @@
+ALTER TABLE public.registrations DROP CONSTRAINT IF EXISTS registrations_mobile_number_unique;
