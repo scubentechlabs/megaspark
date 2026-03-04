@@ -5,10 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Smartphone, Download, ArrowLeft, Send } from "lucide-react";
+import { Smartphone, Download, ArrowLeft, Send, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
-import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
-import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 
 interface Registration {
@@ -136,148 +134,64 @@ export default function Login() {
     return 'TBA';
   };
 
-  const handleDownloadHallTicket = (registration: Registration) => {
-    // Generate hall ticket HTML
-    const hallTicketHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>MEGA SPARK EXAM Hall Ticket - ${registration.registration_number}</title>
-  <style>
-    @page { 
-      size: A4;
-      margin: 0; 
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: Arial, sans-serif; 
-      padding: 15px 25px; 
-      background: white; 
-      width: 210mm;
-      height: 297mm;
-      margin: 0 auto;
-    }
-    .header { text-align: center; margin-bottom: 12px; }
-    .header h1 { font-size: 20px; color: #1a1a1a; margin: 3px 0; }
-    .header h2 { font-size: 26px; color: #2563eb; margin: 5px 0; font-weight: bold; }
-    .header h3 { font-size: 16px; color: #1a1a1a; margin: 3px 0; }
-    .info-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    .info-table td { padding: 8px 10px; border: 1px solid #ddd; font-size: 12px; }
-    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 38%; }
-    .exam-pattern-box { padding: 6px; background: #f0f0f0; margin-top: 3px; font-size: 11px; }
-    .exam-pattern-box strong { display: block; margin-bottom: 3px; }
-    .notes { margin: 12px 0; }
-    .notes h4 { font-size: 14px; font-weight: bold; margin-bottom: 8px; }
-    .notes ol { padding-left: 18px; }
-    .notes li { margin: 5px 0; line-height: 1.4; font-size: 11px; }
-    .exam-center { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #2563eb; }
-    .exam-center h4 { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
-    .exam-center p { font-size: 12px; }
-    .footer { margin-top: 15px; text-align: center; padding: 10px; background: #f0f0f0; }
-    .footer p { margin: 3px 0; font-size: 12px; }
-    .footer-image { max-width: 60%; height: auto; margin: 10px 0; }
-    @media print {
-      body { padding: 15px 25px; }
-      .no-print { display: none; }
-      @page { size: A4; margin: 0; }
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>P.P. SAVANI GROUP</h1>
-    <h2>MEGA SPARK EXAM 2026</h2>
-    <h3>EXAMINATION HALL TICKET</h3>
-  </div>
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  <table class="info-table">
-    <tr>
-      <td>Student Name :</td>
-      <td><strong>${registration.student_name}</strong></td>
-    </tr>
-    <tr>
-      <td>Seat No :</td>
-      <td><strong>${formatRegistrationNumber(registration.registration_number)}</strong></td>
-    </tr>
-    <tr>
-      <td>Std :</td>
-      <td><strong>${registration.standard}</strong></td>
-    </tr>
-    <tr>
-      <td>Medium :</td>
-      <td><strong>${formatMedium(registration.medium)}</strong></td>
-    </tr>
-    <tr>
-      <td>Time Slot :</td>
-      <td><strong>${formatTimeSlot(registration.time_slot)}</strong></td>
-    </tr>
-    <tr>
-      <td>Exam Date :</td>
-      <td><strong>${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'}</strong></td>
-    </tr>
-    <tr>
-      <td>Reporting Date & Time :</td>
-      <td><strong>${registration.exam_date ? `${new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at ${getReportingTime(registration.time_slot)}` : getReportingTime(registration.time_slot)}</strong></td>
-    </tr>
-    <tr>
-      <td>Exam Pattern :</td>
-      <td>
-        <strong>MCQ (Multiple Choice Questions)</strong>
-        <div class="exam-pattern-box">
-          <strong>Subjects / વિષયો:</strong>
-          Science (વિજ્ઞાન), Maths (ગણિત), English (અંગ્રેજી)
-        </div>
-      </td>
-    </tr>
-  </table>
+  const handleDownloadHallTicket = async (registration: Registration) => {
+    setDownloadingId(registration.id);
+    try {
+      // If hall ticket URL already exists, download directly
+      if (registration.hall_ticket_url) {
+        const link = document.createElement('a');
+        link.href = registration.hall_ticket_url;
+        link.target = '_blank';
+        link.download = `hall-ticket-${registration.registration_number || registration.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Hall Ticket Downloaded!", {
+          description: "Your hall ticket PDF has been downloaded.",
+        });
+        return;
+      }
 
-  <div class="exam-center">
-    <h4>Exam Centre</h4>
-    <p>PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</p>
-  </div>
-
-  <div class="notes">
-    <h4>નોંધ (Notes):</h4>
-    <ol>
-      <li>પરીક્ષા તારીખ: ${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'} | રિપોર્ટિંગ સમય: ${getReportingTime(registration.time_slot)}</li>
-      <li>Exam Date: ${registration.exam_date ? new Date(registration.exam_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBA'} | Reporting Time: ${getReportingTime(registration.time_slot)}</li>
-      <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
-    </ol>
-  </div>
-
-
-  <div style="text-align: center; margin: 10px 0;">
-    <img src="${hallTicketFooterImage}" class="footer-image" alt="PP Savani Banner" />
-  </div>
-
-  <div class="footer">
-    <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
-    <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
-  </div>
-
-  <div class="no-print" style="margin-top: 30px; text-align: center;">
-    <button onclick="window.print()" style="padding: 15px 40px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold;">
-      Print / Save as PDF
-    </button>
-  </div>
-</body>
-</html>
-    `;
-
-    // Open in new window for printing
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(hallTicketHTML);
-      printWindow.document.close();
-      
-      toast.success("Hall Ticket Ready!", {
-        description: "Print or save the hall ticket as PDF from the new window",
+      // Generate hall ticket PDF via edge function
+      toast.info("Generating PDF...", {
+        description: "Please wait while your hall ticket is being generated.",
       });
-    } else {
-      toast.error("Error", {
-        description: "Please allow pop-ups to view the hall ticket",
+
+      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId: registration.id }
       });
+
+      if (error) throw error;
+
+      if (data?.success && data?.hallTicketUrl) {
+        // Update local state with the new URL
+        setRegistrations(prev => prev.map(r => 
+          r.id === registration.id ? { ...r, hall_ticket_url: data.hallTicketUrl } : r
+        ));
+
+        const link = document.createElement('a');
+        link.href = data.hallTicketUrl;
+        link.target = '_blank';
+        link.download = `hall-ticket-${registration.registration_number || registration.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success("Hall Ticket Downloaded!", {
+          description: "Your hall ticket PDF has been downloaded.",
+        });
+      } else {
+        throw new Error(data?.error || 'Failed to generate hall ticket');
+      }
+    } catch (error: any) {
+      console.error("Error downloading hall ticket:", error);
+      toast.error("Download Failed", {
+        description: error.message || "Failed to download hall ticket. Please try again.",
+      });
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -360,9 +274,14 @@ export default function Login() {
                           <Button
                             onClick={() => handleDownloadHallTicket(registration)}
                             className="bg-accent hover:bg-accent/90 gap-2"
+                            disabled={downloadingId === registration.id}
                           >
-                            <Download className="h-4 w-4" />
-                            Download
+                            {downloadingId === registration.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Download className="h-4 w-4" />
+                            )}
+                            {downloadingId === registration.id ? 'Generating...' : 'Download'}
                           </Button>
                           <Button
                             onClick={() => handleSendHallTicket(registration.id)}
