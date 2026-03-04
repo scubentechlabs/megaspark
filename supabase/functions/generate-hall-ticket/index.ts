@@ -186,7 +186,16 @@ serve(async (req) => {
     drawInfoRow('Reporting Date & Time', reportingDateTime, yPosition);
     yPosition -= 20;
     
-    drawInfoRow('Exam Center', 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150', yPosition);
+    const getExamCenterAddress = (center: string | null) => {
+      if (!center) return 'TBA';
+      const c = center.toUpperCase();
+      if (c === 'ABRAMA') return 'P.P Savani, Abrama Rd, Mota Varachha, Surat, Gujarat 394150';
+      if (c === 'HIRABAUG') return 'P.P Savani Hirabaugh, Varachha Main Rd, Bhaktinagar V-2, Hirabaugh, Surat, Gujarat 395006';
+      if (c === 'UMRA') return 'Radiant English Academy (P.P Savani Umra), Keshav Nagar, Umra Gam, Athwa, Surat, Gujarat 395007';
+      return center;
+    };
+
+    drawInfoRow('Exam Center', getExamCenterAddress(registration.exam_center), yPosition);
     yPosition -= 20;
     
     drawInfoRow('Registration No', registration.registration_number || 'Pending', yPosition);
