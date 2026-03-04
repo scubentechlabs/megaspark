@@ -15,7 +15,7 @@ export const RegistrationSection = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<any>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [mobileError, setMobileError] = useState<string>("");
+  
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
@@ -27,10 +27,6 @@ export const RegistrationSection = () => {
 
   const updateFormData = (updates: any) => {
     setFormData((prev: any) => ({ ...prev, ...updates }));
-    // Clear mobile error when user changes the phone number
-    if (updates.phoneNumber !== undefined) {
-      setMobileError("");
-    }
   };
 
   const validateStep = () => {
@@ -106,30 +102,6 @@ export const RegistrationSection = () => {
   const handleNext = async () => {
     if (!validateStep()) return;
     
-    // Check for duplicate mobile number before moving to next step
-    if (currentStep === 1 && formData.phoneNumber) {
-      try {
-        const { data: existingRegistrations, error: checkError } = await supabase
-          .from('registrations')
-          .select('id, mobile_number')
-          .eq('mobile_number', formData.phoneNumber)
-          .limit(1);
-
-        if (checkError) {
-          console.error('Error checking existing registration:', checkError);
-          toast.error("Error checking mobile number");
-          return;
-        }
-
-        if (existingRegistrations && existingRegistrations.length > 0) {
-          setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking mobile number:', error);
-        return;
-      }
-    }
     
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
@@ -153,24 +125,6 @@ export const RegistrationSection = () => {
     try {
       console.log('Starting registration save with data:', formData);
 
-      // Check if mobile number already exists
-      const { data: existingRegistrations, error: checkError } = await supabase
-        .from('registrations')
-        .select('id, mobile_number')
-        .eq('mobile_number', formData.phoneNumber)
-        .limit(1);
-
-      if (checkError) {
-        console.error('Error checking existing registration:', checkError);
-        throw checkError;
-      }
-
-      if (existingRegistrations && existingRegistrations.length > 0) {
-        setMobileError("This mobile number is already registered. Each mobile number can only be used once.");
-        setIsSubmitting(false);
-        setCurrentStep(1); // Go back to first step to show error
-        return;
-      }
 
       // Verify slot availability before registration
       const { data: slotData, error: slotError } = await supabase
@@ -320,7 +274,7 @@ export const RegistrationSection = () => {
           <CardContent className="p-8">
             <div className="min-h-[350px]">
               {currentStep === 1 && (
-                <StudentDetailsStep formData={formData} updateFormData={updateFormData} mobileError={mobileError} />
+                <StudentDetailsStep formData={formData} updateFormData={updateFormData} />
               )}
               {currentStep === 2 && (
                 <ParentSchoolStep formData={formData} updateFormData={updateFormData} />
