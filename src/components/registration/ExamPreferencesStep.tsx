@@ -83,17 +83,12 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
           <SelectContent className="bg-background z-50">
             {examCenters.map((center) => {
               const full = isCenterFull(center.value);
-              const count = centerCounts?.[center.value] || 0;
               return (
                 <SelectItem key={center.value} value={center.value} disabled={full}>
                   <span className="flex items-center gap-2">
                     {center.label}
-                    {full ? (
+                    {full && (
                       <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Full</Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                        {MAX_CENTER_CAPACITY - count} seats left
-                      </Badge>
                     )}
                   </span>
                 </SelectItem>
