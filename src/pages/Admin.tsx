@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
 import { fetchAll } from "@/lib/fetchAll";
@@ -23,8 +23,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import hallTicketHeaderImage from "@/assets/hall-ticket-header.jpg";
-import hallTicketFooterImage from "@/assets/hall-ticket-footer-new.jpg";
 
 interface Registration {
   id: string;
@@ -68,6 +66,7 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [downloadingHallTicketId, setDownloadingHallTicketId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [stats, setStats] = useState({ total: 0, todayRegistrations: 0, yesterdayRegistrations: 0 });
@@ -292,169 +291,54 @@ export default function Admin() {
     return 'TBA';
   };
 
-  const handleDownloadHallTicket = (reg: Registration) => {
-    const hallTicketHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Hall Ticket - ${reg.registration_number}</title>
-        <style>
-          @page { size: A4; margin: 0; }
-          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
-          .container { max-width: 800px; margin: 0 auto; border: 2px solid #000; padding: 20px; }
-          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
-          .header-image { width: 100%; max-width: 600px; margin-bottom: 15px; }
-          .header h1 { margin: 0; font-size: 24px; color: #000; }
-          .header h2 { margin: 5px 0; font-size: 18px; color: #333; }
-          .header p { margin: 5px 0; font-size: 14px; }
-          .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          .info-table td { padding: 10px; border: 1px solid #000; }
-          .info-table td:first-child { font-weight: bold; width: 40%; background: #f5f5f5; }
-          .exam-pattern-box { padding: 10px; background: #f0f0f0; margin-top: 5px; }
-          .exam-pattern-box strong { display: block; margin-bottom: 5px; }
-          .notes { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #000; }
-          .notes h3 { margin-top: 0; }
-          .notes ul { margin: 10px 0; padding-left: 20px; }
-          .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 2px solid #000; }
-          @media print { body { padding: 0; } }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🌟 MEGA SPARK EXAM 2026 🌟</h1>
-            <h2>મેગા સ્પાર્ક પરીક્ષા - 2026</h2>
-            <p><strong>HALL TICKET / પ્રવેશ પત્ર</strong></p>
-          </div>
-          
-          <table class="info-table">
-            <tr>
-              <td>Registration Number<br>નોંધણી નંબર</td>
-              <td><strong style="font-size: 18px;">${formatRegistrationNumber(reg.registration_number)}</strong></td>
-            </tr>
-            <tr>
-              <td>Student Name<br>વિદ્યાર્થીનું નામ</td>
-              <td>${reg.student_name}</td>
-            </tr>
-            <tr>
-              <td>Parent Name<br>વાલીનું નામ</td>
-              <td>${reg.parent_name || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>WhatsApp Number<br>વોટ્સએપ નંબર</td>
-              <td>${reg.whatsapp_number || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>State<br>રાજ્ય</td>
-              <td>${reg.state || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>District<br>જિલ્લો</td>
-              <td>${reg.district || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>Standard<br>ધોરણ</td>
-              <td>${reg.standard}</td>
-            </tr>
-            <tr>
-              <td>Medium<br>માધ્યમ</td>
-              <td>${formatMedium(reg.medium)}</td>
-            </tr>
-            <tr>
-              <td>School Name<br>શાળાનું નામ</td>
-              <td>${reg.school_name || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>School Medium<br>શાળા માધ્યમ</td>
-              <td>${reg.school_medium ? (reg.school_medium === 'gujarati' ? 'Gujarati' : 'English') : 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>Previous Year %<br>પાછલા વર્ષની ટકાવારી</td>
-              <td>${reg.previous_year_percentage || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>Preferred Exam Date<br>પસંદગીની પરીક્ષા તારીખ</td>
-              <td>${reg.preferred_exam_date ? (() => {
-                const date = new Date(reg.preferred_exam_date);
-                const day = date.getDate();
-                const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
-                return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long' }).replace(/\d+/, day + suffix);
-              })() : 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>Mobile Number<br>મોબાઇલ નંબર</td>
-              <td>${reg.mobile_number}</td>
-            </tr>
-            <tr>
-              <td>Email Address<br>ઇમેઇલ સરનામું</td>
-              <td>${reg.email || 'N/A'}</td>
-            </tr>
-            <tr>
-              <td>Exam Date<br>પરીક્ષા તારીખ</td>
-              <td>${reg.exam_date ? (() => {
-                const date = new Date(reg.exam_date);
-                const day = date.getDate();
-                const suffix = day === 1 || day === 21 || day === 31 ? 'st' : day === 2 || day === 22 ? 'nd' : day === 3 || day === 23 ? 'rd' : 'th';
-                return date.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long' }).replace(/\d+/, day + suffix);
-              })() : 'To be announced'}</td>
-            </tr>
-            <tr>
-              <td>Exam Pattern<br>પરીક્ષા પેટર્ન</td>
-              <td>
-                <strong>MCQ (Multiple Choice Questions)</strong>
-                <div class="exam-pattern-box">
-                  <strong>Subjects / વિષયો:</strong>
-                  Science (વિજ્ઞાન), Maths (ગણિત), English (અંગ્રેજી)
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Exam Center<br>પરીક્ષા કેન્દ્ર</td>
-              <td>PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150</td>
-            </tr>
-          </table>
+  const handleDownloadHallTicket = async (reg: Registration) => {
+    setDownloadingHallTicketId(reg.id);
+    try {
+      // If hall ticket URL already exists, download directly
+      if (reg.hall_ticket_url) {
+        const link = document.createElement('a');
+        link.href = reg.hall_ticket_url;
+        link.target = '_blank';
+        link.download = `hall-ticket-${reg.registration_number || reg.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast({ title: "Hall Ticket Downloaded" });
+        return;
+      }
 
-          <div class="notes">
-            <h3>Notes / નોંધ:</h3>
-            <ul>
-              <li>પરીક્ષાનો રિપોર્ટિંગ સમય સવારે 8:00 કલાકે રહેશે</li>
-              <li>દરેક વિદ્યાર્થીએ આ હોલ ટિકિટ ની પ્રિન્ટ કાઢી સાથે રાખવી</li>
-            </ul>
-          </div>
+      // Generate hall ticket PDF via edge function
+      toast({ title: "Generating PDF...", description: "Please wait while the hall ticket is being generated." });
 
-
-          <div style="text-align: center; margin: 20px 0;">
-            <img src="${hallTicketFooterImage}" style="max-width: 70%; height: auto;" alt="PP Savani Banner" />
-          </div>
-
-          <div class="footer">
-            <p><strong>MEGA SPARK EXAM COMMITTEE</strong></p>
-            <p><em>Best Wishes for Your Examination! / તમારી પરીક્ષા માટે શુભેચ્છાઓ!</em></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(hallTicketHTML);
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.print();
-      };
-      
-      toast({
-        title: "Hall Ticket Ready",
-        description: "Opening print dialog for hall ticket",
+      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
+        body: { registrationId: reg.id }
       });
-    } else {
-      toast({
-        title: "Error",
-        description: "Please allow popups to download hall ticket",
-        variant: "destructive",
-      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.hallTicketUrl) {
+        // Update local state
+        setRegistrations(prev => prev.map(r => 
+          r.id === reg.id ? { ...r, hall_ticket_url: data.hallTicketUrl } : r
+        ));
+
+        const link = document.createElement('a');
+        link.href = data.hallTicketUrl;
+        link.target = '_blank';
+        link.download = `hall-ticket-${reg.registration_number || reg.id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast({ title: "Hall Ticket Downloaded" });
+      } else {
+        throw new Error(data?.error || 'Failed to generate hall ticket');
+      }
+    } catch (error: any) {
+      console.error("Error downloading hall ticket:", error);
+      toast({ title: "Download Failed", description: error.message || "Please try again.", variant: "destructive" });
+    } finally {
+      setDownloadingHallTicketId(null);
     }
   };
 
@@ -826,9 +710,14 @@ export default function Admin() {
                                     size="sm"
                                     onClick={() => handleDownloadHallTicket(reg)}
                                     className="gap-2"
+                                    disabled={downloadingHallTicketId === reg.id}
                                   >
-                                    <Download className="h-4 w-4" />
-                                    Hall Ticket
+                                    {downloadingHallTicketId === reg.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Download className="h-4 w-4" />
+                                    )}
+                                    {downloadingHallTicketId === reg.id ? 'Generating...' : 'Hall Ticket'}
                                   </Button>
                                   <Button
                                     size="sm"
