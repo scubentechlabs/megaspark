@@ -99,6 +99,10 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         toast.error("Please select a time slot");
         return false;
       }
+      if (!formData.examCenter) {
+        toast.error("Please select a preferred exam center");
+        return false;
+      }
     }
     return true;
   };
@@ -180,7 +184,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           time_slot: formData.timeSlot,
           exam_date: formData.examDate,
           preferred_exam_date: formData.examDate,
-          exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150'
+          exam_center: formData.examCenter
         } as any)
         .select()
         .single();
