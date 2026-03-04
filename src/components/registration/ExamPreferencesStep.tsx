@@ -36,6 +36,20 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
         </Select>
       </div>
 
+      <div className="space-y-2">
+        <Label htmlFor="examCenter">Preferred Exam Center *</Label>
+        <Select value={formData.examCenter} onValueChange={(value) => updateFormData({ examCenter: value })}>
+          <SelectTrigger className="bg-background">
+            <SelectValue placeholder="Select exam center" />
+          </SelectTrigger>
+          <SelectContent className="bg-background z-50">
+            <SelectItem value="ABRAMA">ABRAMA</SelectItem>
+            <SelectItem value="HIRABAUG">HIRABAUG</SelectItem>
+            <SelectItem value="UMRA">UMRA</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <Card className="bg-primary/5 border-primary/20 p-3">
         <p className="text-sm text-foreground">
           <strong className="text-primary">Time Slot:</strong> Morning Slot — 8:00 AM to 11:00 AM (Reporting: 7:45 AM)
