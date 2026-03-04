@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface StudentDetailsStepProps {
   formData: any;
   updateFormData: (data: any) => void;
-  mobileError?: string;
 }
 
 const stateDistrictsData: Record<string, string[]> = {
@@ -48,7 +47,7 @@ const stateDistrictsData: Record<string, string[]> = {
   "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
 };
 
-export const StudentDetailsStep = ({ formData, updateFormData, mobileError }: StudentDetailsStepProps) => {
+export const StudentDetailsStep = ({ formData, updateFormData }: StudentDetailsStepProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     // Keep only digits and cap at 10
     const value = e.target.value.replace(/\D/g, '').slice(0, 10);
@@ -111,12 +110,8 @@ export const StudentDetailsStep = ({ formData, updateFormData, mobileError }: St
             placeholder="Enter 10-digit mobile number"
             maxLength={10}
             required
-            className={mobileError ? "border-red-500 focus-visible:ring-red-500" : ""}
           />
-          {mobileError && (
-            <p className="text-sm font-medium text-red-600">{mobileError}</p>
-          )}
-          {!mobileError && formData.phoneNumber && formData.phoneNumber.length !== 10 && (
+          {formData.phoneNumber && formData.phoneNumber.length !== 10 && (
             <p className="text-xs text-destructive">Mobile number must be 10 digits</p>
           )}
         </div>
