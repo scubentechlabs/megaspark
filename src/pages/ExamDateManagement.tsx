@@ -37,7 +37,7 @@ export default function ExamDateManagement() {
     exam_date: "",
     label: "",
     day_name: "",
-    exam_time: "8:00 AM - 12:00 PM",
+    exam_time: "8:00 AM - 11:00 AM",
     is_active: true,
   });
 
@@ -81,7 +81,7 @@ export default function ExamDateManagement() {
       exam_date: "",
       label: "",
       day_name: "",
-      exam_time: "8:00 AM - 12:00 PM",
+      exam_time: "8:00 AM - 11:00 AM",
       is_active: true,
     });
     setDialogOpen(true);
@@ -93,7 +93,7 @@ export default function ExamDateManagement() {
       exam_date: examDate.exam_date,
       label: examDate.label,
       day_name: examDate.day_name || "",
-      exam_time: examDate.exam_time || "8:00 AM - 12:00 PM",
+      exam_time: examDate.exam_time || "8:00 AM - 11:00 AM",
       is_active: examDate.is_active,
     });
     setDialogOpen(true);
@@ -321,7 +321,7 @@ export default function ExamDateManagement() {
                   <Label htmlFor="exam_time">Exam Time</Label>
                   <Input
                     id="exam_time"
-                    placeholder="e.g., 8:00 AM - 12:00 PM"
+                    placeholder="e.g., 8:00 AM - 11:00 AM"
                     value={formData.exam_time}
                     onChange={(e) => setFormData({ ...formData, exam_time: e.target.value })}
                   />

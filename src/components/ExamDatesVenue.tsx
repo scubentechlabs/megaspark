@@ -64,8 +64,8 @@ export const ExamDatesVenue = () => {
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Morning Slot</p>
-                        <p className="text-lg font-bold text-primary">8:00 AM - 12:00 PM</p>
-                        <p className="text-xs text-accent font-semibold">Reporting: 8:00 AM</p>
+                        <p className="text-lg font-bold text-primary">8:00 AM - 11:00 AM</p>
+                        <p className="text-xs text-accent font-semibold">Reporting: 7:45 AM</p>
                       </div>
                     </div>
                   </div>
