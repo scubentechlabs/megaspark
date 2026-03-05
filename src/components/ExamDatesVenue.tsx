@@ -1,19 +1,42 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Clock } from "lucide-react";
-import schoolBuilding from "@/assets/school-building.webp";
+import { Calendar, MapPin, Clock, ExternalLink, X } from "lucide-react";
 
 const staticExamDates = [
   { label: "15 March 2026", day_name: "Sunday" },
   { label: "22 March 2026", day_name: "Sunday" },
 ];
 
+const examCenters = [
+  {
+    name: "ABRAMA",
+    fullName: "PP Savani CFE – Abrama",
+    address: "Abrama Rd, Mota Varachha, Surat, Gujarat 394150",
+    mapUrl: "https://maps.app.goo.gl/Ro47DrhhPu9S7UWX6",
+  },
+  {
+    name: "HIRABAUG",
+    fullName: "PP Savani School – Hirabaug, Varachha",
+    address: "Varachha Main Rd, Bhaktinagar V-2, Near Hirabaug, Surat, Gujarat 395006",
+    mapUrl: "https://maps.app.goo.gl/wtaBX6u7X16Y8DFU6",
+  },
+  {
+    name: "UMRA",
+    fullName: "Radiant English Academy – Umra Gam",
+    address: "Keshav Nagar, Umra Gam, Athwa, Surat, Gujarat 395007",
+    mapUrl: "https://maps.app.goo.gl/p3uwr9uJXbVn8J7u5",
+  },
+];
+
 export const ExamDatesVenue = () => {
+  const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
+
+  const activeCenter = examCenters.find((c) => c.name === selectedCenter);
 
   return (
     <section id="dates" className="py-12 bg-muted/30 relative overflow-hidden">
-      {/* Background decorative elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-      
+
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-fade-in">
           <span className="text-accent text-sm font-semibold uppercase tracking-wide flex items-center justify-center gap-2">
@@ -34,7 +57,7 @@ export const ExamDatesVenue = () => {
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                {staticExamDates.map((exam, idx) => {
+                  {staticExamDates.map((exam, idx) => {
                     const parts = exam.label.split(' ');
                     const dateNum = parts[0] || '';
                     const month = parts[1] || '';
@@ -46,9 +69,7 @@ export const ExamDatesVenue = () => {
                         <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
                           <Calendar className="h-7 w-7" />
                         </div>
-                        <div className="text-2xl font-bold mb-1 text-foreground">
-                          {dateNum}
-                        </div>
+                        <div className="text-2xl font-bold mb-1 text-foreground">{dateNum}</div>
                         <div className="text-sm text-muted-foreground mb-1">{exam.day_name || ''}</div>
                         <div className="text-sm font-semibold text-accent">{month}</div>
                       </div>
@@ -57,7 +78,7 @@ export const ExamDatesVenue = () => {
                 </div>
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
-                <div className="flex justify-center">
+                  <div className="flex justify-center">
                     <div className="flex items-center gap-4 p-4 bg-background rounded-lg border-2 border-accent/30 max-w-md w-full">
                       <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
                         <Clock className="h-6 w-6 text-white" />
@@ -69,7 +90,7 @@ export const ExamDatesVenue = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="relative max-w-md mx-auto">
                     <div className="bg-[#fef9c3] p-6 rounded-lg shadow-lg border-l-4 border-accent rotate-1 transform hover:rotate-0 transition-transform">
                       <div className="absolute -top-3 -right-3 h-8 w-8 bg-accent/20 rounded-full" />
@@ -102,23 +123,66 @@ export const ExamDatesVenue = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            {[
-              { name: "ABRAMA", address: "PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150" },
-              { name: "HIRABAUG", address: "PP Savani School, Hirabaug, Surat, Gujarat" },
-              { name: "UMRA", address: "PP Savani School, Umra, Surat, Gujarat" },
-            ].map((center) => (
-              <Card key={center.name} className="overflow-hidden hover:shadow-hover transition-all duration-300 border-2 border-accent/20 hover:border-accent">
+            {examCenters.map((center) => (
+              <Card
+                key={center.name}
+                className={`overflow-hidden cursor-pointer transition-all duration-300 border-2 hover:shadow-hover ${
+                  selectedCenter === center.name
+                    ? "border-accent shadow-lg scale-[1.02]"
+                    : "border-accent/20 hover:border-accent"
+                }`}
+                onClick={() =>
+                  setSelectedCenter(selectedCenter === center.name ? null : center.name)
+                }
+              >
                 <CardContent className="p-6 text-center">
                   <div className="h-14 w-14 mx-auto rounded-full bg-accent/10 flex items-center justify-center mb-4">
                     <MapPin className="h-7 w-7 text-accent" />
                   </div>
                   <h4 className="text-xl font-bold text-primary mb-2">{center.name}</h4>
                   <p className="text-sm text-muted-foreground">{center.address}</p>
+                  <p className="text-xs text-accent font-semibold mt-3">Click to view location →</p>
                 </CardContent>
               </Card>
             ))}
           </div>
 
+          {/* Address Detail Box */}
+          {activeCenter && (
+            <div className="animate-fade-in">
+              <Card className="border-2 border-accent bg-gradient-to-br from-accent/5 to-primary/5">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="h-12 w-12 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                        <MapPin className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-bold text-primary mb-1">{activeCenter.fullName}</h4>
+                        <p className="text-muted-foreground mb-3">📍 {activeCenter.address}</p>
+                        <a
+                          href={activeCenter.mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white font-semibold text-sm hover:bg-accent/90 transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open in Google Maps
+                        </a>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedCenter(null)}
+                      className="p-1 rounded-full hover:bg-muted transition-colors flex-shrink-0"
+                    >
+                      <X className="h-5 w-5 text-muted-foreground" />
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </section>
