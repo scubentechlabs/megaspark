@@ -466,23 +466,26 @@ serve(async (req) => {
       throw updateError;
     }
 
-    // Send WhatsApp message with hall ticket
-    console.log('Sending WhatsApp message...');
+    // Send WhatsApp message with hall ticket (fire-and-forget, don't block response)
+    console.log('Triggering WhatsApp message (non-blocking)...');
     const whatsappPhone = registration.whatsapp_number || registration.mobile_number;
     
-    const { error: whatsappError } = await supabase.functions.invoke('send-whatsapp', {
-      body: {
+    // Use fetch directly for fire-and-forget instead of supabase.functions.invoke which blocks
+    const whatsappUrl = `${SUPABASE_URL}/functions/v1/send-whatsapp`;
+    fetch(whatsappUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+      body: JSON.stringify({
         phoneNumber: whatsappPhone,
         messageType: 'hall_ticket',
         registrationId: registrationId,
+        registrationNumber: registration.registration_number || 'Hall-Ticket',
         messageBody: publicUrl,
-      },
-    });
-
-    if (whatsappError) {
-      console.error('WhatsApp error:', whatsappError);
-      // Don't throw - hall ticket was generated successfully
-    }
+      }),
+    }).catch(err => console.error('WhatsApp fire-and-forget error:', err));
 
     return new Response(
       JSON.stringify({ 

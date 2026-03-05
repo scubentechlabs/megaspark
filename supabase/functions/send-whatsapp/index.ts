@@ -20,8 +20,7 @@ serve(async (req) => {
 
   let messageId: string | null = null;
   try {
-    const { phoneNumber, messageType, registrationId, messageBody, templateName, variables } = await req.json();
-
+    const { phoneNumber, messageType, registrationId, messageBody, templateName, variables, registrationNumber: passedRegNumber } = await req.json();
     console.log('Sending WhatsApp message:', { phoneNumber, messageType, registrationId });
     // messageId declared above for catch scope
 
@@ -79,9 +78,9 @@ serve(async (req) => {
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
-      // Get registration number from database to use as filename
-      let registrationNumber = 'Hall-Ticket';
-      if (registrationId) {
+      // Get registration number - use passed value or fetch from DB
+      let registrationNumber = passedRegNumber || 'Hall-Ticket';
+      if (!passedRegNumber && registrationId) {
         const { data: regData } = await supabase
           .from('registrations')
           .select('registration_number')
