@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.expire-pending-payments]
 verify_jwt = false
+
+[functions.create-admin-user]
+verify_jwt = false
