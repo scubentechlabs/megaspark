@@ -57,8 +57,9 @@ serve(async (req) => {
     messageId = messageRecord.id;
     console.log('Message record created:', messageRecord.id);
 
-    // Use OfficialWA gateway for Meta API
-    const apiUrl = `https://crm.officialwa.com/api/meta/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
+    // Try direct Meta Graph API first, fallback to OfficialWA
+    const directMetaUrl = `https://graph.facebook.com/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
+    const officialWaUrl = `https://crm.officialwa.com/api/meta/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     let apiPayload: any;
 
@@ -146,36 +147,50 @@ serve(async (req) => {
       };
     }
 
-    console.log('Sending WhatsApp message via Meta API...', { apiUrl });
+    console.log('Sending WhatsApp message, trying direct Meta API first...');
+    console.log('Payload:', JSON.stringify(apiPayload));
 
     let successResponse: any = null;
     let lastError: any = null;
 
-    try {
-      console.log('Calling Meta WhatsApp API:', apiUrl);
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${META_WHATSAPP_ACCESS_TOKEN}`,
-        },
-        body: JSON.stringify(apiPayload),
-      });
+    // Try direct Meta Graph API first
+    for (const apiUrl of [directMetaUrl, officialWaUrl]) {
+      try {
+        console.log('Trying API:', apiUrl);
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${META_WHATSAPP_ACCESS_TOKEN}`,
+          },
+          body: JSON.stringify(apiPayload),
+        });
 
-      const responseData = await response.json().catch(() => ({}));
-      console.log('Meta API response:', response.status, responseData);
+        const responseData = await response.json().catch(() => ({}));
+        console.log('API response:', response.status, JSON.stringify(responseData));
 
-      if (response.ok) {
-        successResponse = responseData;
-      } else {
-        lastError = new Error(`HTTP ${response.status}: ${JSON.stringify(responseData)}`);
+        if (response.ok && responseData?.messages?.[0]?.id) {
+          // Direct Meta API returns { messages: [{ id: "wamid.xxx" }] }
+          successResponse = responseData;
+          console.log('Message sent successfully via:', apiUrl);
+          break;
+        } else if (response.ok) {
+          // OfficialWA returns { message: { queue_id, message_status } }
+          successResponse = responseData;
+          console.log('Message queued via:', apiUrl);
+          break;
+        } else {
+          lastError = new Error(`HTTP ${response.status}: ${JSON.stringify(responseData)}`);
+          console.log('Failed with', apiUrl, '- trying next...');
+        }
+      } catch (e) {
+        lastError = e;
+        console.log('Error with', apiUrl, ':', e.message, '- trying next...');
       }
-    } catch (e) {
-      lastError = e;
     }
 
     if (!successResponse) {
-      throw lastError || new Error('Meta WhatsApp API error: all paths failed');
+      throw lastError || new Error('WhatsApp API error: all endpoints failed');
     }
 
     // Update message status to sent
