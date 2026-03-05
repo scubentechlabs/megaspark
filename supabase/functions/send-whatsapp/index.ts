@@ -95,7 +95,6 @@ serve(async (req) => {
       
       // Send hall ticket template with document using OfficialWA format
       apiPayload = {
-        messaging_product: "whatsapp",
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
@@ -104,7 +103,7 @@ serve(async (req) => {
             policy: "deterministic",
             code: "en"
           },
-          name: "hall_ticket_mega",
+          name: "mega_hallticket",
           components: [
             {
               type: "header",
@@ -112,8 +111,7 @@ serve(async (req) => {
                 {
                   type: "document",
                   document: {
-                    link: messageBody,
-                    filename: `${registrationNumber}.pdf`
+                    link: messageBody
                   }
                 }
               ]
