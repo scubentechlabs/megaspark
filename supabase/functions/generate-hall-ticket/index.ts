@@ -41,9 +41,9 @@ serve(async (req) => {
       return slot;
     };
     
-    const getReportingTime = (slot: string | null) => {
+     const getReportingTime = (slot: string | null) => {
       if (!slot) return 'TBA';
-      if (slot.toLowerCase() === 'morning') return '7:45 AM';
+      if (slot.toLowerCase() === 'morning') return '8:00 AM';
       if (slot.toLowerCase() === 'afternoon') return '2:30 PM';
       return 'TBA';
     };
@@ -282,7 +282,7 @@ serve(async (req) => {
       color: rgb(0.77, 0.19, 0.19),
     });
 
-    page.drawText('• The reporting time for the exam will be 8:00 a.m.', {
+    page.drawText('• The reporting time for the exam will be 8:00 AM. Exam: 9:00 AM to 10:00 AM.', {
       x: 60,
       y: yPosition - 32,
       size: 9,

@@ -100,13 +100,13 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
 
       <Card className="bg-primary/5 border-primary/20 p-3">
         <p className="text-sm text-foreground">
-          <strong className="text-primary">Time Slot:</strong> Morning Slot — 8:00 AM to 11:00 AM (Reporting: 7:45 AM)
+          <strong className="text-primary">Time Slot:</strong> Morning Slot — 9:00 AM to 10:00 AM (Reporting: 8:00 AM)
         </p>
       </Card>
 
       <Card className="bg-primary/5 border-primary/20 p-4">
         <p className="text-sm text-foreground">
-          <strong className="text-primary">Important:</strong> Each exam center has a maximum capacity of {MAX_CENTER_CAPACITY} students. Please select your preferred exam date and arrive at the exam center by 7:45 AM. Late arrivals will not be permitted.
+          <strong className="text-primary">Important:</strong> Each exam center has a maximum capacity of {MAX_CENTER_CAPACITY} students. Please select your preferred exam date and arrive at the exam center by 8:00 AM. Late arrivals will not be permitted.
         </p>
       </Card>
     </div>
