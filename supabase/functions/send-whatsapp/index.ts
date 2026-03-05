@@ -65,6 +65,7 @@ serve(async (req) => {
     if (messageType === 'registration_confirmation' || templateName === 'megamsg_1') {
       // Send registration confirmation with megamsg_1 template using OfficialWA format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
@@ -94,6 +95,7 @@ serve(async (req) => {
       
       // Send hall ticket template with document using OfficialWA format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
@@ -122,6 +124,7 @@ serve(async (req) => {
     } else if (templateName) {
       // Send template message using OfficialWA format
       apiPayload = {
+        messaging_product: "whatsapp",
         to: formattedPhone,
         recipient_type: "individual",
         type: "template",
