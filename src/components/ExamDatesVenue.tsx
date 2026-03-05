@@ -119,55 +119,6 @@ export const ExamDatesVenue = () => {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="overflow-hidden hover:shadow-hover transition-all duration-300">
-              <img
-                src={schoolBuilding}
-                alt="P.P. Savani CFE Campus"
-                className="w-full h-[300px] object-cover"
-              />
-              <CardContent className="p-6">
-                <h4 className="text-xl font-bold text-foreground mb-2">PP Savani Cfe - Abrama</h4>
-                <p className="text-sm text-muted-foreground">
-                  Abrama Rd, Mota Varachha, Surat, Gujarat 394150 - State-of-the-art facilities with air-conditioned examination halls and 
-                  comfortable seating arrangements for all candidates.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card 
-              className="overflow-hidden hover:shadow-hover transition-all duration-300 cursor-pointer"
-              onClick={() => window.open('https://www.google.com/maps/dir/?api=1&destination=P.P.+Savani+CFE+Abrama+Surat+Gujarat', '_blank')}
-            >
-              <div className="relative h-[300px]">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3719.6614947091847!2d72.89814731493284!3d21.193534985903668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04f2f6b5e6b85%3A0x7e0e1b5f5e6b5e6b!2sP.P.%20Savani%20School!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="P.P. Savani CFE Location"
-                  className="rounded-t-lg pointer-events-none"
-                />
-                <div className="absolute inset-0 bg-transparent hover:bg-primary/5 transition-colors" />
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-1" />
-                  <div>
-                    <h4 className="font-bold text-foreground mb-1">Click for Directions</h4>
-                    <p className="text-sm text-muted-foreground">
-                      PP Savani Cfe<br />
-                      Abrama Rd, Mota Varachha<br />
-                      Surat, Gujarat 394150
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </section>
