@@ -371,8 +371,8 @@ serve(async (req) => {
         const posterImage = await pdfDoc.embedJpg(posterBytes);
 
         // Fit within page margins (compact for single page)
-        const maxWidth = width - 100;
-        const maxHeight = 120; // Reduced from 180
+        const maxWidth = width - 80;
+        const maxHeight = 180;
         const scaleX = maxWidth / posterImage.width;
         const scaleY = maxHeight / posterImage.height;
         const scale = Math.min(scaleX, scaleY, 1);
