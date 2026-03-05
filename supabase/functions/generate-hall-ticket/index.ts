@@ -149,6 +149,60 @@ serve(async (req) => {
       });
     };
 
+    // Helper to wrap text into multiple lines based on max width
+    const wrapText = (text: string, font: any, fontSize: number, maxWidth: number): string[] => {
+      const words = text.split(' ');
+      const lines: string[] = [];
+      let currentLine = '';
+      for (const word of words) {
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+        if (testWidth > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      return lines;
+    };
+
+    // Draw a multi-line info row (returns total height used)
+    const drawMultiLineInfoRow = (label: string, value: string, y: number): number => {
+      page.drawText(label + ':', {
+        x: 50,
+        y,
+        size: 10,
+        font: helveticaBold,
+        color: rgb(0.2, 0.2, 0.2),
+      });
+
+      const maxValueWidth = width - 50 - 220 - 10; // available width for value
+      const lines = wrapText(value, helveticaFont, 10, maxValueWidth);
+      const lineHeight = 13;
+
+      for (let i = 0; i < lines.length; i++) {
+        page.drawText(lines[i], {
+          x: 220,
+          y: y - (i * lineHeight),
+          size: 10,
+          font: helveticaFont,
+          color: rgb(0, 0, 0),
+        });
+      }
+
+      const bottomY = y - ((lines.length - 1) * lineHeight);
+      page.drawLine({
+        start: { x: 50, y: bottomY - 4 },
+        end: { x: width - 50, y: bottomY - 4 },
+        thickness: 0.5,
+        color: rgb(0.8, 0.8, 0.8),
+      });
+
+      return (lines.length - 1) * lineHeight;
+    };
+
     drawInfoRow('Student Name', registration.student_name, yPosition);
     yPosition -= 20;
     
@@ -195,8 +249,8 @@ serve(async (req) => {
       return center;
     };
 
-    drawInfoRow('Exam Center', getExamCenterAddress(registration.exam_center), yPosition);
-    yPosition -= 20;
+    const centerExtraHeight = drawMultiLineInfoRow('Exam Center', getExamCenterAddress(registration.exam_center), yPosition);
+    yPosition -= (20 + centerExtraHeight);
     
     drawInfoRow('Registration No', registration.registration_number || 'Pending', yPosition);
     yPosition -= 20;
