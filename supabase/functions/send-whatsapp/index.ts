@@ -58,7 +58,7 @@ serve(async (req) => {
     console.log('Message record created:', messageRecord.id);
 
     // Use OfficialWA gateway for Meta API
-    const apiUrl = `https://crm.officialwa.com/api/meta/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
+    const apiUrl = `https://crm.officialwa.com/api/meta/v19.0/${META_WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     let apiPayload: any;
 
