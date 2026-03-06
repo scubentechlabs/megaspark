@@ -112,7 +112,8 @@ serve(async (req) => {
                 {
                   type: "document",
                   document: {
-                    link: messageBody
+                    link: messageBody,
+                    filename: `${registrationNumber}.pdf`
                   }
                 }
               ]
