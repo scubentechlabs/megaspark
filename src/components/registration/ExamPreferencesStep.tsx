@@ -19,8 +19,6 @@ const MAX_CENTER_CAPACITY = 2500;
 
 const examCenters = [
   { value: "ABRAMA", label: "PP Savani CFE, Abrama – Surat" },
-  { value: "HIRABAUG", label: "PP Savani School, Hirabaug Varachha – Surat" },
-  { value: "UMRA", label: "Radiant English Academy, Umra Gam – Surat" },
 ];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {

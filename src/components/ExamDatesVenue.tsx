@@ -14,18 +14,6 @@ const examCenters = [
     address: "Abrama Rd, Mota Varachha, Surat, Gujarat 394150",
     mapUrl: "https://maps.app.goo.gl/Ro47DrhhPu9S7UWX6",
   },
-  {
-    name: "PP Savani School, Hirabaug Varachha – Surat",
-    fullName: "PP Savani School – Hirabaug, Varachha",
-    address: "Varachha Main Rd, Bhaktinagar V-2, Near Hirabaug, Surat, Gujarat 395006",
-    mapUrl: "https://maps.app.goo.gl/wtaBX6u7X16Y8DFU6",
-  },
-  {
-    name: "Radiant English Academy, Umra Gam – Surat",
-    fullName: "Radiant English Academy – Umra Gam",
-    address: "Keshav Nagar, Umra Gam, Athwa, Surat, Gujarat 395007",
-    mapUrl: "https://maps.app.goo.gl/p3uwr9uJXbVn8J7u5",
-  },
 ];
 
 export const ExamDatesVenue = () => {
