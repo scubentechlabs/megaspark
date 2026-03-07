@@ -80,21 +80,7 @@ serve(async (req) => {
         }
       };
     } else if (messageType === 'hall_ticket' && messageBody) {
-      // Get registration number - use passed value or fetch from DB
-      let registrationNumber = passedRegNumber || 'Hall-Ticket';
-      if (!passedRegNumber && registrationId) {
-        const { data: regData } = await supabase
-          .from('registrations')
-          .select('registration_number')
-          .eq('id', registrationId)
-          .single();
-        
-        if (regData?.registration_number) {
-          registrationNumber = regData.registration_number;
-        }
-      }
-      
-      // Send hall ticket template with document using OfficialWA format
+      // Send hall ticket template with document using hall_ticket_mega template
       apiPayload = {
         to: formattedPhone,
         recipient_type: "individual",
@@ -104,7 +90,7 @@ serve(async (req) => {
             policy: "deterministic",
             code: "en"
           },
-          name: "mega_hallticket",
+          name: "hall_ticket_mega",
           components: [
             {
               type: "header",
@@ -112,8 +98,7 @@ serve(async (req) => {
                 {
                   type: "document",
                   document: {
-                    link: messageBody,
-                    filename: `${registrationNumber}.pdf`
+                    link: messageBody
                   }
                 }
               ]
