@@ -23,15 +23,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useMaintenanceMode } from "@/hooks/useExamData";
 
 const Index = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { data: isMaintenanceMode, isLoading } = useMaintenanceMode();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPopupOpen(true);
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Don't block rendering for maintenance check - show page immediately
 
