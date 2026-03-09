@@ -44,6 +44,8 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <SelectItem value="8">Standard 8</SelectItem>
             <SelectItem value="9">Standard 9</SelectItem>
             <SelectItem value="10">Standard 10</SelectItem>
+            <SelectItem value="11">Standard 11</SelectItem>
+            <SelectItem value="12">Standard 12</SelectItem>
           </SelectContent>
         </Select>
       </div>
