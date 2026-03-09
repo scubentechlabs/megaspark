@@ -62,7 +62,7 @@ serve(async (req) => {
 
     // Header - Center aligned (optimized for single page)
     const headerText1 = 'P.P. SAVANI GROUP';
-    const headerText2 = 'MEGA SCHOLARSHIP EXAM 2026';
+    const headerText2 = 'MEGHA SPARK SCHOLARSHIP EXAM 2026';
     const headerText3 = 'EXAMINATION HALL TICKET';
     
     page.drawText(headerText1, {
