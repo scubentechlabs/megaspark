@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, MapPin, Clock, ExternalLink, X } from "lucide-react";
 
 const staticExamDates = [
-  { label: "15 March 2026", day_name: "Sunday" },
   { label: "22 March 2026", day_name: "Sunday" },
 ];
 
