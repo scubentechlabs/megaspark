@@ -11,7 +11,6 @@ interface ExamPreferencesStepProps {
 }
 
 const staticExamDates = [
-  { value: "2026-03-15", label: "15 March 2026 - Sunday" },
   { value: "2026-03-22", label: "22 March 2026 - Sunday" },
 ];
 
