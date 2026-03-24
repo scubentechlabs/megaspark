@@ -61,7 +61,7 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
             <SelectValue placeholder="Select exam date" />
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            {staticExamDates.map((date) => (
+            {examDates.map((date) => (
               <SelectItem key={date.value} value={date.value}>
                 {date.label}
               </SelectItem>
