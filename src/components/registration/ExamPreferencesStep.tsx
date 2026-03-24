@@ -18,6 +18,8 @@ const examCenters = [
 ];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
+  const { data: examDates = [] } = useExamDateOptions();
+
   if (!formData.timeSlot) {
     updateFormData({ timeSlot: "morning" });
   }
