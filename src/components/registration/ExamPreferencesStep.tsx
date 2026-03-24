@@ -4,15 +4,12 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useExamDateOptions } from "@/hooks/useExamData";
 
 interface ExamPreferencesStepProps {
   formData: any;
   updateFormData: (data: any) => void;
 }
-
-const staticExamDates = [
-  { value: "2026-03-22", label: "22 March 2026 - Sunday" },
-];
 
 const MAX_CENTER_CAPACITY = 2500;
 
@@ -21,6 +18,8 @@ const examCenters = [
 ];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
+  const { data: examDates = [] } = useExamDateOptions();
+
   if (!formData.timeSlot) {
     updateFormData({ timeSlot: "morning" });
   }
@@ -62,7 +61,7 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
             <SelectValue placeholder="Select exam date" />
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            {staticExamDates.map((date) => (
+            {examDates.map((date) => (
               <SelectItem key={date.value} value={date.value}>
                 {date.label}
               </SelectItem>
