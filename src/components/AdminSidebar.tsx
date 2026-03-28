@@ -23,6 +23,7 @@ export function AdminSidebar() {
   const location = useLocation();
   const [userEmail, setUserEmail] = useState<string>("");
   const { open, setOpen } = useSidebar();
+  const queryClient = useQueryClient();
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
