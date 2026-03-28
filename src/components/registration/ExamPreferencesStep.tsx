@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseProxy";
 import { Badge } from "@/components/ui/badge";
 import { useExamDateOptions } from "@/hooks/useExamData";
+import { Loader2 } from "lucide-react";
 
 interface ExamPreferencesStepProps {
   formData: any;
@@ -18,11 +20,14 @@ const examCenters = [
 ];
 
 export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreferencesStepProps) => {
-  const { data: examDates = [] } = useExamDateOptions();
+  const { data: examDates = [], isLoading: datesLoading, error: datesError } = useExamDateOptions();
 
-  if (!formData.timeSlot) {
-    updateFormData({ timeSlot: "morning" });
-  }
+  // Set default timeSlot via useEffect instead of during render
+  useEffect(() => {
+    if (!formData.timeSlot) {
+      updateFormData({ timeSlot: "morning" });
+    }
+  }, []);
 
   const { data: centerCounts } = useQuery({
     queryKey: ["centerCounts"],
@@ -48,26 +53,39 @@ export const ExamPreferencesStep = ({ formData, updateFormData }: ExamPreference
   };
 
   // Clear selection if selected center became full
-  if (formData.examCenter && isCenterFull(formData.examCenter)) {
-    updateFormData({ examCenter: undefined });
-  }
+  useEffect(() => {
+    if (formData.examCenter && isCenterFull(formData.examCenter)) {
+      updateFormData({ examCenter: undefined });
+    }
+  }, [centerCounts, formData.examCenter]);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="space-y-2">
         <Label htmlFor="examDate">Preferred Exam Date *</Label>
-        <Select value={formData.examDate} onValueChange={(value) => updateFormData({ examDate: value })}>
-          <SelectTrigger className="bg-background">
-            <SelectValue placeholder="Select exam date" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-50">
-            {examDates.map((date) => (
-              <SelectItem key={date.value} value={date.value}>
-                {date.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {datesLoading ? (
+          <div className="flex items-center gap-2 p-3 border rounded-md text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading exam dates...
+          </div>
+        ) : datesError ? (
+          <div className="p-3 border border-destructive/50 rounded-md text-destructive text-sm">
+            Failed to load exam dates. Please refresh the page.
+          </div>
+        ) : (
+          <Select value={formData.examDate} onValueChange={(value) => updateFormData({ examDate: value })}>
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Select exam date" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-50">
+              {examDates.map((date) => (
+                <SelectItem key={date.value} value={date.value}>
+                  {date.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <div className="space-y-2">
