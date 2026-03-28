@@ -114,6 +114,7 @@ export default function AdminLogin() {
             });
           } catch {}
 
+          setLoginAttempts(0);
           toast({ title: "Login Successful", description: "Welcome to the admin panel" });
           navigate("/admin");
           setIsLoading(false);
