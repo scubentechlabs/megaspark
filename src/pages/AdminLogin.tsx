@@ -15,6 +15,8 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -39,6 +41,17 @@ export default function AdminLogin() {
       toast({
         title: "Missing Information",
         description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+    // Rate limiting: lock out after 5 failed attempts for 2 minutes
+    const now = Date.now();
+    if (lockoutUntil > now) {
+      const secondsLeft = Math.ceil((lockoutUntil - now) / 1000);
+      toast({
+        title: "Account Locked",
+        description: `Too many failed attempts. Try again in ${secondsLeft} seconds.`,
         variant: "destructive",
       });
       return;
@@ -101,6 +114,7 @@ export default function AdminLogin() {
             });
           } catch {}
 
+          setLoginAttempts(0);
           toast({ title: "Login Successful", description: "Welcome to the admin panel" });
           navigate("/admin");
           setIsLoading(false);
@@ -112,6 +126,12 @@ export default function AdminLogin() {
           continue;
         }
         console.error("Login error:", error);
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        if (newAttempts >= 5) {
+          setLockoutUntil(Date.now() + 120000); // 2 minute lockout
+          setLoginAttempts(0);
+        }
         toast({
           title: "Login Failed",
           description: error.message || "Invalid email or password",

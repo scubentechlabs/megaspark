@@ -31,8 +31,15 @@ serve(async (req) => {
     const requestData: CreateOrderRequest = await req.json();
     const { amount, studentName, mobileNumber, email, discountAmount, couponCode } = requestData;
 
-    if (!amount || amount <= 0) {
+    // Input validation
+    if (!amount || typeof amount !== 'number' || amount <= 0 || amount > 100000) {
       throw new Error('Invalid amount');
+    }
+    if (!studentName || typeof studentName !== 'string' || studentName.length > 200) {
+      throw new Error('Invalid student name');
+    }
+    if (!mobileNumber || typeof mobileNumber !== 'string' || !/^\d{10}$/.test(mobileNumber.replace(/\D/g, '').slice(-10))) {
+      throw new Error('Invalid mobile number');
     }
 
     // Create Razorpay order

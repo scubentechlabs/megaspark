@@ -18,6 +18,15 @@ serve(async (req) => {
 
   try {
     const { registrationId, isUpdate } = await req.json();
+    
+    // Input validation
+    if (!registrationId || typeof registrationId !== 'string' || registrationId.length > 100) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid registration ID' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     console.log('Generating hall ticket for registration:', registrationId);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

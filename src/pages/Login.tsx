@@ -48,6 +48,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [lastAttemptTime, setLastAttemptTime] = useState(0);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,13 +62,25 @@ export default function Login() {
       return;
     }
 
+    // Rate limiting: max 5 attempts per minute
+    const now = Date.now();
+    if (now - lastAttemptTime < 60000 && attemptCount >= 5) {
+      toast.error("Too Many Attempts", {
+        description: "Please wait a minute before trying again.",
+      });
+      return;
+    }
+    if (now - lastAttemptTime >= 60000) {
+      setAttemptCount(0);
+    }
+    setAttemptCount(prev => prev + 1);
+    setLastAttemptTime(now);
+
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .eq("mobile_number", mobileNumber);
+        .rpc("get_registrations_by_mobile", { _mobile: mobileNumber });
 
       if (error) throw error;
 

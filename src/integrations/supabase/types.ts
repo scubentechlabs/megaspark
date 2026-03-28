@@ -575,6 +575,56 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_registrations_by_mobile: {
+        Args: { _mobile: string }
+        Returns: {
+          address: string | null
+          building_name: string | null
+          city: string | null
+          class_rank: string | null
+          created_at: string
+          date_of_birth: string | null
+          district: string | null
+          email: string | null
+          exam_center: string
+          exam_date: string | null
+          exam_pattern: string | null
+          floor: string | null
+          gender: string | null
+          hall_ticket_url: string | null
+          id: string
+          marksheet_url: string | null
+          medium: string | null
+          mobile_number: string
+          olympiad_appeared: string | null
+          olympiad_certificate_url: string | null
+          parent_email: string | null
+          parent_first_name: string | null
+          parent_last_name: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          preferred_exam_date: string | null
+          previous_year_percentage: string | null
+          registration_number: string | null
+          room_no: string | null
+          school_address: string | null
+          school_medium: string | null
+          school_name: string | null
+          standard: string
+          state: string | null
+          status: string
+          student_name: string
+          time_slot: string | null
+          updated_at: string
+          whatsapp_number: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "registrations"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
