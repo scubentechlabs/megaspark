@@ -80,9 +80,7 @@ export default function Login() {
 
     try {
       const { data, error } = await supabase
-        .from("registrations")
-        .select("*")
-        .eq("mobile_number", mobileNumber);
+        .rpc("get_registrations_by_mobile", { _mobile: mobileNumber });
 
       if (error) throw error;
 
