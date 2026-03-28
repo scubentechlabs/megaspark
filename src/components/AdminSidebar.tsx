@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock, Calendar } from "lucide-react";
 import logo from "@/assets/logo.png";
-import { supabase } from "@/lib/supabaseProxy";
+import { forceLocalSignOut, supabase } from "@/lib/supabaseProxy";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,6 @@ export function AdminSidebar() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Mark current session as inactive
       if (session?.user) {
         await supabase
           .from('admin_sessions')
@@ -70,10 +69,15 @@ export function AdminSidebar() {
           .eq('is_active', true);
       }
 
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error && !/session not found/i.test(error.message)) {
+        throw error;
+      }
+
+      await forceLocalSignOut();
       queryClient.clear();
       toast.success("Logged out successfully");
-      navigate("/admin/login");
+      navigate("/admin/login", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Failed to logout");
