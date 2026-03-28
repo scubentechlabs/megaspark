@@ -126,6 +126,12 @@ export default function AdminLogin() {
           continue;
         }
         console.error("Login error:", error);
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        if (newAttempts >= 5) {
+          setLockoutUntil(Date.now() + 120000); // 2 minute lockout
+          setLoginAttempts(0);
+        }
         toast({
           title: "Login Failed",
           description: error.message || "Invalid email or password",
