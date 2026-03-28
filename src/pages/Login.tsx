@@ -62,6 +62,20 @@ export default function Login() {
       return;
     }
 
+    // Rate limiting: max 5 attempts per minute
+    const now = Date.now();
+    if (now - lastAttemptTime < 60000 && attemptCount >= 5) {
+      toast.error("Too Many Attempts", {
+        description: "Please wait a minute before trying again.",
+      });
+      return;
+    }
+    if (now - lastAttemptTime >= 60000) {
+      setAttemptCount(0);
+    }
+    setAttemptCount(prev => prev + 1);
+    setLastAttemptTime(now);
+
     setIsLoading(true);
 
     try {
