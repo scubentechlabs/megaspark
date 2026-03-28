@@ -42,12 +42,9 @@ const fetchActiveExamDates = async (): Promise<ExamDate[]> => {
 };
 
 const fetchMaintenanceMode = async (): Promise<boolean> => {
-  const { data, error } = await supabase
-    .from("settings")
-    .select("maintenance_mode")
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('get_maintenance_mode');
   if (error) throw error;
-  if (!data?.maintenance_mode) return false;
+  if (!data) return false;
   const hostname = window.location.hostname;
   const isLovable = hostname.includes("lovable.app") || hostname.includes("lovableproject.com");
   return !isLovable;
