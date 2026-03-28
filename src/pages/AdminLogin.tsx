@@ -15,6 +15,8 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
