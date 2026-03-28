@@ -51,18 +51,13 @@ const fetchMaintenanceMode = async (): Promise<boolean> => {
 };
 
 const fetchSlotSettings = async (): Promise<SlotSetting[]> => {
-  const { data, error } = await supabase
-    .from("slot_settings")
-    .select("*")
-    .order("slot_name");
+  const { data, error } = await supabase.rpc('get_enabled_slot_settings');
   if (error) throw error;
   return (data as SlotSetting[]) || [];
 };
 
 const fetchDateSlotSettings = async (): Promise<SlotDateSetting[]> => {
-  const { data, error } = await supabase
-    .from("slot_date_settings")
-    .select("*");
+  const { data, error } = await supabase.rpc('get_enabled_slot_date_settings');
   if (error) throw error;
   return (data as SlotDateSetting[]) || [];
 };
