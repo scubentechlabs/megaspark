@@ -10,6 +10,45 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const PROXY_URL = `${SUPABASE_URL}/functions/v1/supabase-proxy`;
 
+const AUTH_STORAGE_KEY_PATTERN = /^sb-.*-auth-token$/;
+
+function getDerivedAuthStorageKey() {
+  try {
+    const projectRef = new URL(SUPABASE_URL).host.split('.')[0];
+    return `sb-${projectRef}-auth-token`;
+  } catch {
+    return null;
+  }
+}
+
+export function clearStoredAuthSession() {
+  if (typeof window === 'undefined') return;
+
+  const derivedKey = getDerivedAuthStorageKey();
+  const storageKeys = new Set<string>();
+
+  if (derivedKey) {
+    storageKeys.add(derivedKey);
+  }
+
+  for (const key of Object.keys(window.localStorage)) {
+    if (AUTH_STORAGE_KEY_PATTERN.test(key)) {
+      storageKeys.add(key);
+    }
+  }
+
+  for (const key of Object.keys(window.sessionStorage)) {
+    if (AUTH_STORAGE_KEY_PATTERN.test(key)) {
+      storageKeys.add(key);
+    }
+  }
+
+  storageKeys.forEach((key) => {
+    window.localStorage.removeItem(key);
+    window.sessionStorage.removeItem(key);
+  });
+}
+
 /**
  * Custom fetch that intercepts Supabase HTTP requests and routes them
  * through the proxy edge function. The apikey header is stripped from
@@ -76,8 +115,16 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, 
 
 
 export async function forceLocalSignOut() {
+  let signOutError: Error | null = null;
+
   const { error } = await supabase.auth.signOut({ scope: 'local' });
-  if (error) {
-    throw error;
+  clearStoredAuthSession();
+
+  if (error && !/session not found/i.test(error.message)) {
+    signOutError = error;
+  }
+
+  if (signOutError) {
+    throw signOutError;
   }
 }
