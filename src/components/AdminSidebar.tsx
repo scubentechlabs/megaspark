@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock, Calendar } from "lucide-react";
 import logo from "@/assets/logo.png";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";

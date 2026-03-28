@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Smartphone, CreditCard, Wallet, CheckCircle2, Loader2, Tag, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 
 interface PaymentStepProps {
   onPaymentComplete: (orderId: string) => Promise<void>;
