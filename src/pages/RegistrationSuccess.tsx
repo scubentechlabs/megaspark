@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 
 const RegistrationSuccess = () => {
   const navigate = useNavigate();

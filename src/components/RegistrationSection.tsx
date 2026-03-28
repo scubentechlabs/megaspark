@@ -8,7 +8,7 @@ import { ParentSchoolStep } from "./registration/ParentSchoolStep";
 import { ExamPreferencesStep } from "./registration/ExamPreferencesStep";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 
 export const RegistrationSection = () => {
   const navigate = useNavigate();

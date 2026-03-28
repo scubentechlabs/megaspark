@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 
 export const Newsletter = () => {
   const [email, setEmail] = useState("");

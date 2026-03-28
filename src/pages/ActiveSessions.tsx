@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseProxy";
 import { useToast } from "@/hooks/use-toast";
 import { LogOut, RefreshCw, User, MapPin, Clock, Monitor } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
