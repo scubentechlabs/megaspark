@@ -30,144 +30,96 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    // Disable right-click
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      return false;
+    let isBlocked = false;
+    const blockPage = () => {
+      if (isBlocked) return;
+      isBlocked = true;
+      try {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0a;color:#fff;"><div style="text-align:center;"><h1 style="font-size:2rem;margin-bottom:1rem;">⚠️ Access Denied</h1><p>Developer tools are not allowed on this website.</p><p style="margin-top:1rem;color:#888;">Please close developer tools and refresh the page.</p></div></div>';
+      } catch {}
     };
 
-    // Disable all developer tools shortcuts
+    // 1. Disable right-click
+    const handleContextMenu = (e: MouseEvent) => { e.preventDefault(); return false; };
+
+    // 2. Block all dev tools shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
-      // F12 - Developer tools
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      
-      // Ctrl+Shift+I - Developer tools
-      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      
-      // Ctrl+Shift+J - Console
-      if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      
-      // Ctrl+Shift+C - Element inspector
-      if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Ctrl+Shift+E - Network tab (Firefox)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'E' || e.key === 'e' || e.keyCode === 69)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Ctrl+Shift+K - Console (Firefox)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k' || e.keyCode === 75)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Ctrl+Shift+M - Responsive design mode
-      if (e.ctrlKey && e.shiftKey && (e.key === 'M' || e.key === 'm' || e.keyCode === 77)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-      
-      // Ctrl+U - View source
-      if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Ctrl+S - Save page
-      if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.keyCode === 83)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Cmd+Option+I (Mac) - Developer tools
-      if (e.metaKey && e.altKey && (e.key === 'i' || e.key === 'I' || e.keyCode === 73)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Cmd+Option+J (Mac) - Console
-      if (e.metaKey && e.altKey && (e.key === 'j' || e.key === 'J' || e.keyCode === 74)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Cmd+Option+C (Mac) - Inspector
-      if (e.metaKey && e.altKey && (e.key === 'c' || e.key === 'C' || e.keyCode === 67)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-
-      // Cmd+Option+U (Mac) - View source
-      if (e.metaKey && e.altKey && (e.key === 'u' || e.key === 'U' || e.keyCode === 85)) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
+      if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); return false; }
+      if (e.ctrlKey && e.shiftKey && /^[IJCEKMijcekm]$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); return false; }
+      if (e.ctrlKey && /^[uUsS]$/.test(e.key) && !e.shiftKey && !e.altKey) { e.preventDefault(); e.stopPropagation(); return false; }
+      if (e.metaKey && e.altKey && /^[IJCUijcu]$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); return false; }
     };
 
-    // Disable text selection on body (prevents copy of content)
+    // 3. Disable selection, drag, copy
     const handleSelectStart = (e: Event) => {
-      const target = e.target as HTMLElement;
-      // Allow selection in input fields and textareas
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-        return true;
-      }
-      e.preventDefault();
-      return false;
+      const t = e.target as HTMLElement;
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return true;
+      e.preventDefault(); return false;
     };
-
-    // Disable drag
-    const handleDragStart = (e: DragEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // Disable copy (except in input/textarea)
+    const handleDragStart = (e: DragEvent) => { e.preventDefault(); return false; };
     const handleCopy = (e: ClipboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        return true;
-      }
-      e.preventDefault();
-      return false;
+      const t = e.target as HTMLElement;
+      if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') return true;
+      e.preventDefault(); return false;
     };
 
-    // DevTools detection via debugger timing
-    let devtoolsCheckInterval: ReturnType<typeof setInterval>;
-    const checkDevTools = () => {
+    // 4. DevTools detection: window size diff
+    const checkWindowSize = () => {
       const threshold = 160;
-      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-      if (widthThreshold || heightThreshold) {
-        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0a;color:#fff;"><div style="text-align:center;"><h1 style="font-size:2rem;margin-bottom:1rem;">⚠️ Access Denied</h1><p>Developer tools are not allowed on this website.</p></div></div>';
+      if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+        blockPage();
       }
     };
-    devtoolsCheckInterval = setInterval(checkDevTools, 1000);
+
+    // 5. DevTools detection: debugger timing
+    const checkDebuggerTiming = () => {
+      const start = performance.now();
+      // eslint-disable-next-line no-debugger
+      debugger;
+      const duration = performance.now() - start;
+      if (duration > 100) {
+        blockPage();
+      }
+    };
+
+    // 6. DevTools detection: console-based (image trick)
+    const checkConsoleOpen = () => {
+      const element = new Image();
+      let consoleOpen = false;
+      Object.defineProperty(element, 'id', {
+        get: () => {
+          consoleOpen = true;
+          blockPage();
+          return '';
+        },
+      });
+      // Accessing console.log with the element triggers getter if DevTools console is open
+      console.log('%c', element as any);
+      console.clear();
+    };
+
+    // 7. Neutralize console to prevent data leakage
+    const noop = () => {};
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+      Object.keys(console).forEach((key) => {
+        try { (console as any)[key] = noop; } catch {}
+      });
+    }
+    // Always clear console periodically
+    const consoleClearInterval = setInterval(() => {
+      try { console.clear(); } catch {}
+    }, 500);
+
+    // 8. Run all detection checks
+    const detectionInterval = setInterval(() => {
+      checkWindowSize();
+      try { checkConsoleOpen(); } catch {}
+    }, 1000);
+
+    // Run debugger check less frequently (it pauses execution when DevTools open)
+    const debuggerInterval = setInterval(() => {
+      try { checkDebuggerTiming(); } catch {}
+    }, 3000);
 
     document.addEventListener('contextmenu', handleContextMenu, true);
     document.addEventListener('keydown', handleKeyDown, true);
@@ -181,7 +133,9 @@ const App = () => {
       document.removeEventListener('selectstart', handleSelectStart);
       document.removeEventListener('dragstart', handleDragStart);
       document.removeEventListener('copy', handleCopy);
-      clearInterval(devtoolsCheckInterval);
+      clearInterval(detectionInterval);
+      clearInterval(debuggerInterval);
+      clearInterval(consoleClearInterval);
     };
   }, []);
 
