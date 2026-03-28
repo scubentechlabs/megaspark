@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock, Calendar } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/lib/supabaseProxy";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -22,6 +23,7 @@ export function AdminSidebar() {
   const location = useLocation();
   const [userEmail, setUserEmail] = useState<string>("");
   const { open, setOpen } = useSidebar();
+  const queryClient = useQueryClient();
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
@@ -69,6 +71,7 @@ export function AdminSidebar() {
       }
 
       await supabase.auth.signOut();
+      queryClient.clear();
       toast.success("Logged out successfully");
       navigate("/admin/login");
     } catch (error) {

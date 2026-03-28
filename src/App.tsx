@@ -25,6 +25,7 @@ import ActiveSessions from "./pages/ActiveSessions";
 import UserManagement from "./pages/UserManagement";
 import SlotManagement from "./pages/SlotManagement";
 import ExamDateManagement from "./pages/ExamDateManagement";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -148,18 +149,18 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/active-sessions" element={<ActiveSessions />} />
-        <Route path="/admin/user-management" element={<UserManagement />} />
-        <Route path="/admin/slots" element={<SlotManagement />} />
-        <Route path="/admin/exam-dates" element={<ExamDateManagement />} />
-        <Route path="/admin/coupons" element={<Coupons />} />
-        <Route path="/admin/whatsapp" element={<WhatsAppManagement />} />
-        <Route path="/admin/newsletter" element={<NewsletterManagement />} />
-        <Route path="/admin/reports" element={<Reports />} />
-        <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin/active-sessions" element={<ProtectedRoute><ActiveSessions /></ProtectedRoute>} />
+        <Route path="/admin/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/slots" element={<ProtectedRoute><SlotManagement /></ProtectedRoute>} />
+        <Route path="/admin/exam-dates" element={<ProtectedRoute><ExamDateManagement /></ProtectedRoute>} />
+        <Route path="/admin/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
+        <Route path="/admin/whatsapp" element={<ProtectedRoute><WhatsAppManagement /></ProtectedRoute>} />
+        <Route path="/admin/newsletter" element={<ProtectedRoute><NewsletterManagement /></ProtectedRoute>} />
+        <Route path="/admin/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
