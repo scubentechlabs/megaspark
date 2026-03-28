@@ -98,6 +98,45 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           code: string
@@ -575,6 +614,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_enabled_slot_date_settings: {
+        Args: never
+        Returns: {
+          exam_date: string
+          id: string
+          is_enabled: boolean
+          slot_name: string
+        }[]
+      }
+      get_enabled_slot_settings: {
+        Args: never
+        Returns: {
+          current_count: number
+          id: string
+          is_enabled: boolean
+          max_capacity: number
+          reporting_time: string
+          slot_name: string
+        }[]
+      }
       get_maintenance_mode: { Args: never; Returns: boolean }
       get_registrations_by_mobile: {
         Args: { _mobile: string }
