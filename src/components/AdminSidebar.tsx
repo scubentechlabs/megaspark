@@ -71,6 +71,7 @@ export function AdminSidebar() {
       }
 
       await supabase.auth.signOut();
+      queryClient.clear();
       toast.success("Logged out successfully");
       navigate("/admin/login");
     } catch (error) {
