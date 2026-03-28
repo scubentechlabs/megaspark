@@ -34,41 +34,17 @@ export const PaymentStep = ({ onPaymentComplete, formData }: PaymentStepProps) =
 
     setIsValidatingCoupon(true);
     try {
-      const { data, error } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('code', couponCode.toUpperCase().trim())
-        .eq('is_active', true)
-        .single();
+      const { data, error } = await supabase.functions.invoke('validate-coupon', {
+        body: { code: couponCode.toUpperCase().trim() },
+      });
 
-      if (error || !data) {
-        toast.error('Invalid coupon code');
+      if (error || !data?.success) {
+        toast.error(data?.error || 'Invalid coupon code');
         return;
       }
 
-      // Check validity period
-      const now = new Date();
-      const validFrom = new Date(data.valid_from);
-      const validUntil = data.valid_until ? new Date(data.valid_until) : null;
-
-      if (now < validFrom) {
-        toast.error('This coupon is not yet valid');
-        return;
-      }
-
-      if (validUntil && now > validUntil) {
-        toast.error('This coupon has expired');
-        return;
-      }
-
-      // Check usage limit
-      if (data.max_uses && data.current_uses >= data.max_uses) {
-        toast.error('This coupon has reached its usage limit');
-        return;
-      }
-
-      setAppliedCoupon(data);
-      toast.success(`Coupon applied! You saved ${data.discount_type === 'percentage' ? `${data.discount_value}%` : `₹${data.discount_value}`}`);
+      setAppliedCoupon(data.coupon);
+      toast.success(`Coupon applied! You saved ${data.coupon.discount_type === 'percentage' ? `${data.coupon.discount_value}%` : `₹${data.coupon.discount_value}`}`);
     } catch (error: any) {
       toast.error('Failed to validate coupon');
       console.error(error);
