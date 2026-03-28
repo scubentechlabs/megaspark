@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { supabase } from "@/lib/supabaseProxy";
+import { forceLocalSignOut, supabase } from "@/lib/supabaseProxy";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Download, LogOut, Printer, Users, Calendar, Edit, Send, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
@@ -78,6 +78,18 @@ export default function Admin() {
     checkAuth();
   }, []);
 
+  const redirectToLogin = () => {
+    navigate("/admin/login", { replace: true });
+
+    if (typeof window !== "undefined") {
+      window.setTimeout(() => {
+        if (window.location.pathname !== "/admin/login") {
+          window.location.replace("/admin/login");
+        }
+      }, 0);
+    }
+  };
+
   useEffect(() => {
     // Set up realtime subscription for registrations
     const channel = supabase
@@ -118,19 +130,42 @@ export default function Admin() {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        await supabase
+          .from('admin_sessions')
+          .update({
+            is_active: false,
+            logout_time: new Date().toISOString()
+          })
+          .eq('user_id', session.user.id)
+          .eq('is_active', true);
+      }
+
+      await forceLocalSignOut();
+
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch {}
+
       toast({
         title: "Logged Out",
         description: "You have been logged out successfully",
       });
-      navigate("/admin/login");
     } catch (error) {
       console.error("Logout error:", error);
+      try {
+        await forceLocalSignOut();
+      } catch {}
+
       toast({
         title: "Error",
-        description: "Failed to logout",
+        description: "We cleared your local session and are redirecting you to login.",
         variant: "destructive",
       });
+    } finally {
+      redirectToLogin();
     }
   };
 
