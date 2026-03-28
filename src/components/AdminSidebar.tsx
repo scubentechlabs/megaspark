@@ -69,18 +69,23 @@ export function AdminSidebar() {
           .eq('is_active', true);
       }
 
-      const { error } = await supabase.auth.signOut();
-      if (error && !/session not found/i.test(error.message)) {
-        throw error;
-      }
-
-      await forceLocalSignOut();
+      // Clear local session first (always works), then attempt server logout
       queryClient.clear();
+      await supabase.auth.signOut({ scope: 'local' });
+      
+      // Best-effort server-side logout (may fail in preview env)
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch {}
+
       toast.success("Logged out successfully");
       navigate("/admin/login", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Failed to logout");
+      // Even if something fails, force clear local auth state
+      queryClient.clear();
+      try { await supabase.auth.signOut({ scope: 'local' }); } catch {}
+      navigate("/admin/login", { replace: true });
     }
   };
 
