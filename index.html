@@ -38,6 +38,38 @@
 </head>
 
   <body>
+    <!-- Pre-load DevTools blocker - runs before ANY network request -->
+    <script>
+    (function(){
+      var b=false;
+      function k(){
+        if(b)return;b=true;
+        try{document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0a;color:#fff"><div style="text-align:center"><h1 style="font-size:2rem;margin-bottom:1rem">⚠️ Access Denied</h1><p>Developer tools are not allowed.</p><p style="margin-top:1rem;color:#888">Close developer tools and refresh.</p></div></div>';}catch(e){}
+        try{window.stop();}catch(e){}
+      }
+      // Window size detection
+      function c(){
+        if(window.outerWidth-window.innerWidth>160||window.outerHeight-window.innerHeight>160)k();
+      }
+      c();
+      // Debugger timing
+      try{var s=performance.now();debugger;if(performance.now()-s>100)k();}catch(e){}
+      // Continuous checks
+      setInterval(c,800);
+      setInterval(function(){try{var s=performance.now();debugger;if(performance.now()-s>100)k();}catch(e){}},2500);
+      // Block shortcuts
+      document.addEventListener('keydown',function(e){
+        if(e.key==='F12'||e.keyCode===123){e.preventDefault();e.stopPropagation();return false;}
+        if(e.ctrlKey&&e.shiftKey&&/^[IJCEKMijcekm]$/.test(e.key)){e.preventDefault();e.stopPropagation();return false;}
+        if(e.ctrlKey&&/^[uUsS]$/.test(e.key)&&!e.shiftKey&&!e.altKey){e.preventDefault();e.stopPropagation();return false;}
+        if(e.metaKey&&e.altKey&&/^[IJCUijcu]$/.test(e.key)){e.preventDefault();e.stopPropagation();return false;}
+      },true);
+      document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},true);
+      // Neutralize console
+      var n=function(){};try{Object.keys(console).forEach(function(k){try{console[k]=n;}catch(e){}});}catch(e){}
+      setInterval(function(){try{console.clear();}catch(e){}},400);
+    })();
+    </script>
     <!-- Meta Pixel Code - noscript fallback -->
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1158921413083101&ev=PageView&noscript=1"
