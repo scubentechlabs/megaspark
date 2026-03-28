@@ -32,13 +32,11 @@ export interface SlotDateSetting {
 }
 
 const fetchActiveExamDates = async (): Promise<ExamDate[]> => {
-  console.log('[DEBUG] fetchActiveExamDates called');
   const { data, error } = await supabase
     .from("exam_dates")
     .select("*")
     .eq("is_active", true)
     .order("exam_date", { ascending: true });
-  console.log('[DEBUG] exam_dates response:', { data, error });
   if (error) throw error;
   return (data as ExamDate[]) || [];
 };
