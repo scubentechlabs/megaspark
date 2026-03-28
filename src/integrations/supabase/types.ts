@@ -575,6 +575,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_maintenance_mode: { Args: never; Returns: boolean }
       get_registrations_by_mobile: {
         Args: { _mobile: string }
         Returns: {
