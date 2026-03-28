@@ -25,6 +25,7 @@ import ActiveSessions from "./pages/ActiveSessions";
 import UserManagement from "./pages/UserManagement";
 import SlotManagement from "./pages/SlotManagement";
 import ExamDateManagement from "./pages/ExamDateManagement";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
