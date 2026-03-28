@@ -45,6 +45,17 @@ export default function AdminLogin() {
       });
       return;
     }
+    // Rate limiting: lock out after 5 failed attempts for 2 minutes
+    const now = Date.now();
+    if (lockoutUntil > now) {
+      const secondsLeft = Math.ceil((lockoutUntil - now) / 1000);
+      toast({
+        title: "Account Locked",
+        description: `Too many failed attempts. Try again in ${secondsLeft} seconds.`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsLoading(true);
 
