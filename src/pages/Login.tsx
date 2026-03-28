@@ -48,6 +48,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [lastAttemptTime, setLastAttemptTime] = useState(0);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
