@@ -20,7 +20,23 @@ serve(async (req) => {
 
   let messageId: string | null = null;
   try {
-    const { phoneNumber, messageType, registrationId, messageBody, templateName, variables, registrationNumber: passedRegNumber } = await req.json();
+    const body = await req.json();
+    const { phoneNumber, messageType, registrationId, messageBody, templateName, variables, registrationNumber: passedRegNumber } = body;
+    
+    // Input validation
+    if (!phoneNumber || typeof phoneNumber !== 'string' || phoneNumber.length > 20) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid phone number' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (!messageType || typeof messageType !== 'string' || messageType.length > 50) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid message type' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     console.log('Sending WhatsApp message:', { phoneNumber, messageType, registrationId });
     // messageId declared above for catch scope
 
