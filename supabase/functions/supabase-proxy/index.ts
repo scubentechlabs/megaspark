@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-target-path, x-target-method, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version, prefer, range, x-upsert',
+  'Access-Control-Allow-Headers': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Expose-Headers': 'content-range, x-total-count, content-type, apikey',
 };
@@ -16,6 +16,15 @@ serve(async (req) => {
   }
 
   try {
+    // Validate env vars
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.error('Missing env vars:', { hasUrl: !!SUPABASE_URL, hasKey: !!SUPABASE_ANON_KEY });
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const targetPath = req.headers.get('x-target-path');
     if (!targetPath) {
       return new Response(
@@ -49,10 +58,11 @@ serve(async (req) => {
     const upstreamHeaders = new Headers();
     upstreamHeaders.set('apikey', SUPABASE_ANON_KEY);
 
-    // Forward relevant headers
+    // Forward all relevant headers from client
     const forwardHeaders = [
       'authorization', 'content-type', 'prefer', 'range',
       'x-client-info', 'x-upsert', 'accept',
+      'accept-profile', 'content-profile',
       'x-supabase-client-platform', 'x-supabase-client-platform-version',
       'x-supabase-client-runtime', 'x-supabase-client-runtime-version',
     ];
