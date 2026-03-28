@@ -116,6 +116,7 @@ export default function AdminLogin() {
           } catch {}
 
           setLoginAttempts(0);
+          await logAuditEvent('admin_login', 'admin_sessions', data.session.user.id, { email, ip: ipAddress, city, country });
           toast({ title: "Login Successful", description: "Welcome to the admin panel" });
           navigate("/admin");
           setIsLoading(false);
