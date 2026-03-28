@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, Mail, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { logAuditEvent } from "@/lib/auditLogger";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
