@@ -31,6 +31,24 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
+    const hostname = window.location.hostname;
+    const isLovableHost =
+      hostname.includes("lovable.app") ||
+      hostname.includes("lovableproject.com") ||
+      hostname === "localhost";
+
+    const isInIframe = (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+
+    if (isLovableHost || isInIframe) {
+      return;
+    }
+
     let isBlocked = false;
     const blockPage = () => {
       if (isBlocked) return;
@@ -40,10 +58,8 @@ const App = () => {
       } catch {}
     };
 
-    // 1. Disable right-click
     const handleContextMenu = (e: MouseEvent) => { e.preventDefault(); return false; };
 
-    // 2. Block all dev tools shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); e.stopPropagation(); return false; }
       if (e.ctrlKey && e.shiftKey && /^[IJCEKMijcekm]$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); return false; }
@@ -51,7 +67,6 @@ const App = () => {
       if (e.metaKey && e.altKey && /^[IJCUijcu]$/.test(e.key)) { e.preventDefault(); e.stopPropagation(); return false; }
     };
 
-    // 3. Disable selection, drag, copy
     const handleSelectStart = (e: Event) => {
       const t = e.target as HTMLElement;
       if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable) return true;
@@ -64,7 +79,6 @@ const App = () => {
       e.preventDefault(); return false;
     };
 
-    // 4. DevTools detection: window size diff
     const checkWindowSize = () => {
       const threshold = 160;
       if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
@@ -72,10 +86,8 @@ const App = () => {
       }
     };
 
-    // 5. DevTools detection: debugger timing
     const checkDebuggerTiming = () => {
       const start = performance.now();
-      // eslint-disable-next-line no-debugger
       debugger;
       const duration = performance.now() - start;
       if (duration > 100) {
@@ -83,41 +95,34 @@ const App = () => {
       }
     };
 
-    // 6. DevTools detection: console-based (image trick)
     const checkConsoleOpen = () => {
       const element = new Image();
-      let consoleOpen = false;
       Object.defineProperty(element, 'id', {
         get: () => {
-          consoleOpen = true;
           blockPage();
           return '';
         },
       });
-      // Accessing console.log with the element triggers getter if DevTools console is open
       console.log('%c', element as any);
       console.clear();
     };
 
-    // 7. Neutralize console to prevent data leakage
     const noop = () => {};
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined' && import.meta.env.PROD) {
       Object.keys(console).forEach((key) => {
         try { (console as any)[key] = noop; } catch {}
       });
     }
-    // Always clear console periodically
+
     const consoleClearInterval = setInterval(() => {
       try { console.clear(); } catch {}
     }, 500);
 
-    // 8. Run all detection checks
     const detectionInterval = setInterval(() => {
       checkWindowSize();
       try { checkConsoleOpen(); } catch {}
     }, 1000);
 
-    // Run debugger check less frequently (it pauses execution when DevTools open)
     const debuggerInterval = setInterval(() => {
       try { checkDebuggerTiming(); } catch {}
     }, 3000);
