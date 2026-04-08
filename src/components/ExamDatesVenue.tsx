@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Clock, ExternalLink, X } from "lucide-react";
-
-const staticExamDates = [
-  { label: "22 March 2026", day_name: "Sunday" },
-];
+import { Calendar, MapPin, Clock, ExternalLink, X, Loader2 } from "lucide-react";
+import { useActiveExamDates } from "@/hooks/useExamData";
 
 const examCenters = [
   {
@@ -17,6 +14,7 @@ const examCenters = [
 
 export const ExamDatesVenue = () => {
   const [selectedCenter, setSelectedCenter] = useState<string | null>(null);
+  const { data: examDates = [], isLoading } = useActiveExamDates();
 
   const activeCenter = examCenters.find((c) => c.name === selectedCenter);
 
@@ -34,7 +32,7 @@ export const ExamDatesVenue = () => {
             Exam Dates & <span className="text-accent">Venue</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Mark your calendar for all exam dates in March 2026
+            Mark your calendar for the upcoming exam dates
           </p>
         </div>
 
@@ -43,26 +41,35 @@ export const ExamDatesVenue = () => {
           <div className="max-w-5xl mx-auto">
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-accent">
               <CardContent className="p-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-                  {staticExamDates.map((exam, idx) => {
-                    const parts = exam.label.split(' ');
-                    const dateNum = parts[0] || '';
-                    const month = parts[1] || '';
-                    return (
-                      <div
-                        key={idx}
-                        className="text-center p-4 border-2 border-accent rounded-lg bg-background"
-                      >
-                        <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
-                          <Calendar className="h-7 w-7" />
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <span className="ml-2 text-muted-foreground">Loading exam dates...</span>
+                  </div>
+                ) : examDates.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No exam dates available yet.</p>
+                ) : (
+                  <div className={`grid ${examDates.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-2 md:grid-cols-4'} gap-6 mb-6`}>
+                    {examDates.map((exam) => {
+                      const parts = exam.label.split(' ');
+                      const dateNum = parts[0] || '';
+                      const month = parts.slice(1).join(' ') || '';
+                      return (
+                        <div
+                          key={exam.id}
+                          className="text-center p-4 border-2 border-accent rounded-lg bg-background"
+                        >
+                          <div className="mb-3 h-14 w-14 mx-auto rounded-full flex items-center justify-center bg-accent/10 text-accent">
+                            <Calendar className="h-7 w-7" />
+                          </div>
+                          <div className="text-2xl font-bold mb-1 text-foreground">{dateNum}</div>
+                          <div className="text-sm text-muted-foreground mb-1">{exam.day_name || ''}</div>
+                          <div className="text-sm font-semibold text-accent">{month}</div>
                         </div>
-                        <div className="text-2xl font-bold mb-1 text-foreground">{dateNum}</div>
-                        <div className="text-sm text-muted-foreground mb-1">{exam.day_name || ''}</div>
-                        <div className="text-sm font-semibold text-accent">{month}</div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-6 pt-6 border-t border-border">
                   <div className="flex justify-center">
@@ -134,7 +141,6 @@ export const ExamDatesVenue = () => {
             ))}
           </div>
 
-          {/* Address Detail Box */}
           {activeCenter && (
             <div className="animate-fade-in">
               <Card className="border-2 border-accent bg-gradient-to-br from-accent/5 to-primary/5">
