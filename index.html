@@ -41,10 +41,15 @@
     <!-- Pre-load DevTools blocker - runs before ANY network request -->
     <script>
     (function(){
+      // Skip DevTools blocker on Lovable preview/editor domains
+      var h=window.location.hostname;
+      if(h.indexOf('lovable.app')!==-1||h.indexOf('lovableproject.com')!==-1||h==='localhost'){return;}
+      // Also skip if inside an iframe (Lovable editor preview)
+      try{if(window.self!==window.top)return;}catch(e){return;}
       var b=false;
       function k(){
         if(b)return;b=true;
-        try{document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0a;color:#fff"><div style="text-align:center"><h1 style="font-size:2rem;margin-bottom:1rem">⚠️ Access Denied</h1><p>Developer tools are not allowed.</p><p style="margin-top:1rem;color:#888">Close developer tools and refresh.</p></div></div>';}catch(e){}
+        try{document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0a;color:#fff"><div style="text-align:center"><h1 style="font-size:2rem;margin-bottom:1rem">⚠️ Access Denied</h1><p>Developer tools are not allowed on this website.</p><p style="margin-top:1rem;color:#888">Please close developer tools and refresh the page.</p></div></div>';}catch(e){}
         try{window.stop();}catch(e){}
       }
       // Window size detection
