@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Loader2, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
 interface ExamDate {
   id: string;
