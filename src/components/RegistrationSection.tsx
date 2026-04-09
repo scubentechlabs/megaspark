@@ -140,8 +140,10 @@ export const RegistrationSection = () => {
         return;
       }
 
-      if (slotCheck && !slotCheck.available) {
-        const reason = slotCheck.reason;
+      const slotResult = slotCheck as { available: boolean; reason: string } | null;
+
+      if (slotResult && !slotResult.available) {
+        const reason = slotResult.reason;
         if (reason === 'slot_full') {
           toast.error("Selected time slot is now full", {
             description: "Please go back and select a different time slot."
