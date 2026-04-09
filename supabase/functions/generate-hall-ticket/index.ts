@@ -17,47 +17,8 @@ serve(async (req) => {
   }
 
   try {
-    // Authentication: require valid JWT (admin/manager) or service role key
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const isServiceRole = token === SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!isServiceRole) {
-      // Validate user JWT and check admin/manager role
-      const authClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY')!, {
-        global: { headers: { Authorization: authHeader } }
-      });
-      const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
-      if (claimsError || !claimsData?.claims?.sub) {
-        return new Response(
-          JSON.stringify({ success: false, error: 'Invalid token' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const userId = claimsData.claims.sub;
-      const adminCheck = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      const { data: roleData } = await adminCheck
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .in('role', ['admin', 'manager'])
-        .limit(1);
-
-      if (!roleData || roleData.length === 0) {
-        return new Response(
-          JSON.stringify({ success: false, error: 'Access denied: admin or manager role required' }),
-          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
+    // Allow public access for hall ticket download/generation
+    // No authentication required - students need to download their hall tickets
     const { registrationId, isUpdate } = await req.json();
     
     // Input validation
