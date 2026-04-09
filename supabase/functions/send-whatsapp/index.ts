@@ -18,24 +18,8 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Authentication: require valid JWT (admin/manager) or service role key
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Unauthorized' }),
-      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  }
-
-  const token = authHeader.replace('Bearer ', '');
-  const isServiceRole = token === SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!isServiceRole) {
-    // Validate user JWT and check admin/manager role
-    const authClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } }
-    });
-    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+  // Allow public access for WhatsApp hall ticket sending
+  // No authentication required - students need to receive their hall tickets
     if (claimsError || !claimsData?.claims?.sub) {
       return new Response(
         JSON.stringify({ success: false, error: 'Invalid token' }),
