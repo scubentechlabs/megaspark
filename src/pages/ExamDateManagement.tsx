@@ -296,14 +296,29 @@ export default function ExamDateManagement() {
                     id="exam_date"
                     type="date"
                     value={formData.exam_date}
-                    onChange={(e) => setFormData({ ...formData, exam_date: e.target.value })}
+                    onChange={(e) => {
+                      const dateVal = e.target.value;
+                      if (dateVal) {
+                        const dateObj = new Date(dateVal + "T00:00:00");
+                        const dayName = format(dateObj, "EEEE"); // e.g., Sunday
+                        const label = format(dateObj, "d MMMM yyyy"); // e.g., 12 April 2026
+                        setFormData({
+                          ...formData,
+                          exam_date: dateVal,
+                          label,
+                          day_name: dayName,
+                        });
+                      } else {
+                        setFormData({ ...formData, exam_date: dateVal });
+                      }
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="label">Display Label *</Label>
                   <Input
                     id="label"
-                    placeholder="e.g., 30th November 2025"
+                    placeholder="e.g., 12 April 2026 (auto-filled from date)"
                     value={formData.label}
                     onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                   />
@@ -312,7 +327,7 @@ export default function ExamDateManagement() {
                   <Label htmlFor="day_name">Day Name</Label>
                   <Input
                     id="day_name"
-                    placeholder="e.g., Sunday"
+                    placeholder="e.g., Sunday (auto-filled from date)"
                     value={formData.day_name}
                     onChange={(e) => setFormData({ ...formData, day_name: e.target.value })}
                   />
