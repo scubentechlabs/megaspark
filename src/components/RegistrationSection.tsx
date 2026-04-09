@@ -160,7 +160,7 @@ export const RegistrationSection = () => {
         return;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('registrations')
         .insert({
           student_name: formData.studentName,
@@ -176,10 +176,8 @@ export const RegistrationSection = () => {
           time_slot: formData.timeSlot,
           exam_date: formData.examDate,
           preferred_exam_date: formData.examDate,
-          exam_center: 'PP Savani Cfe, Abrama Rd, Mota Varachha, Surat, Gujarat 394150'
-        } as any)
-        .select()
-        .single();
+          exam_center: formData.examCenter || 'ABRAMA'
+        } as any);
 
       if (error) {
         console.error('Database error:', error);
