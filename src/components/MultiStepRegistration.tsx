@@ -162,7 +162,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         return;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('registrations')
         .insert({
           student_name: formData.studentName,
@@ -179,9 +179,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
           exam_date: formData.examDate,
           preferred_exam_date: formData.examDate,
           exam_center: formData.examCenter
-        } as any)
-        .select()
-        .single();
+        } as any);
 
       if (error) {
         console.error('Database error:', error);
