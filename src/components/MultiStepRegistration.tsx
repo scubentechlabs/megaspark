@@ -186,7 +186,7 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
         throw error;
       }
 
-      console.log("Registration saved successfully:", data);
+      console.log("Registration saved successfully");
 
       toast.success("Registration Successful!", {
         description: "Redirecting to confirmation page..."
