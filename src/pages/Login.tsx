@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Smartphone, Download, ArrowLeft, Send, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { formatMedium, formatRegistrationNumber } from "@/lib/formatters";
+import { downloadFileFromUrl, openWhatsAppShare } from "@/lib/hallTicket";
 
 interface Registration {
   id: string;
@@ -108,30 +109,7 @@ export default function Login() {
   };
 
   const handleSendHallTicket = async (registrationId: string) => {
-    try {
-      toast.info("Sending...", {
-        description: "Generating and sending hall ticket via WhatsApp",
-      });
-
-      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
-        body: { registrationId }
-      });
-
-      if (error) throw error;
-
-      if (data?.success) {
-        toast.success("Success", {
-          description: "Hall ticket sent successfully via WhatsApp",
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to send hall ticket');
-      }
-    } catch (error: any) {
-      console.error("Error sending hall ticket:", error);
-      toast.error("Error", {
-        description: error.message || "Failed to send hall ticket",
-      });
-    }
+    return registrationId;
   };
 
   const formatTimeSlot = (slot: string | null) => {
@@ -149,56 +127,75 @@ export default function Login() {
   };
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+
+  const getHallTicketAccessUrl = async (registration: Registration) => {
+    const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
+      body: {
+        registrationId: registration.id,
+        sendWhatsapp: false,
+      }
+    });
+
+    if (error) throw error;
+
+    if (!data?.success || !data?.hallTicketUrl) {
+      throw new Error(data?.error || 'Failed to prepare hall ticket');
+    }
+
+    setRegistrations(prev => prev.map(r =>
+      r.id === registration.id ? { ...r, hall_ticket_url: data.hallTicketUrl } : r
+    ));
+
+    return data.hallTicketUrl as string;
+  };
+
+  const handleShareHallTicket = async (registration: Registration) => {
+    setSharingId(registration.id);
+
+    try {
+      toast.info("Preparing share link...", {
+        description: "Opening WhatsApp with your hall ticket",
+      });
+
+      const hallTicketUrl = await getHallTicketAccessUrl(registration);
+
+      openWhatsAppShare({
+        hallTicketUrl,
+        registrationNumber: formatRegistrationNumber(registration.registration_number),
+        studentName: registration.student_name,
+      });
+
+      toast.success("WhatsApp opened", {
+        description: "Your hall ticket link is ready to share.",
+      });
+    } catch (error: any) {
+      console.error("Error sharing hall ticket:", error);
+      toast.error("Share Failed", {
+        description: error.message || "Failed to prepare hall ticket sharing link.",
+      });
+    } finally {
+      setSharingId(null);
+    }
+  };
 
   const handleDownloadHallTicket = async (registration: Registration) => {
     setDownloadingId(registration.id);
     try {
-      // If hall ticket URL already exists, download directly
-      if (registration.hall_ticket_url) {
-        const link = document.createElement('a');
-        link.href = registration.hall_ticket_url;
-        link.target = '_blank';
-        link.download = `hall-ticket-${registration.registration_number || registration.id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success("Hall Ticket Downloaded!", {
-          description: "Your hall ticket PDF has been downloaded.",
-        });
-        return;
-      }
-
-      // Generate hall ticket PDF via edge function
-      toast.info("Generating PDF...", {
-        description: "Please wait while your hall ticket is being generated.",
+      toast.info("Preparing download...", {
+        description: "Please wait while your hall ticket is being prepared.",
       });
 
-      const { data, error } = await supabase.functions.invoke('generate-hall-ticket', {
-        body: { registrationId: registration.id }
+      const hallTicketUrl = await getHallTicketAccessUrl(registration);
+
+      await downloadFileFromUrl(
+        hallTicketUrl,
+        `hall-ticket-${registration.registration_number || registration.id}.pdf`
+      );
+
+      toast.success("Hall Ticket Downloaded!", {
+        description: "Your hall ticket PDF has been downloaded.",
       });
-
-      if (error) throw error;
-
-      if (data?.success && data?.hallTicketUrl) {
-        // Update local state with the new URL
-        setRegistrations(prev => prev.map(r => 
-          r.id === registration.id ? { ...r, hall_ticket_url: data.hallTicketUrl } : r
-        ));
-
-        const link = document.createElement('a');
-        link.href = data.hallTicketUrl;
-        link.target = '_blank';
-        link.download = `hall-ticket-${registration.registration_number || registration.id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        toast.success("Hall Ticket Downloaded!", {
-          description: "Your hall ticket PDF has been downloaded.",
-        });
-      } else {
-        throw new Error(data?.error || 'Failed to generate hall ticket');
-      }
     } catch (error: any) {
       console.error("Error downloading hall ticket:", error);
       toast.error("Download Failed", {
@@ -298,12 +295,17 @@ export default function Login() {
                             {downloadingId === registration.id ? 'Generating...' : 'Download'}
                           </Button>
                           <Button
-                            onClick={() => handleSendHallTicket(registration.id)}
+                            onClick={() => handleShareHallTicket(registration)}
                             variant="default"
                             className="gap-2"
+                            disabled={sharingId === registration.id || downloadingId === registration.id}
                           >
-                            <Send className="h-4 w-4" />
-                            WhatsApp
+                            {sharingId === registration.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Send className="h-4 w-4" />
+                            )}
+                            {sharingId === registration.id ? 'Opening...' : 'WhatsApp'}
                           </Button>
                         </div>
                       </div>

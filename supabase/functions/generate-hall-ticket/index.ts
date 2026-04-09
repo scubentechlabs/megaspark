@@ -19,7 +19,7 @@ serve(async (req) => {
   try {
     // Allow public access for hall ticket download/generation
     // No authentication required - students need to download their hall tickets
-    const { registrationId, isUpdate } = await req.json();
+    const { registrationId, isUpdate, sendWhatsapp } = await req.json();
     
     // Input validation
     if (!registrationId || typeof registrationId !== 'string' || registrationId.length > 100) {
@@ -42,6 +42,78 @@ serve(async (req) => {
 
     if (fetchError || !registration) {
       throw new Error('Registration not found');
+    }
+
+    const shouldSendWhatsapp = sendWhatsapp ?? true;
+    const signedUrlExpiry = 60 * 60 * 24 * 365;
+    const filePrefix = isUpdate ? 'updated-hall-ticket-' : 'hall-ticket-';
+    const fileName = `${filePrefix}${registration.registration_number || registrationId}.pdf`;
+    const downloadFileName = `${registration.registration_number || registrationId}.pdf`;
+
+    const syncHallTicketUrl = async (url: string) => {
+      const { error } = await supabase
+        .from('registrations')
+        .update({ hall_ticket_url: url })
+        .eq('id', registrationId);
+
+      if (error) {
+        console.error('Update error:', error);
+      }
+    };
+
+    const createSignedHallTicketUrl = async (path: string) => {
+      const { data, error } = await supabase.storage
+        .from('hall-tickets')
+        .createSignedUrl(path, signedUrlExpiry, {
+          download: downloadFileName,
+        });
+
+      if (error) {
+        console.log('Signed URL not available yet:', error.message);
+        return null;
+      }
+
+      return data.signedUrl;
+    };
+
+    const queueWhatsappShare = (hallTicketUrl: string) => {
+      if (!shouldSendWhatsapp) return;
+
+      console.log('Triggering WhatsApp message (non-blocking)...');
+      const whatsappPhone = registration.whatsapp_number || registration.mobile_number;
+      const whatsappUrl = `${SUPABASE_URL}/functions/v1/send-whatsapp`;
+
+      fetch(whatsappUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+        body: JSON.stringify({
+          phoneNumber: whatsappPhone,
+          messageType: 'hall_ticket',
+          registrationId,
+          registrationNumber: registration.registration_number || 'Hall-Ticket',
+          messageBody: hallTicketUrl,
+        }),
+      }).catch(err => console.error('WhatsApp fire-and-forget error:', err));
+    };
+
+    if (!isUpdate) {
+      const existingSignedUrl = await createSignedHallTicketUrl(fileName);
+
+      if (existingSignedUrl) {
+        await syncHallTicketUrl(existingSignedUrl);
+        queueWhatsappShare(existingSignedUrl);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            hallTicketUrl: existingSignedUrl,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Format time slot
@@ -445,8 +517,6 @@ serve(async (req) => {
     console.log('PDF created, uploading to storage...');
 
     // Upload PDF to Supabase Storage
-    const filePrefix = isUpdate ? 'updated-hall-ticket-' : 'hall-ticket-';
-    const fileName = `${filePrefix}${registration.registration_number || registrationId}.pdf`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('hall-tickets')
       .upload(fileName, pdfBytes, {
@@ -459,49 +529,21 @@ serve(async (req) => {
       throw uploadError;
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('hall-tickets')
-      .getPublicUrl(fileName);
+    const hallTicketUrl = await createSignedHallTicketUrl(fileName);
 
-    console.log('PDF uploaded, URL:', publicUrl);
-
-    // Update registration with hall ticket URL
-    const { error: updateError } = await supabase
-      .from('registrations')
-      .update({ hall_ticket_url: publicUrl })
-      .eq('id', registrationId);
-
-    if (updateError) {
-      console.error('Update error:', updateError);
-      throw updateError;
+    if (!hallTicketUrl) {
+      throw new Error('Failed to create secure hall ticket link');
     }
 
-    // Send WhatsApp message with hall ticket (fire-and-forget, don't block response)
-    console.log('Triggering WhatsApp message (non-blocking)...');
-    const whatsappPhone = registration.whatsapp_number || registration.mobile_number;
-    
-    // Use fetch directly for fire-and-forget instead of supabase.functions.invoke which blocks
-    const whatsappUrl = `${SUPABASE_URL}/functions/v1/send-whatsapp`;
-    fetch(whatsappUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-      body: JSON.stringify({
-        phoneNumber: whatsappPhone,
-        messageType: 'hall_ticket',
-        registrationId: registrationId,
-        registrationNumber: registration.registration_number || 'Hall-Ticket',
-        messageBody: publicUrl,
-      }),
-    }).catch(err => console.error('WhatsApp fire-and-forget error:', err));
+    console.log('PDF uploaded, signed URL created');
+
+    await syncHallTicketUrl(hallTicketUrl);
+    queueWhatsappShare(hallTicketUrl);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        hallTicketUrl: publicUrl 
+        hallTicketUrl 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
