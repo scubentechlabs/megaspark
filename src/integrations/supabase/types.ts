@@ -693,6 +693,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_manager: { Args: { _user_id: string }; Returns: boolean }
+      verify_slot_availability: {
+        Args: { _exam_date: string; _slot_name: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "manager" | "user"

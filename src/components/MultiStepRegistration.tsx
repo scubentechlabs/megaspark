@@ -128,41 +128,35 @@ export const MultiStepRegistration = ({ onClose }: MultiStepRegistrationProps) =
     try {
       console.log('Starting registration save with data:', formData);
 
-      // Verify slot availability before registration
-      const { data: slotData, error: slotError } = await supabase
-        .from('slot_settings')
-        .select('*')
-        .eq('slot_name', formData.timeSlot)
-        .single();
+      // Verify slot availability using server-side RPC function
+      const { data: slotCheck, error: slotCheckError } = await supabase
+        .rpc('verify_slot_availability', {
+          _slot_name: formData.timeSlot || 'morning',
+          _exam_date: formData.examDate
+        });
 
-      if (slotError || !slotData) {
+      if (slotCheckError) {
+        console.error('Slot verification error:', slotCheckError);
         toast.error("Error verifying slot availability");
         setIsSubmitting(false);
         return;
       }
 
-      // Check if slot is enabled and has capacity
-      if (!slotData.is_enabled || slotData.current_count >= slotData.max_capacity) {
-        toast.error("Selected time slot is now full", {
-          description: "Please go back and select a different time slot."
-        });
-        setIsSubmitting(false);
-        setCurrentStep(3); // Go back to slot selection step
-        return;
-      }
+      const slotResult = slotCheck as { available: boolean; reason: string } | null;
 
-      // Check date-specific overrides
-      const { data: dateSlotData } = await supabase
-        .from('slot_date_settings')
-        .select('*')
-        .eq('exam_date', formData.examDate)
-        .eq('slot_name', formData.timeSlot)
-        .maybeSingle();
-
-      if (dateSlotData && !dateSlotData.is_enabled) {
-        toast.error("Selected time slot is not available for this date", {
-          description: "Please go back and select a different time slot or date."
-        });
+      if (slotResult && !slotResult.available) {
+        const reason = slotResult.reason;
+        if (reason === 'slot_full') {
+          toast.error("Selected time slot is now full", {
+            description: "Please go back and select a different time slot."
+          });
+        } else if (reason === 'date_slot_disabled') {
+          toast.error("Selected time slot is not available for this date", {
+            description: "Please go back and select a different time slot or date."
+          });
+        } else {
+          toast.error("Selected time slot is not available");
+        }
         setIsSubmitting(false);
         setCurrentStep(3);
         return;
