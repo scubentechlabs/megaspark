@@ -20,29 +20,6 @@ serve(async (req) => {
 
   // Allow public access for WhatsApp hall ticket sending
   // No authentication required - students need to receive their hall tickets
-    if (claimsError || !claimsData?.claims?.sub) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const userId = claimsData.claims.sub;
-    const adminCheck = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { data: roleData } = await adminCheck
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .in('role', ['admin', 'manager'])
-      .limit(1);
-
-    if (!roleData || roleData.length === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Access denied: admin or manager role required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-  }
 
   let messageId: string | null = null;
   try {
