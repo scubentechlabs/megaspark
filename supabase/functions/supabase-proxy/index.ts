@@ -103,9 +103,11 @@ serve(async (req) => {
       }
     }
 
-    const responseBody = await upstreamResponse.arrayBuffer();
+    // Null-body statuses (204, 304) must NOT have a body
+    const isNullBody = upstreamResponse.status === 204 || upstreamResponse.status === 304;
+    const responseBody = isNullBody ? null : await upstreamResponse.arrayBuffer();
 
-    return new Response(responseBody, {
+    return new Response(isNullBody ? null : responseBody, {
       status: upstreamResponse.status,
       statusText: upstreamResponse.statusText,
       headers: responseHeaders,
