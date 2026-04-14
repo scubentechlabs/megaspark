@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { Loader2, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { format, parse } from "date-fns";
+import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 interface ExamDate {
   id: string;
@@ -25,6 +26,7 @@ interface ExamDate {
 
 export default function ExamDateManagement() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [examDates, setExamDates] = useState<ExamDate[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -73,6 +75,13 @@ export default function ExamDateManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const syncExamDateViews = async () => {
+    await Promise.all([
+      fetchExamDates(),
+      queryClient.invalidateQueries({ queryKey: ["examDates"] }),
+    ]);
   };
 
   const openAddDialog = () => {
@@ -137,7 +146,7 @@ export default function ExamDateManagement() {
       }
 
       setDialogOpen(false);
-      fetchExamDates();
+      await syncExamDateViews();
     } catch (error: any) {
       console.error("Error saving exam date:", error);
       toast.error(error.message || "Failed to save exam date");
@@ -160,7 +169,7 @@ export default function ExamDateManagement() {
       toast.success("Exam date deleted successfully");
       setDeleteDialogOpen(false);
       setDeletingDate(null);
-      fetchExamDates();
+      await syncExamDateViews();
     } catch (error: any) {
       console.error("Error deleting exam date:", error);
       toast.error(error.message || "Failed to delete exam date");
@@ -178,7 +187,7 @@ export default function ExamDateManagement() {
 
       if (error) throw error;
       toast.success(`Exam date ${!examDate.is_active ? "enabled" : "disabled"}`);
-      fetchExamDates();
+      await syncExamDateViews();
     } catch (error) {
       console.error("Error toggling exam date:", error);
       toast.error("Failed to update exam date");
