@@ -5,6 +5,23 @@ import { useActiveStandards } from "@/hooks/useStandards";
 export const EligibilityCriteria = () => {
   const { data: standards = [], isLoading } = useActiveStandards();
 
+  const getRangeText = () => {
+    if (!standards.length) return "";
+    const nums = standards
+      .map((s) => parseInt(s.value, 10))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => a - b);
+    if (!nums.length) return `${standards.length} standards available`;
+    const min = nums[0];
+    const max = nums[nums.length - 1];
+    const ord = (n: number) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+    return min === max ? `Standard ${ord(min)}` : `Standard ${ord(min)} to ${ord(max)}`;
+  };
+
   return (
     <section id="eligibility" className="py-12 bg-background relative overflow-hidden">
       {/* Background decorative elements */}
@@ -21,7 +38,9 @@ export const EligibilityCriteria = () => {
             Eligibility
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Open to students in both Gujarati and English mediums
+            {standards.length > 0
+              ? `Open to students from ${getRangeText()} in both Gujarati and English mediums`
+              : "Open to students in both Gujarati and English mediums"}
           </p>
         </div>
 
