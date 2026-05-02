@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock, Calendar } from "lucide-react";
+import { BarChart3, FileText, Settings, Users, CreditCard, LayoutDashboard, Tag, MessageSquare, LogOut, User, Mail, Activity, UserCog, Clock, Calendar, GraduationCap } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { forceLocalSignOut, supabase } from "@/lib/supabaseProxy";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,6 +32,7 @@ export function AdminSidebar() {
     { title: "User Management", icon: UserCog, path: "/admin/user-management" },
     { title: "Slot Management", icon: Clock, path: "/admin/slots" },
     { title: "Exam Dates", icon: Calendar, path: "/admin/exam-dates" },
+    { title: "Standards", icon: GraduationCap, path: "/admin/standards" },
     { title: "Coupons", icon: Tag, path: "/admin/coupons" },
     { title: "WhatsApp", icon: MessageSquare, path: "/admin/whatsapp" },
     { title: "Newsletter", icon: Mail, path: "/admin/newsletter" },

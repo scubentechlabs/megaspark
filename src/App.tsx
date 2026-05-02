@@ -25,6 +25,7 @@ import ActiveSessions from "./pages/ActiveSessions";
 import UserManagement from "./pages/UserManagement";
 import SlotManagement from "./pages/SlotManagement";
 import ExamDateManagement from "./pages/ExamDateManagement";
+import StandardManagement from "./pages/StandardManagement";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -161,6 +162,7 @@ const App = () => {
         <Route path="/admin/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
         <Route path="/admin/slots" element={<ProtectedRoute><SlotManagement /></ProtectedRoute>} />
         <Route path="/admin/exam-dates" element={<ProtectedRoute><ExamDateManagement /></ProtectedRoute>} />
+        <Route path="/admin/standards" element={<ProtectedRoute><StandardManagement /></ProtectedRoute>} />
         <Route path="/admin/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
         <Route path="/admin/whatsapp" element={<ProtectedRoute><WhatsAppManagement /></ProtectedRoute>} />
         <Route path="/admin/newsletter" element={<ProtectedRoute><NewsletterManagement /></ProtectedRoute>} />
