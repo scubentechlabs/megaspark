@@ -1,16 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, GraduationCap } from "lucide-react";
-
-const standards = [
-  { grade: "5th", name: "Standard 5" },
-  { grade: "6th", name: "Standard 6" },
-  { grade: "7th", name: "Standard 7" },
-  { grade: "8th", name: "Standard 8" },
-  { grade: "9th", name: "Standard 9" },
-  { grade: "10th", name: "Standard 10" }
-];
+import { BookOpen, GraduationCap, Loader2 } from "lucide-react";
+import { useActiveStandards } from "@/hooks/useStandards";
 
 export const EligibilityCriteria = () => {
+  const { data: standards = [], isLoading } = useActiveStandards();
+
   return (
     <section id="eligibility" className="py-12 bg-background relative overflow-hidden">
       {/* Background decorative elements */}
@@ -27,7 +21,7 @@ export const EligibilityCriteria = () => {
             Eligibility
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Open to students from Standard 5th to 10th in both Gujarati and English mediums
+            Open to students in both Gujarati and English mediums
           </p>
         </div>
 
@@ -43,16 +37,22 @@ export const EligibilityCriteria = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <div className="grid grid-cols-3 gap-2">
-                {standards.map((standard, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-center p-3 rounded-lg bg-secondary/50 border border-border"
-                  >
-                    <span className="font-semibold text-sm text-foreground">{standard.name}</span>
-                  </div>
-                ))}
-              </div>
+              {isLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : standards.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8 text-sm">No standards available</p>
+              ) : (
+                <div className="grid grid-cols-3 gap-2">
+                  {standards.map((standard) => (
+                    <div
+                      key={standard.id}
+                      className="flex items-center justify-center p-3 rounded-lg bg-secondary/50 border border-border"
+                    >
+                      <span className="font-semibold text-sm text-foreground">{standard.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -68,16 +68,22 @@ export const EligibilityCriteria = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4">
-              <div className="grid grid-cols-3 gap-2">
-                {standards.map((standard, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-center p-3 rounded-lg bg-secondary/50 border border-border"
-                  >
-                    <span className="font-semibold text-sm text-foreground">{standard.name}</span>
-                  </div>
-                ))}
-              </div>
+              {isLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-accent" /></div>
+              ) : standards.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8 text-sm">No standards available</p>
+              ) : (
+                <div className="grid grid-cols-3 gap-2">
+                  {standards.map((standard) => (
+                    <div
+                      key={standard.id}
+                      className="flex items-center justify-center p-3 rounded-lg bg-secondary/50 border border-border"
+                    >
+                      <span className="font-semibold text-sm text-foreground">{standard.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
