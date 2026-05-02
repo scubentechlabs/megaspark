@@ -5,6 +5,23 @@ import { useActiveStandards } from "@/hooks/useStandards";
 export const EligibilityCriteria = () => {
   const { data: standards = [], isLoading } = useActiveStandards();
 
+  const getRangeText = () => {
+    if (!standards.length) return "";
+    const nums = standards
+      .map((s) => parseInt(s.value, 10))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => a - b);
+    if (!nums.length) return `${standards.length} standards available`;
+    const min = nums[0];
+    const max = nums[nums.length - 1];
+    const ord = (n: number) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+    return min === max ? `Standard ${ord(min)}` : `Standard ${ord(min)} to ${ord(max)}`;
+  };
+
   return (
     <section id="eligibility" className="py-12 bg-background relative overflow-hidden">
       {/* Background decorative elements */}
