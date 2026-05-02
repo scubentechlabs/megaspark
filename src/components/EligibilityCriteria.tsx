@@ -38,7 +38,9 @@ export const EligibilityCriteria = () => {
             Eligibility
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Open to students in both Gujarati and English mediums
+            {standards.length > 0
+              ? `Open to students from ${getRangeText()} in both Gujarati and English mediums`
+              : "Open to students in both Gujarati and English mediums"}
           </p>
         </div>
 
