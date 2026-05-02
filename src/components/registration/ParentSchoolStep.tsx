@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useActiveStandards } from "@/hooks/useStandards";
 
 interface ParentSchoolStepProps {
   formData: any;
@@ -8,6 +9,7 @@ interface ParentSchoolStepProps {
 }
 
 export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepProps) => {
+  const { data: standards = [], isLoading: loadingStandards } = useActiveStandards();
   const handlePercentageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^\d.]/g, ''); // Allow only digits and decimal point
     
@@ -38,14 +40,17 @@ export const ParentSchoolStep = ({ formData, updateFormData }: ParentSchoolStepP
             <SelectValue placeholder="Select your standard" />
           </SelectTrigger>
           <SelectContent className="bg-background z-50">
-            <SelectItem value="5">Standard 5</SelectItem>
-            <SelectItem value="6">Standard 6</SelectItem>
-            <SelectItem value="7">Standard 7</SelectItem>
-            <SelectItem value="8">Standard 8</SelectItem>
-            <SelectItem value="9">Standard 9</SelectItem>
-            <SelectItem value="10">Standard 10</SelectItem>
-            <SelectItem value="11">Standard 11</SelectItem>
-            <SelectItem value="12">Standard 12</SelectItem>
+            {loadingStandards ? (
+              <div className="px-2 py-2 text-sm text-muted-foreground">Loading...</div>
+            ) : standards.length === 0 ? (
+              <div className="px-2 py-2 text-sm text-muted-foreground">No standards available</div>
+            ) : (
+              standards.map((s) => (
+                <SelectItem key={s.id} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>
